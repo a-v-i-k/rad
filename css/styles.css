@@ -1,0 +1,314 @@
+html {
+  user-select: none;
+}
+main {
+  background: honeydew;
+  /* border: 3px solid saddlebrown; */
+  border-radius: 10px;
+
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- TOP --- */
+#top-frame {
+  background: #3399ff; /* royalblue; */
+  border: 3px solid saddlebrown;
+  border-radius: 10px;
+  border-style: groove; /* ridge; */
+  margin: 5px 5px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: auto;
+  gap: 10px;
+  align-items: center;
+  justify-items: center;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #top-frame {
+    grid-template-columns: repeat(5, 1fr); /* 480px 120px; */
+  }
+}
+
+/* --- TITLE --- */
+#title-frame {
+  color: indigo;
+  background: honeydew;
+  width: 300px;
+  height: 40px;
+  border: 5px solid saddlebrown;
+  border-radius: 10px;
+  margin: 10px 0;
+
+  grid-row: 1;
+  grid-column: 1 / 4;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #title-frame {
+    height: 50px;
+    grid-column: 1 / 6;
+  }
+}
+#title-header {
+  font-size: 200%;
+  font-weight: bold;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #title-header {
+    font-size: 250%;
+  }
+}
+
+/* --- PANEL --- */
+#panel-frame {
+  width: 300px;
+  height: 40px;
+  background: peru;
+  border: 5px solid saddlebrown;
+  border-radius: 10px;
+
+  grid-row: 2;
+  grid-column: 1 / 4;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #panel-frame {
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    margin-right: 10px;
+    grid-row: 2 / 5;
+    grid-column: 5;
+    flex-direction: column;
+    justify-content: unset;
+    align-items: unset;
+  }
+}
+#panel-frame .button {
+  width: 22%;
+  height: 80%;
+  border: 3px solid saddlebrown;
+  border-radius: 6px;
+  margin: 3px 0;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  justify-content: center;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #panel-frame .button {
+    width: unset;
+    height: unset;
+    padding: 5px 5px;
+    border-radius: 10px;
+    margin: 5px 5px;
+    font-size: 30px;
+  }
+}
+#panel-frame .button:hover {
+  background-color: aliceblue;
+}
+@media only screen and (min-width: 800px) {
+  /* RWD */
+  #panel-frame .button:hover {
+    color: gold;
+  }
+}
+
+/* --- GAME --- */
+#display-frame {
+  margin: 10px;
+
+  grid-row: 4 / 7;
+  grid-column: 1 / 4;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #display-frame {
+    grid-row: 2 / 5;
+    grid-column: 2 / 5;
+  }
+}
+#display-canvas {
+  outline: thick solid saddlebrown;
+  display: block;
+}
+
+/* --- TIMER --- */
+#timer-frame {
+  grid-row: 3;
+  grid-column: 2 / 4;
+
+  display: block;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #timer-frame {
+    margin-left: 20px;
+    grid-row: 2;
+    grid-column: 1;
+    justify-self: left;
+  }
+}
+#timer-watch {
+  padding: 5px 10px;
+  border: 5px solid saddlebrown;
+  background: black;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: lighter;
+}
+label {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* --- RANDY --- */
+#randy-frame {
+  grid-row: 3;
+  grid-column: 1;
+  justify-self: right;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #randy-frame {
+    margin-top: 30px;
+    margin-left: 20px;
+    grid-row: 3;
+    grid-column: 1;
+    justify-self: left;
+  }
+}
+select {
+  display: block;
+  margin-top: 5px;
+}
+
+/* --- QUOTE --- */
+#quote {
+  background: white;
+  outline: thick solid black;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media only screen and (min-width: 600px) {
+  /* RWD */
+  #quote {
+    background: white;
+    border-radius: 10px;
+  }
+}
+
+/* --- LOGO --- */
+/* #logo {
+  background: #f0f0f0;
+  border: 3px solid saddlebrown;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#logo img {
+  max-height: 90%;
+  max-width: auto;
+} */
+
+#stones-grid {
+  outline: thick solid gold;
+  border-radius: 5%;
+  background-color: goldenrod;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  justify-content: space-evenly;
+  justify-items: center;
+  align-content: space-evenly;
+  align-items: center;
+}
+.stone {
+  padding: 20% 30%;
+  outline: medium solid black;
+  border: 0.5em outset;
+}
+/* Priestly breastplate (חושן): https://he.wikipedia.org/wiki/%D7%97%D7%95%D7%A9%D7%9F
+ * - Ruby (אודם): #e0115f
+ * - Emerald (ברקת): #50c878
+ * - Topaz (פטדה): #ffc87c
+ * - Garnet (נופך): #733635
+ * - Sapphire (ספיר): #0f52ba
+ * - Diamond (יהלום): #b9f2ff
+ * - Opal (לשם): #a8c3bc
+ * - Agate (שבו): #ccc7bf
+ * - Amethyst (אחלמה): #9966cc
+ * - Aquamarine (תרשיש): #7fffd4
+ * - Onyx (שוהם): #353839
+ * - Jasper (ישפה): #d73b3e
+ */
+#ruby {
+  border-color: #e0115f;
+  background-color: #e0115f;
+}
+#emerald {
+  border-color: #50c878;
+  background-color: #50c878;
+}
+#topaz {
+  border-color: #ffc87c;
+  background-color: #ffc87c;
+}
+#garnet {
+  border-color: #733635;
+  background-color: #733635;
+}
+#sapphire {
+  border-color: #0f52ba;
+  background-color: #0f52ba;
+}
+#diamond {
+  border-color: #b9f2ff;
+  background-color: #b9f2ff;
+}
+#opal {
+  border-color: #a8c3bc;
+  background-color: #a8c3bc;
+}
+#agate {
+  border-color: #ccc7bf;
+  background-color: #ccc7bf;
+}
+#amethyst {
+  border-color: #9966cc;
+  background-color: #9966cc;
+}
+#aquamarine {
+  border-color: #7fffd4;
+  background-color: #7fffd4;
+}
+#onyx {
+  border-color: #353839;
+  background-color: #353839;
+}
+#jasper {
+  border-color: #d73b3e;
+  background-color: #d73b3e;
+}

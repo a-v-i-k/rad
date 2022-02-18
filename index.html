@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="Find the golder door using your memory and luck."
+    />
+    <meta name="author" content="Avi Kaplan" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="css/styles.css" type="text/css" />
+
+    <!-- LIBRARY -->
+    <!-- <script type="module" src="script/library/errors.js"></script>
+    <script type="module" src="script/library/random.js"></script>
+    <script type="module" src="script/library/linkedlist.js"></script>
+    <script type="module" src="script/library/unionfind.js"></script>
+    <script type="module" src="script/library/graph.js"></script>
+    <script type="module" src="script/library/graphutils.js"></script>
+    <script type="module" src="script/library/quotes.js"></script> -->
+
+    <!-- GAME -->
+    <!-- <script type="module" src="script/game/location.js"></script>
+    <script type="module" src="script/game/direction.js"></script>
+    <script type="module" src="script/game/topology.js"></script>
+    <script type="module" src="script/game/element.js"></script>
+    <script type="module" src="script/game/door.js"></script>
+    <script type="module" src="script/game/cell.js"></script>
+    <script type="module" src="script/game/grid.js"></script>
+    <script type="module" src="script/game/room.js"></script>
+    <script type="module" src="script/game/position.js"></script>
+    <script type="module" src="script/game/player.js"></script>
+    <script type="module" src="script/game/network.js"></script>
+    <script type="module" src="script/game/game.js"></script> -->
+
+    <!-- TEST -->
+    <!-- <script type="module" src="script/test/random-walker.js"></script>
+    <script type="module" src="script/test/game-tester.js"></script> -->
+
+    <!-- GUI -->
+    <!-- <script type="module" src="script/gui/bounding-box.js"></script>
+    <script type="module" src="script/gui/style.js"></script>
+    <script type="module" src="script/gui/styler.js"></script>
+    <script type="module" src="script/gui/drawer.js"></script>
+    <script type="module" src="script/gui/displayer.js"></script>
+    <script type="module" src="script/gui/scheduler.js"></script>
+    <script type="module" src="script/gui/timed-iterator.js"></script>
+    <script type="module" src="script/gui/timer.js"></script>
+    <script type="module" src="script/gui/random-path.js"></script>
+    <script type="module" src="script/gui/randy.js"></script>
+    <script type="module" src="script/gui/randy-manager.js"></script>
+    <script type="module" src="script/gui/gui.js"></script> -->
+
+    <!-- QUESTION: Do I need to upload all javascript files or is it enough to
+    upload only main.js? -->
+    <script type="module" src="script/main.js"></script>
+    <noscript>Sorry, your browser does not support JavaScript.</noscript>
+
+    <title></title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+    <!-- TODO: Make better favicon (https://www.favicon.cc/) -->
+
+    <!-- <base href="https://avikap.com/25rooms"> -->
+  </head>
+
+  <body>
+    <main>
+      <div id="top-frame" class="widget frame">
+        <!-- TITLE -->
+        <div id="title-frame" class="widget frame">
+          <h1 id="title-header" class="widget header">25 Rooms</h1>
+        </div>
+
+        <!-- PANEL -->
+        <div id="panel-frame" class="widget frame">
+          <button
+            id="play"
+            class="widget button"
+            type="button"
+            onclick="this.blur();"
+          >
+            Play
+          </button>
+          <button
+            id="pause"
+            class="widget button"
+            type="button"
+            onclick="this.blur();"
+          >
+            Pause
+          </button>
+          <button
+            id="reset"
+            class="widget button"
+            type="button"
+            onclick="this.blur();"
+          >
+            Reset
+          </button>
+          <button
+            id="stop"
+            class="widget button"
+            type="button"
+            onclick="this.blur();"
+          >
+            Stop
+          </button>
+        </div>
+
+        <!-- DISPLAY -->
+        <div id="display-frame" class="widget frame">
+          <div
+            id="loading"
+            style="color: indigo; font-weight: bold; font-size: 26px"
+          >
+            Loading...
+          </div>
+        </div>
+
+        <!-- TIMER -->
+        <div id="timer-frame" class="widget frame">
+          <label for="timer-checkbox" class="widget label">Timer</label>
+          <input
+            type="checkbox"
+            id="timer-checkbox"
+            class="widget checkbox"
+            checked
+          />
+          <div id="timer-watch" class="widget timer" style="color: gray">
+            00:00
+          </div>
+        </div>
+
+        <!-- RANDY -->
+        <div id="randy-frame" class="widget frame">
+          <label for="randy-control" class="widget label">Randys</label>
+          <select id="randy-control" class="widget select">
+            <option value="None">None</option>
+          </select>
+        </div>
+      </div>
+    </main>
+
+    <!-- SOUND -->
+    <!-- Free Sound Effects: https://www.zapsplat.com/ -->
+    <audio
+      id="start"
+      src="sound/welcome.mp3"
+      preload="auto"
+      controls="none"
+      style="display: none"
+    ></audio>
+    <audio
+      id="enter"
+      src="sound/enter.mp3"
+      preload="auto"
+      controls="none"
+      style="display: none"
+    ></audio>
+    <audio
+      id="time-is-up"
+      src="sound/time-is-up.mp3"
+      preload="auto"
+      controls="none"
+      style="display: none"
+    ></audio>
+    <audio
+      id="randy-done"
+      src="sound/randy-done.mp3"
+      preload="auto"
+      controls="none"
+      style="display: none"
+    ></audio>
+    <audio
+      id="pause-sound"
+      src="sound/pause-sound.mp3"
+      preload="auto"
+      controls="none"
+      style="display: none"
+    ></audio>
+    <audio
+      id="triumph"
+      src="sound/triumph.mp3"
+      preload="auto"
+      controls="none"
+      style="display: none"
+    ></audio>
+  </body>
+</html>
