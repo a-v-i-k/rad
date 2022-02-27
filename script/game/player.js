@@ -79,18 +79,14 @@ const Player = class extends Element {
     this.#validateState(Player.State.PLAYING);
     console.assert(this.#position !== null); // sanity check
 
-    if (this.#position.room.isWelcomeLocation(this.#position.loc)) {
-      this.backtrack(); // go back to previous room
+    const door = this.#position.room.peek(this.#position.loc);
+    if (door === null) {
+      console.log("Nothing to inspect...");
     } else {
-      const door = this.#position.room.peek(this.#position.loc);
-      if (door === null) {
-        console.log("Nothing to inspect...");
-      } else {
-        const record = this.getPosition();
-        this.#trace.push(record);
-        this.exit();
-        this.enter(door.open());
-      }
+      const record = this.getPosition();
+      this.#trace.push(record);
+      this.exit();
+      this.enter(door.open());
     }
   }
 
