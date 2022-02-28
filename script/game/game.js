@@ -1,8 +1,8 @@
 /* --- IMPORTS --- */
 // import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
-import Topology from "./topology.js";
-import Network from "./network.js";
+import Door, { ExitDoor } from "./door.js";
+import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
 import { ETypeError, ERangeError, StateError } from "../library/errors.js";
@@ -27,11 +27,13 @@ const DEFAULT_NUM_PLAYERS = 1;
  *****************************************************************************/
 const Game = class {
   #state;
-  #network;
   #players;
   #rows;
   #columns;
   #numRooms;
+  #rooms;
+  #entryRoom;
+  #exitRoom;
 
   /* --- INNER: State --- */
   static State = GameState;
@@ -44,7 +46,7 @@ const Game = class {
     this.#numRooms = rows * columns;
 
     this.#setState(Game.State.IDLE);
-    this.#network = new Network();
+    this.#rooms = null;
     this.#players = [];
   }
 
@@ -108,7 +110,7 @@ const Game = class {
     this.#createPlayers(numPlayers);
     for (let i = 0; i < numPlayers; i++) {
       this.#players[i].play(); // start playing
-      this.#network.register(this.#players[i]); // register player in network
+      this.#players[i].enter(this.#entryRoom); // let player in
     }
 
     this.#setState(Game.State.PLAYING);
@@ -138,7 +140,7 @@ const Game = class {
     }
 
     for (let i = 0; i < this.getNumPlayers(); i++) {
-      this.#network.deregister(this.#players[i]);
+      this.#players[i].exit(); // let player out
       this.#players[i].stop();
     }
     this.#players = [];
@@ -164,7 +166,7 @@ const Game = class {
 
     const player = this.#players[index];
     player.inspect();
-    if (this.#network.finished(player)) {
+    if (player.getPosition().room === this.#exitRoom) {
       console.log(`Player ${index} has won the game!`);
       this.stop();
       return true;
@@ -214,16 +216,49 @@ const Game = class {
 
   /* --- METHOD: #createNetwork --- */
   #createNetwork() {
+    console.assert(this.getState() === Game.State.IDLE); // sanity check
+
+    // create underlying graph
     const graph = this.#getGraph(this.getNumRooms());
     const endpoints = this.#getEndpoints(graph); // source, target
-    const dimensions = this.getDimensions(); // rows, columns
-    const topology = new Topology(graph, endpoints[0], endpoints[1]);
-    this.#network.build(topology, dimensions[0], dimensions[1]);
+
+    // create rooms
+    this.#rooms = {};
+    graph.V().forEach((u) => {
+      this.#rooms[u] = new Room(this.#rows, this.#columns);
+    });
+
+    // create and add doors to rooms
+    graph.V().forEach((u) => {
+      // no doors in exit room
+      if (u !== endpoints[1]) {
+        graph.neighbors(u).forEach((v) => {
+          let DoorType;
+          if (v === endpoints[1]) {
+            DoorType = ExitDoor;
+          } else {
+            DoorType = Door;
+          }
+          const door = new DoorType(this.#rooms[v]);
+          this.#rooms[u].addDoor(door);
+        });
+      }
+    });
+
+    // set entry and exit rooms
+    this.#entryRoom = this.#rooms[endpoints[0]];
+    this.#exitRoom = this.#rooms[endpoints[1]];
   }
 
   /* --- METHOD: #destroyNetwork --- */
   #destroyNetwork() {
-    this.#network.destroy();
+    console.assert(this.getState() === Game.State.PLAYING); // sanity check
+
+    // clear rooms (door detachments prevent circular references)
+    for (const id in this.#rooms) {
+      this.#rooms[id].clear();
+    }
+    this.#rooms = null;
   }
 
   /* --- METHOD: #createPlayers --- */
