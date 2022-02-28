@@ -9,7 +9,6 @@ import { ETypeError, ERangeError, StateError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Game as default };
-export { DEFAULT_NUM_ROWS, DEFAULT_NUM_COLUMNS, DEFAULT_NUM_PLAYERS };
 
 /* --- ENUM: GameState --- */
 const GameState = {
