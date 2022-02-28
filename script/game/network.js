@@ -41,11 +41,6 @@ const Network = class {
     return this.#state;
   }
 
-  /* --- METHOD: getVisitors --- */
-  getVisitors() {
-    return Object.keys(this.#visitors);
-  }
-
   /* --- METHOD: build --- */
   build(topology, rows, columns) {
     this.#validateState(Network.State.DISABLED);
