@@ -220,21 +220,22 @@ const Game = class {
 
     // create underlying graph
     const graph = this.#getGraph(this.getNumRooms());
-    const endpoints = this.#getEndpoints(graph); // source, target
+    const [source, target] = this.#getEndpoints(graph); // source, target
 
     // create rooms
+    const [rows, columns] = this.getDimensions();
     this.#rooms = {};
     graph.V().forEach((u) => {
-      this.#rooms[u] = new Room(this.#rows, this.#columns);
+      this.#rooms[u] = new Room(rows, columns);
     });
 
     // create and add doors to rooms
     graph.V().forEach((u) => {
       // no doors in exit room
-      if (u !== endpoints[1]) {
+      if (u !== target) {
         graph.neighbors(u).forEach((v) => {
           let DoorType;
-          if (v === endpoints[1]) {
+          if (v === target) {
             DoorType = ExitDoor;
           } else {
             DoorType = Door;
@@ -246,8 +247,8 @@ const Game = class {
     });
 
     // set entry and exit rooms
-    this.#entryRoom = this.#rooms[endpoints[0]];
-    this.#exitRoom = this.#rooms[endpoints[1]];
+    this.#entryRoom = this.#rooms[source];
+    this.#exitRoom = this.#rooms[target];
   }
 
   /* --- METHOD: #destroyNetwork --- */
