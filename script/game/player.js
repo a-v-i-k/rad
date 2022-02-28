@@ -4,33 +4,33 @@ import Room from "./room.js";
 // import Location from "./location.js";
 import Direction from "./direction.js";
 import Position from "./position.js";
-import { ETypeError, StateError } from "../library/errors.js";
+import { ETypeError, StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Player as default };
 
-/* --- ENUM: PlayerState --- */
-const PlayerState = {
+/* --- ENUM: PlayerStatus --- */
+const PlayerStatus = {
   IDLE: "IDLE",
   PLAYING: "PLAYING",
 };
-Object.freeze(PlayerState);
+Object.freeze(PlayerStatus);
 
 /*
  * CLASS: Player [UML]
  *****************************************************************************/
 const Player = class extends Element {
-  #state;
+  #status;
   #position;
   #trace;
 
-  /* --- INNER: State --- */
-  static State = PlayerState;
+  /* --- INNER: Status --- */
+  static Status = PlayerStatus;
 
   /* --- C'TOR: constructor --- */
   constructor() {
     super();
-    this.#setState(Player.State.IDLE);
+    this.#setStatus(Player.Status.IDLE);
     this.#clear();
   }
 
@@ -40,27 +40,27 @@ const Player = class extends Element {
     this.#trace = [];
   }
 
-  /* --- METHOD: getState --- */
-  getState() {
-    return this.#state;
+  /* --- METHOD: getStatus --- */
+  getStatus() {
+    return this.#status;
   }
 
   /* --- METHOD: getPosition --- */
   getPosition() {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     console.assert(this.#position !== null); // sanity check
     return this.#position.clone();
   }
 
   /* --- METHOD: play --- */
   play() {
-    this.#validateState(Player.State.IDLE);
-    this.#setState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.IDLE);
+    this.#setStatus(Player.Status.PLAYING);
   }
 
   /* --- METHOD: enter --- */
   enter(room, loc = null) {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     console.assert(this.#position === null); // sanity check
 
     if (!(room instanceof Room)) {
@@ -76,7 +76,7 @@ const Player = class extends Element {
 
   /* --- METHOD: inspect --- */
   inspect() {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     console.assert(this.#position !== null); // sanity check
 
     const door = this.#position.room.peek(this.#position.loc);
@@ -92,7 +92,7 @@ const Player = class extends Element {
 
   /* --- METHOD: backtrack --- */
   backtrack() {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     if (this.#trace.length > 0) {
       const position = this.#trace.pop();
       this.exit();
@@ -104,14 +104,14 @@ const Player = class extends Element {
 
   /* --- METHOD: toggleMark --- */
   toggleMark() {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     console.assert(this.#position !== null); // sanity check
     this.#position.room.toggleMark(this.#position.loc);
   }
 
   /* --- METHOD: move --- */
   move(dir) {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     console.assert(this.#position !== null); // sanity check
     if (!(dir in Direction)) {
       throw new ETypeError(`input is not of a Direction`, dir);
@@ -140,30 +140,30 @@ const Player = class extends Element {
 
   /* --- METHOD: exit --- */
   exit() {
-    this.#validateState(Player.State.PLAYING);
+    this.#validateStatus(Player.Status.PLAYING);
     console.assert(this.#position !== null); // sanity check
     this.#position = null;
   }
 
   /* ---METHOD:  stop --- */
   stop() {
-    this.#validateState(Player.State.PLAYING);
-    this.#setState(Player.State.IDLE);
+    this.#validateStatus(Player.Status.PLAYING);
+    this.#setStatus(Player.Status.IDLE);
     this.#clear();
   }
 
-  /* --- METHOD: #setState --- */
-  #setState(state) {
-    console.assert(state in Player.State); // sanity check
-    this.#state = state;
+  /* --- METHOD: #setStatus --- */
+  #setStatus(status) {
+    console.assert(status in Player.Status); // sanity check
+    this.#status = status;
   }
 
-  /* --- METHOD: #validateState --- */
-  #validateState(expected) {
-    console.assert(expected in Player.State); // sanity check
-    const state = this.getState();
-    if (state !== expected) {
-      throw new StateError(`player state is not ${expected}`, state);
+  /* --- METHOD: #validateStatus --- */
+  #validateStatus(expected) {
+    console.assert(expected in Player.Status); // sanity check
+    const status = this.getStatus();
+    if (status !== expected) {
+      throw new StatusError(`player status is not ${expected}`, status);
     }
   }
 };

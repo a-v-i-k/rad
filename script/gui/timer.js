@@ -1,45 +1,45 @@
 /* --- IMPORTS --- */
 import Scheduler from "./scheduler.js";
-import { ETypeError, ERangeError, StateError } from "../library/errors.js";
+import { ETypeError, ERangeError, StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Timer as default };
 
-/* --- ENUM: TimerState --- */
-const TimerState = {
+/* --- ENUM: TimerStatus --- */
+const TimerStatus = {
   RUNNING: "RUNNING",
   PAUSED: "PAUSED",
   IDLE: "IDLE",
 };
-Object.freeze(TimerState);
+Object.freeze(TimerStatus);
 
 /*
  * CLASS: Timer
  *****************************************************************************/
 const Timer = class {
-  #state;
+  #status;
   #time;
   #delay;
   #callbacks;
   #jobId;
 
-  /* --- INNER: State --- */
-  static State = TimerState;
+  /* --- INNER: Status --- */
+  static Status = TimerStatus;
 
   /* --- C'TOR: constructor --- */
   constructor() {
-    this.#setState(Timer.State.IDLE);
+    this.#setStatus(Timer.Status.IDLE);
     this.#jobId = null;
   }
 
-  /* --- METHOD: getState --- */
-  getState() {
-    return this.#state;
+  /* --- METHOD: getStatus --- */
+  getStatus() {
+    return this.#status;
   }
 
   /* --- METHOD: start --- */
   start(startTime, delay, intervalCallback, finalCallback) {
-    this.#validateState(Timer.State.IDLE);
+    this.#validateStatus(Timer.Status.IDLE);
 
     // argument validation
     if (!Number.isInteger(startTime)) {
@@ -67,31 +67,31 @@ const Timer = class {
     this.#jobId = Scheduler.after(delay, () => {
       this.#handler();
     });
-    this.#setState(Timer.State.RUNNING);
+    this.#setStatus(Timer.Status.RUNNING);
   }
 
   /* --- METHOD: pause --- */
   pause() {
-    this.#validateState(Timer.State.RUNNING);
+    this.#validateStatus(Timer.Status.RUNNING);
     Scheduler.cancel(this.#jobId);
-    this.#setState(Timer.State.PAUSED);
+    this.#setStatus(Timer.Status.PAUSED);
   }
 
   /* --- METHOD: resume --- */
   resume() {
-    this.#validateState(Timer.State.PAUSED);
+    this.#validateStatus(Timer.Status.PAUSED);
     this.#jobId = Scheduler.after(this.#delay, () => {
       this.#handler();
     });
-    this.#setState(Timer.State.RUNNING);
+    this.#setStatus(Timer.Status.RUNNING);
   }
 
   /* --- METHOD: stop --- */
   stop() {
-    if (this.getState() == Timer.State.IDLE) return;
+    if (this.getStatus() == Timer.Status.IDLE) return;
     Scheduler.cancel(this.#jobId);
     this.#jobId = null;
-    this.#setState(Timer.State.IDLE);
+    this.#setStatus(Timer.Status.IDLE);
   }
 
   /* --- METHOD: #handler --- */
@@ -107,18 +107,18 @@ const Timer = class {
     }
   }
 
-  /* --- METHOD: #setState --- */
-  #setState(state) {
-    console.assert(state in Timer.State); // sanity check
-    this.#state = state;
+  /* --- METHOD: #setStatus --- */
+  #setStatus(status) {
+    console.assert(status in Timer.Status); // sanity check
+    this.#status = status;
   }
 
-  /* --- METHOD: #validateState --- */
-  #validateState(expected) {
-    console.assert(expected in Timer.State); // sanity check
-    const state = this.getState();
-    if (state !== expected) {
-      throw new StateError(`timer state is not ${expected}`, state);
+  /* --- METHOD: #validateStatus --- */
+  #validateStatus(expected) {
+    console.assert(expected in Timer.Status); // sanity check
+    const status = this.getStatus();
+    if (status !== expected) {
+      throw new StatusError(`timer status is not ${expected}`, status);
     }
   }
 };

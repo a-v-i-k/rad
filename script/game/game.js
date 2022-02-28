@@ -5,17 +5,17 @@ import Door, { ExitDoor } from "./door.js";
 import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
-import { ETypeError, ERangeError, StateError } from "../library/errors.js";
+import { ETypeError, ERangeError, StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Game as default };
 
-/* --- ENUM: GameState --- */
-const GameState = {
+/* --- ENUM: GameStatus --- */
+const GameStatus = {
   IDLE: "IDLE",
   PLAYING: "PLAYING",
 };
-Object.freeze(GameState);
+Object.freeze(GameStatus);
 
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 5;
@@ -26,7 +26,7 @@ const DEFAULT_NUM_PLAYERS = 1;
  * CLASS: Game [UML]
  *****************************************************************************/
 const Game = class {
-  #state;
+  #status;
   #players;
   #rows;
   #columns;
@@ -35,8 +35,8 @@ const Game = class {
   #entryRoom;
   #exitRoom;
 
-  /* --- INNER: State --- */
-  static State = GameState;
+  /* --- INNER: Status --- */
+  static Status = GameStatus;
 
   /* --- C'TOR: constructor --- */
   constructor(rows = DEFAULT_NUM_ROWS, columns = DEFAULT_NUM_COLUMNS) {
@@ -45,7 +45,7 @@ const Game = class {
     this.#columns = columns;
     this.#numRooms = rows * columns;
 
-    this.#setState(Game.State.IDLE);
+    this.#setStatus(Game.Status.IDLE);
     this.#rooms = null;
     this.#players = [];
   }
@@ -67,9 +67,9 @@ const Game = class {
     }
   }
 
-  /* --- METHOD: getState --- */
-  getState() {
-    return this.#state;
+  /* --- METHOD: getStatus --- */
+  getStatus() {
+    return this.#status;
   }
 
   /* --- METHOD: getDimensions --- */
@@ -84,20 +84,20 @@ const Game = class {
 
   /* --- METHOD: getNumPlayers --- */
   getNumPlayers() {
-    this.#validateState(Game.State.PLAYING);
+    this.#validateStatus(Game.Status.PLAYING);
     return this.#players.length;
   }
 
   /* --- METHOD: getPlayerPosition --- */
   getPlayerPosition(index) {
-    this.#validateState(Game.State.PLAYING);
+    this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
     return this.#players[index].getPosition();
   }
 
   /* --- METHOD: play --- */
   play(numPlayers = DEFAULT_NUM_PLAYERS) {
-    if (this.getState() === Game.State.PLAYING) {
+    if (this.getStatus() === Game.Status.PLAYING) {
       console.log("You are already playing my dude.");
       return false;
     }
@@ -113,18 +113,18 @@ const Game = class {
       this.#players[i].enter(this.#entryRoom); // let player in
     }
 
-    this.#setState(Game.State.PLAYING);
+    this.#setStatus(Game.Status.PLAYING);
     return true;
   }
 
   /* --- METHOD: reset --- */
   reset() {
-    const state = this.getState();
-    if (state === Game.State.IDLE) {
+    const status = this.getStatus();
+    if (status === Game.Status.IDLE) {
       console.log("Reset what?");
       return false;
     }
-    if (state === Game.State.PLAYING) {
+    if (status === Game.Status.PLAYING) {
       if (!this.stop()) {
         return false;
       }
@@ -134,7 +134,7 @@ const Game = class {
 
   /* --- METHOD: stop --- */
   stop() {
-    if (this.getState() === Game.State.IDLE) {
+    if (this.getStatus() === Game.Status.IDLE) {
       console.log("What are you trying to stop?");
       return false;
     }
@@ -145,13 +145,13 @@ const Game = class {
     }
     this.#players = [];
     this.#destroyNetwork();
-    this.#setState(Game.State.IDLE);
+    this.#setStatus(Game.Status.IDLE);
     return true;
   }
 
   /* --- METHOD: playerMove --- */
   playerMove(index, direction) {
-    this.#validateState(Game.State.PLAYING);
+    this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
     if (!(direction in Direction)) {
       throw new ETypeError(`input is not of type Direction`, direction);
@@ -161,7 +161,7 @@ const Game = class {
 
   /* --- METHOD: playerInspect --- */
   playerInspect(index) {
-    this.#validateState(Game.State.PLAYING);
+    this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
 
     const player = this.#players[index];
@@ -176,30 +176,30 @@ const Game = class {
 
   /* --- METHOD: playerUndo --- */
   playerUndo(index) {
-    this.#validateState(Game.State.PLAYING);
+    this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
     this.#players[index].backtrack();
   }
 
   /* --- METHOD: playerToggleMark --- */
   playerToggleMark(index) {
-    this.#validateState(Game.State.PLAYING);
+    this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
     this.#players[index].toggleMark();
   }
 
-  /* --- METHOD: #setState --- */
-  #setState(state) {
-    console.assert(state in Game.State); // sanity check
-    this.#state = state;
+  /* --- METHOD: #setStatus --- */
+  #setStatus(status) {
+    console.assert(status in Game.Status); // sanity check
+    this.#status = status;
   }
 
-  /* --- METHOD: #validateState --- */
-  #validateState(expected) {
-    console.assert(expected in Game.State); // sanity check
-    const state = this.getState();
-    if (state !== expected) {
-      throw new StateError(`game state is not ${expected}`, state);
+  /* --- METHOD: #validateStatus --- */
+  #validateStatus(expected) {
+    console.assert(expected in Game.Status); // sanity check
+    const status = this.getStatus();
+    if (status !== expected) {
+      throw new StatusError(`game status is not ${expected}`, status);
     }
   }
 
@@ -216,7 +216,7 @@ const Game = class {
 
   /* --- METHOD: #createNetwork --- */
   #createNetwork() {
-    console.assert(this.getState() === Game.State.IDLE); // sanity check
+    console.assert(this.getStatus() === Game.Status.IDLE); // sanity check
 
     // create underlying graph
     const graph = this.#getGraph(this.getNumRooms());
@@ -253,7 +253,7 @@ const Game = class {
 
   /* --- METHOD: #destroyNetwork --- */
   #destroyNetwork() {
-    console.assert(this.getState() === Game.State.PLAYING); // sanity check
+    console.assert(this.getStatus() === Game.Status.PLAYING); // sanity check
 
     // clear rooms (door detachments prevent circular references)
     for (const id in this.#rooms) {

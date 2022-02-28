@@ -12,19 +12,19 @@ import { ETypeError } from "../library/errors.js";
 /* --- EXPORTS --- */
 export { GUI as default };
 
-/* --- ENUM: GUIState --- */
-const GUIState = {
+/* --- ENUM: GUIStatus --- */
+const GUIStatus = {
   IDLE: "IDLE",
   PLAYING: "PLAYING",
   PATH: "PATH",
   PAUSE: "PAUSE",
   REWARD: "REWARD",
-  // TODO: Merge TIMEUP and RANDYDONE states into one ANNOUNCEMENT state?
+  // TODO: Merge TIMEUP and RANDYDONE statuss into one ANNOUNCEMENT status?
   TIMEUP: "TIMEUP",
   RANDYDONE: "RANDYDONE",
   QUIT: "QUIT",
 };
-Object.freeze(GUIState);
+Object.freeze(GUIStatus);
 
 /* --- DEFAULTS --- */
 const DEFAULT_BACKTRACK = true; // undo
@@ -53,7 +53,7 @@ const PLAYER_DELAY = 200; // in milliseconds
  * CLASS: GUI [UML]
  *****************************************************************************/
 const GUI = class {
-  #state;
+  #status;
   #master;
   #slave;
   #cfgn;
@@ -66,8 +66,8 @@ const GUI = class {
   #rpath;
   #backup;
 
-  /* --- INNER: State --- */
-  static State = GUIState;
+  /* --- INNER: Status --- */
+  static Status = GUIStatus;
 
   /* --- C'TOR: constructor --- */
   constructor(
@@ -95,7 +95,7 @@ const GUI = class {
     this.#randy = null;
 
     // setting
-    this.#setState(GUI.State.IDLE); // state
+    this.#setStatus(GUI.Status.IDLE); // status
     // TODO: HTMLManager class?
     this.#setHTML(); // HTML elements
     this.#setWidgets(); // GUI widgets
@@ -113,7 +113,7 @@ const GUI = class {
 
   /* --- D'TOR: #destroctur --- */
   #destroctur() {
-    console.assert(this.getState() === GUI.State.QUIT); // sanity check
+    console.assert(this.getStatus() === GUI.Status.QUIT); // sanity check
     this.#unbindEvents();
     this.#unsetWidgets();
     this.#html = null;
@@ -150,15 +150,15 @@ const GUI = class {
 
   /// GETTERS
 
-  /* --- METHOD: getState --- */
-  getState() {
-    return this.#state;
+  /* --- METHOD: getStatus --- */
+  getStatus() {
+    return this.#status;
   }
 
-  /* --- METHOD: #setState --- */
-  #setState(state) {
-    console.assert(state in GUI.State); // sanity check
-    this.#state = state;
+  /* --- METHOD: #setStatus --- */
+  #setStatus(status) {
+    console.assert(status in GUI.Status); // sanity check
+    this.#status = status;
   }
 
   /* --- METHOD: #CFGN --- */
@@ -381,10 +381,10 @@ const GUI = class {
   #unset() {
     this.#unsetRandy();
     this.#unsetTimer();
-    if (this.getState() === GUI.State.PATH && this.#rpath !== null) {
+    if (this.getStatus() === GUI.Status.PATH && this.#rpath !== null) {
       this.#rpath.cancel();
     }
-    if (this.#game.getState() === Game.State.PLAYING) {
+    if (this.#game.getStatus() === Game.Status.PLAYING) {
       this.#game.stop();
     }
     this.#displayer.clearStyles();
@@ -397,7 +397,7 @@ const GUI = class {
   #bindEvents() {
     // window
     this.#callbacks.keydown = (event) => {
-      if (this.getState() === GUI.State.PAUSE) return;
+      if (this.getStatus() === GUI.Status.PAUSE) return;
 
       switch (event.key) {
         // game events
@@ -456,7 +456,7 @@ const GUI = class {
     // play button
     this.#callbacks.play = () => {
       // this.#HTML().panel.play.blur(); // take back focus
-      if (this.getState() === GUI.State.PAUSE) {
+      if (this.getStatus() === GUI.Status.PAUSE) {
         this.#resume();
       } else {
         this.#play();
@@ -467,7 +467,7 @@ const GUI = class {
     // pause button
     this.#callbacks.pause = () => {
       // this.#HTML().panel.pause.blur(); // take back focus
-      if (this.getState() !== GUI.State.PAUSE) {
+      if (this.getStatus() !== GUI.Status.PAUSE) {
         this.#pause();
       }
     };
@@ -476,7 +476,7 @@ const GUI = class {
     // reset button
     this.#callbacks.reset = () => {
       // this.#HTML().panel.reset.blur(); // take back focus
-      if (this.getState() === GUI.State.PAUSE) {
+      if (this.getStatus() === GUI.Status.PAUSE) {
         this.#resume();
       }
       this.#reset();
@@ -486,7 +486,7 @@ const GUI = class {
     // stop button
     this.#callbacks.stop = () => {
       // this.#HTML().panel.stop.blur(); // take back focus
-      if (this.getState() === GUI.State.PAUSE) {
+      if (this.getStatus() === GUI.Status.PAUSE) {
         this.#resume();
       }
       this.#stop();
@@ -508,12 +508,12 @@ const GUI = class {
       "click",
       (event) => {
         event.preventDefault();
-        if (this.getState() === GUI.State.PAUSE) {
+        if (this.getStatus() === GUI.Status.PAUSE) {
           this.#resume();
-        } else if (this.getState() === GUI.State.REWARD) {
+        } else if (this.getStatus() === GUI.Status.REWARD) {
           this.#displayer.displayRandomQuote();
           return;
-        } else if (this.getState() !== GUI.State.PLAYING) {
+        } else if (this.getStatus() !== GUI.Status.PLAYING) {
           return;
         }
         this.#clientGoTo(event.clientX, event.clientY);
@@ -543,12 +543,12 @@ const GUI = class {
       "touchend",
       (event) => {
         event.preventDefault();
-        if (this.getState() === GUI.State.PAUSE) {
+        if (this.getStatus() === GUI.Status.PAUSE) {
           this.#resume();
-        } else if (this.getState() === GUI.State.REWARD) {
+        } else if (this.getStatus() === GUI.Status.REWARD) {
           this.#displayer.displayRandomQuote();
           return;
-        } else if (this.getState() !== GUI.State.PLAYING) {
+        } else if (this.getStatus() !== GUI.Status.PLAYING) {
           return;
         }
         this.#clientGoTo(
@@ -602,17 +602,17 @@ const GUI = class {
 
   /* --- METHOD: #play --- */
   #play() {
-    const state = this.getState();
-    if (state === GUI.State.PLAYING || state === GUI.State.PATH) return;
+    const status = this.getStatus();
+    if (status === GUI.Status.PLAYING || status === GUI.Status.PATH) return;
 
     this.#set();
-    this.#setState(GUI.State.PLAYING);
+    this.#setStatus(GUI.Status.PLAYING);
   }
 
   /* --- METHOD: #pause --- */
   #pause() {
-    const state = this.getState();
-    if (!(state === GUI.State.PLAYING || state === GUI.State.PATH)) return;
+    const status = this.getStatus();
+    if (!(status === GUI.Status.PLAYING || status === GUI.Status.PATH)) return;
 
     // timer
     if (this.#CFGN().timer && this.#HTML().timer.checkbox.checked) {
@@ -649,12 +649,12 @@ const GUI = class {
       this.#HTML().sound.pause.play(); // sound
     }
 
-    this.#setState(GUI.State.PAUSE);
+    this.#setStatus(GUI.Status.PAUSE);
   }
 
   /* --- METHOD: #resume --- */
   #resume() {
-    console.assert(this.getState() === GUI.State.PAUSE); // sanity check
+    console.assert(this.getStatus() === GUI.Status.PAUSE); // sanity check
 
     if (this.#CFGN().sound) {
       // stop pause sound
@@ -680,32 +680,32 @@ const GUI = class {
     }
 
     this.#refresh();
-    this.#setState(GUI.State.PLAYING);
+    this.#setStatus(GUI.Status.PLAYING);
   }
 
   /* --- METHOD: #reset --- */
   #reset() {
-    if (this.getState() === GUI.State.IDLE) return;
+    if (this.getStatus() === GUI.Status.IDLE) return;
     this.#unset();
     this.#set();
-    this.#setState(GUI.State.PLAYING);
+    this.#setStatus(GUI.Status.PLAYING);
   }
 
   /* --- METHOD: #stop --- */
   #stop() {
-    if (this.getState() === GUI.State.IDLE) return;
+    if (this.getStatus() === GUI.Status.IDLE) return;
     this.#unset();
     this.#displayer.displayIdle();
-    this.#setState(GUI.State.IDLE);
+    this.#setStatus(GUI.Status.IDLE);
   }
 
   /* --- METHOD: #quit --- */
   #quit() {
-    const state = this.getState();
-    if (state === GUI.State.PLAYING || state === GUI.State.PATH) {
+    const status = this.getStatus();
+    if (status === GUI.Status.PLAYING || status === GUI.Status.PATH) {
       this.#unset();
     }
-    this.#setState(GUI.State.QUIT);
+    this.#setStatus(GUI.Status.QUIT);
     this.#destroctur();
   }
 
@@ -713,7 +713,7 @@ const GUI = class {
 
   /* --- METHOD: #playerMove --- */
   #playerMove(event) {
-    if (this.getState() !== GUI.State.PLAYING) return;
+    if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     let direction;
     switch (event.key) {
@@ -739,7 +739,7 @@ const GUI = class {
 
   /* --- METHOD: #playerInspect --- */
   #playerInspect() {
-    if (this.getState() !== GUI.State.PLAYING) return;
+    if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     const room = this.#game.getPlayerPosition(0).room;
     if (this.#game.playerInspect(0)) {
@@ -757,7 +757,7 @@ const GUI = class {
 
   /* --- METHOD: #playerUndo --- */
   #playerUndo() {
-    if (this.getState() !== GUI.State.PLAYING) return;
+    if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     this.#game.playerUndo(0);
     if (this.#CFGN().sound) {
@@ -768,7 +768,7 @@ const GUI = class {
 
   /* --- METHOD: #playerToggleMark --- */
   #playerToggleMark() {
-    if (this.getState() !== GUI.State.PLAYING) return;
+    if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     this.#game.playerToggleMark(0);
     this.#refresh();
@@ -785,13 +785,13 @@ const GUI = class {
   /* --- METHOD: #rewardPlayer --- */
   #rewardPlayer() {
     this.#displayer.displayRandomQuote();
-    this.#setState(GUI.State.REWARD);
+    this.#setStatus(GUI.Status.REWARD);
   }
 
   /* --- METHOD: #playerGoTo --- */
   #playerGoTo(dst) {
     console.assert(dst instanceof Location); // sanity check
-    this.#setState(GUI.State.PATH);
+    this.#setStatus(GUI.Status.PATH);
     const src = this.#game.getPlayerPosition(0).loc;
     this.#rpath = new RandomPath(
       PLAYER_DELAY,
@@ -802,7 +802,7 @@ const GUI = class {
         this.#refresh();
       },
       () => {
-        this.#setState(GUI.State.PLAYING);
+        this.#setStatus(GUI.Status.PLAYING);
         this.#playerInspect();
       }
     );
@@ -848,7 +848,7 @@ const GUI = class {
       this.#HTML().sound.timeup.play(); // sound
     }
     this.#displayer.announce("Time's Up!");
-    this.#setState(GUI.State.TIMEUP);
+    this.#setStatus(GUI.Status.TIMEUP);
   }
 
   /* --- METHOD: #getWatchTimeString --- */
@@ -883,6 +883,6 @@ const GUI = class {
       this.#HTML().sound.randydone.play(); // sound
     }
     this.#displayer.announce("Randy is done :()");
-    this.#setState(GUI.State.RANDYDONE);
+    this.#setStatus(GUI.Status.RANDYDONE);
   }
 };

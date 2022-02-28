@@ -12,8 +12,8 @@ import QUOTES from "../library/quotes.js";
 /* --- EXPORTS --- */
 export { Displayer as default };
 
-/* --- ENUM: DisplayerState --- */
-const DisplayerState = {
+/* --- ENUM: DisplayerStatus --- */
+const DisplayerStatus = {
   NONE: "NONE",
   IDLE: "IDLE",
   PLAY: "PLAY",
@@ -21,7 +21,7 @@ const DisplayerState = {
   QUOTE: "QUOTE",
   ANNOUNCEMENT: "ANNOUNCEMENT",
 };
-Object.freeze(DisplayerState);
+Object.freeze(DisplayerStatus);
 
 /* --- CONSTANTS --- */
 // const IDLE_BG = "powderblue";
@@ -38,7 +38,7 @@ const FONT_PX_PER_CELL = 5;
  * CLASS: Displayer [UML]
  *****************************************************************************/
 const Displayer = class {
-  #state;
+  #status;
   #displayFrame;
   #game;
   #cellwidth;
@@ -49,8 +49,8 @@ const Displayer = class {
   #drawer;
   #styles;
 
-  /* --- INNER: State --- */
-  static State = DisplayerState;
+  /* --- INNER: Status --- */
+  static Status = DisplayerStatus;
 
   /* --- C'TOR: constructor --- */
   constructor(displayFrame, game, cellwidth, cellheight) {
@@ -69,7 +69,7 @@ const Displayer = class {
     this.#drawer = new Drawer(this.#HTML().canvas, DEFAULT_CANVAS_BG);
     this.clearStyles();
 
-    this.#setState(Displayer.State.NONE);
+    this.#setStatus(Displayer.Status.NONE);
   }
 
   /* --- METHOD: #validator --- */
@@ -101,15 +101,15 @@ const Displayer = class {
 
   /// GETTERS
 
-  /* --- METHOD: getState --- */
-  getState() {
-    return this.#state;
+  /* --- METHOD: getStatus --- */
+  getStatus() {
+    return this.#status;
   }
 
-  /* --- METHOD: #setState --- */
-  #setState(state) {
-    console.assert(state in Displayer.State); // sanity check
-    this.#state = state;
+  /* --- METHOD: #setStatus --- */
+  #setStatus(status) {
+    console.assert(status in Displayer.Status); // sanity check
+    this.#status = status;
   }
 
   /* --- METHOD: getWidth --- */
@@ -199,13 +199,13 @@ const Displayer = class {
 
   /* --- METHOD: displayIdle --- */
   displayIdle() {
-    const state = this.getState();
-    console.assert(state !== Displayer.State.IDLE); // sanity check
+    const status = this.getStatus();
+    console.assert(status !== Displayer.Status.IDLE); // sanity check
 
     let child = this.#HTML().canvas;
-    if (state === Displayer.State.NONE) {
+    if (status === Displayer.Status.NONE) {
       child = this.#HTML().loading;
-    } else if (state === Displayer.State.QUOTE) {
+    } else if (status === Displayer.Status.QUOTE) {
       child = this.#HTML().quote;
     }
     this.#displayFrame.replaceChild(this.#HTML().idle, child);
@@ -223,7 +223,7 @@ const Displayer = class {
     // const doorStyle = Styler.getExitDoorStyle();
     // this.#drawDoor(bbox, doorStyle);
 
-    this.#setState(Displayer.State.IDLE);
+    this.#setStatus(Displayer.Status.IDLE);
   }
 
   /* --- METHOD: #clearIdle --- */
@@ -242,9 +242,9 @@ const Displayer = class {
 
   /* --- METHOD: displayPlay --- */
   displayPlay() {
-    if (this.getState() === Displayer.State.IDLE) {
+    if (this.getStatus() === Displayer.Status.IDLE) {
       this.#clearIdle();
-    } else if (this.getState() === Displayer.State.QUOTE) {
+    } else if (this.getStatus() === Displayer.Status.QUOTE) {
       this.#clearQuote();
     }
     this.#clearDisplay();
@@ -254,12 +254,12 @@ const Displayer = class {
     this.#displayRoom(room);
     this.#displayPlayers(room);
 
-    this.#setState(Displayer.State.PLAY);
+    this.#setStatus(Displayer.Status.PLAY);
   }
 
   /* --- METHOD: displayPause --- */
   displayPause() {
-    console.assert(this.getState() === Displayer.State.PLAY); // sanity check
+    console.assert(this.getStatus() === Displayer.Status.PLAY); // sanity check
 
     const dims = this.#game.getDimensions();
     const fontSize = Math.min(dims[0], dims[1]) * FONT_PX_PER_CELL;
@@ -271,7 +271,7 @@ const Displayer = class {
       fontSize
     );
 
-    this.#setState(Displayer.State.PAUSE);
+    this.#setStatus(Displayer.Status.PAUSE);
   }
 
   /// QUOTE
@@ -283,9 +283,9 @@ const Displayer = class {
   /* --- METHOD: displayRandomQuote --- */
   // TODO: Use a proper HTML <blockquote> element?
   displayRandomQuote() {
-    const state = this.getState();
+    const status = this.getStatus();
     console.assert(
-      state === Displayer.State.PLAY || state === Displayer.State.QUOTE
+      status === Displayer.Status.PLAY || status === Displayer.Status.QUOTE
     ); // sanity check
 
     let randQuote = Displayer.#getRandomQuote();
@@ -304,7 +304,7 @@ const Displayer = class {
     // let quote = `${text} <br> <center> ${author} </center>`;
     const quote = this.#HTML().quote;
     quote.innerHTML = `<p> <q>${text}</q> <br> <center>${author}<center> </p>`;
-    if (state !== Displayer.State.QUOTE) {
+    if (status !== Displayer.Status.QUOTE) {
       this.#displayFrame.replaceChild(quote, this.#HTML().canvas);
     }
 
@@ -319,7 +319,7 @@ const Displayer = class {
     const fontSize = Math.min(dims[0], dims[1]) * FONT_PR_PER_CELL;
     quote.style.fontSize = fontSize.toString() + "%";
 
-    this.#setState(Displayer.State.QUOTE);
+    this.#setStatus(Displayer.Status.QUOTE);
   }
 
   /* --- METHOD: #clearQuote --- */
@@ -333,7 +333,7 @@ const Displayer = class {
 
   /* --- METHOD: announce --- */
   announce(message) {
-    console.assert(this.getState() === Displayer.State.PLAY); // sanity check
+    console.assert(this.getStatus() === Displayer.Status.PLAY); // sanity check
 
     this.#setBackground(ANNOUNCEMENT_BG);
     this.#clearDisplay();
@@ -348,7 +348,7 @@ const Displayer = class {
       fontSize
     );
 
-    this.#setState(Displayer.State.ANNOUNCEMENT);
+    this.#setStatus(Displayer.Status.ANNOUNCEMENT);
   }
 
   /// CANVAS

@@ -2,52 +2,52 @@
 import Random from "../../library/random.js";
 import Direction from "../direction.js";
 // import Position from "../game/position.js";
-import { StateError } from "../../library/errors.js";
+import { StatusError } from "../../library/errors.js";
 
 /* --- EXPORTS --- */
 export { RandomWalker as default };
 
-/* --- ENUM: RandomWalkerState --- */
-const RandomWalkerState = {
+/* --- ENUM: RandomWalkerStatus --- */
+const RandomWalkerStatus = {
   IDLE: "IDLE",
   CHOOSING: "CHOOSING",
   WALKING: "WALKING",
   INSPECTING: "INSPECTING",
 };
-Object.freeze(RandomWalkerState);
+Object.freeze(RandomWalkerStatus);
 
 /*
  * CLASS: RandomWalker
  *****************************************************************************/
 const RandomWalker = class {
-  #state;
+  #status;
   #lastPosition;
   #goingTo;
 
-  /* --- INNER: State --- */
-  static State = RandomWalkerState;
+  /* --- INNER: Status --- */
+  static Status = RandomWalkerStatus;
 
   /* --- C'TOR: constructor --- */
   constructor() {
-    this.#setState(RandomWalker.State.IDLE);
+    this.#setStatus(RandomWalker.Status.IDLE);
     this.#clear();
   }
 
-  /* --- METHOD: getState --- */
-  getState() {
-    return this.#state;
+  /* --- METHOD: getStatus --- */
+  getStatus() {
+    return this.#status;
   }
 
   /* --- METHOD: start --- */
   start() {
     // this.#lastPosition = null;
     // this.#goingTo = null;
-    this.#setState(RandomWalker.State.CHOOSING);
+    this.#setStatus(RandomWalker.Status.CHOOSING);
   }
 
   /* --- METHOD: choose --- */
   choose(position) {
-    this.#validateState(RandomWalker.State.CHOOSING);
+    this.#validateStatus(RandomWalker.Status.CHOOSING);
 
     let goingTo = null;
     const occupiedLocs = position.room.getOccupiedLocations();
@@ -73,16 +73,16 @@ const RandomWalker = class {
     }
 
     this.#goingTo = goingTo;
-    this.#setState(RandomWalker.State.WALKING);
+    this.#setStatus(RandomWalker.Status.WALKING);
   }
 
   /* --- METHOD: walk --- */
   walk(position) {
-    this.#validateState(RandomWalker.State.WALKING);
+    this.#validateStatus(RandomWalker.Status.WALKING);
 
     const goingTo = this.#goingTo;
     if (position.loc.isEqualTo(goingTo)) {
-      this.#setState(RandomWalker.State.INSPECTING);
+      this.#setStatus(RandomWalker.Status.INSPECTING);
       return null;
     } else {
       let axis;
@@ -118,27 +118,27 @@ const RandomWalker = class {
   next(position) {
     // input is the position before leaving the current room
     this.#lastPosition = position.clone();
-    this.#setState(RandomWalker.State.CHOOSING);
+    this.#setStatus(RandomWalker.Status.CHOOSING);
   }
 
   /* --- METHOD: halt --- */
   halt() {
-    this.#setState(RandomWalker.State.IDLE);
+    this.#setStatus(RandomWalker.Status.IDLE);
     this.#clear();
   }
 
-  /* --- METHOD: #setState --- */
-  #setState(state) {
-    console.assert(state in RandomWalker.State); // sanity check
-    this.#state = state;
+  /* --- METHOD: #setStatus --- */
+  #setStatus(status) {
+    console.assert(status in RandomWalker.Status); // sanity check
+    this.#status = status;
   }
 
-  /* --- METHOD: #validateState --- */
-  #validateState(expected) {
-    console.assert(expected in RandomWalker.State); // sanity check
-    const state = this.getState();
-    if (state !== expected) {
-      throw new StateError(`random walker state is not ${expected}`, state);
+  /* --- METHOD: #validateStatus --- */
+  #validateStatus(expected) {
+    console.assert(expected in RandomWalker.Status); // sanity check
+    const status = this.getStatus();
+    if (status !== expected) {
+      throw new StatusError(`random walker status is not ${expected}`, status);
     }
   }
 

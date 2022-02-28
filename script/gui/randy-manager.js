@@ -106,15 +106,15 @@ const RandyManager = class {
     const position = this.#game.getPlayerPosition(index);
     const prevRoom = position.room;
 
-    const randyState = randy.walker.getState();
-    if (randyState === Randy.State.CHOOSING) {
+    const randyStatus = randy.walker.getStatus();
+    if (randyStatus === Randy.Status.CHOOSING) {
       randy.walker.choose(position);
-    } else if (randyState === Randy.State.WALKING) {
+    } else if (randyStatus === Randy.Status.WALKING) {
       const direction = randy.walker.walk(position);
       if (direction !== null) {
         this.#game.playerMove(index, direction);
       }
-    } else if (randyState === Randy.State.INSPECTING) {
+    } else if (randyStatus === Randy.Status.INSPECTING) {
       if (this.#game.playerInspect(index)) {
         this.#doneCallback(index);
         return;

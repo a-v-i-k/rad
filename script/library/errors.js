@@ -1,5 +1,5 @@
 /* --- EXPORTS --- */
-export { ETypeError, ERangeError, RuntimeError, StateError };
+export { ETypeError, ERangeError, RuntimeError, StatusError };
 
 /*
  * ERROR: ETypeError
@@ -37,13 +37,13 @@ const RuntimeError = class extends Error {
 };
 
 /*
- * ERROR: StateError
+ * ERROR: StatusError
  *****************************************************************************/
-const StateError = class extends Error {
+const StatusError = class extends Error {
   /* --- C'TOR: constructor --- */
-  constructor(message, state, fileName, lineNumber) {
+  constructor(message, status, fileName, lineNumber) {
     super(message, fileName, lineNumber);
-    this.name = "StateError";
-    this.state = state;
+    this.name = "StatusError";
+    this.status = status;
   }
 };

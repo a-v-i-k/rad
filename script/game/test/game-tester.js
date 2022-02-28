@@ -36,15 +36,15 @@ const GameTester = class {
         // step
         const walker = walkers[i];
         const position = game.getPlayerPosition(i);
-        const walkerState = walker.getState();
-        if (walkerState === RandomWalker.State.CHOOSING) {
+        const walkerStatus = walker.getStatus();
+        if (walkerStatus === RandomWalker.Status.CHOOSING) {
           walker.choose(position);
-        } else if (walkerState === RandomWalker.State.WALKING) {
+        } else if (walkerStatus === RandomWalker.Status.WALKING) {
           const direction = walker.walk(position);
           if (direction !== null) {
             game.playerMove(i, direction);
           }
-        } else if (walkerState === RandomWalker.State.INSPECTING) {
+        } else if (walkerStatus === RandomWalker.Status.INSPECTING) {
           if (game.playerInspect(i)) {
             console.log(
               `Walker ${i} has emerged as the winner after ${numSteps} steps.`
