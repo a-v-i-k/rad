@@ -1,7 +1,6 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
 import Element from "./element.js";
-import Grid from "./grid.js";
 import Location from "./location.js";
 import Cell, { WelcomeCell } from "./cell.js";
 import Door, { ExitDoor } from "./door.js";
@@ -13,6 +12,8 @@ export { Room as default };
  * CLASS: Room [UML]
  *****************************************************************************/
 const Room = class extends Element {
+  #rows;
+  #columns;
   #grid;
   #welcomeLoc;
   #availableLocs;
@@ -21,10 +22,11 @@ const Room = class extends Element {
   /* --- C'TOR: constructor --- */
   constructor(rows, columns) {
     super();
+    Room.#validator(rows, columns);
+    [this.#rows, this.#columns] = [rows, columns];
 
     // create grid
-    // NOTE: rows and columns validation is delegated to the Grid class.
-    this.#grid = new Grid(rows, columns);
+    this.#createGrid();
 
     // set (random) welcome location
     const x = Random.getRandomInteger(0, columns),
@@ -32,23 +34,50 @@ const Room = class extends Element {
     this.setWelcomeLocation(new Location(x, y));
 
     // create cells
-    this.#createCells(rows, columns);
+    this.#createCells();
+  }
+
+  /* --- METHOD: #validator --- */
+  static #validator(rows, columns) {
+    if (!Number.isInteger(rows)) {
+      throw new ETypeError(`input is not an integer`, rows);
+    }
+    if (rows < 0) {
+      throw new ERangeError(`input is negative`, rows);
+    }
+
+    if (!Number.isInteger(columns)) {
+      throw new ETypeError(`input is not an integer`, columns);
+    }
+    if (columns < 0) {
+      throw new ERangeError(`input is negative`, columns);
+    }
   }
 
   /* --- METHOD: validateLocation --- */
   validateLocation(loc) {
-    this.#grid.validateLocation(loc);
+    if (!(loc instanceof Location)) {
+      throw new ETypeError(`input is not of type Location`, loc);
+    }
+    const rows = this.rows,
+      columns = this.columns;
+    if (loc.x < 0 || loc >= columns || loc.y < 0 || loc.y >= rows) {
+      throw new ERangeError(
+        `location is not in the range [${0}, ${rows}] x [${0}, ${columns}]`,
+        loc
+      );
+    }
   }
 
   /* --- METHOD: getDimensions --- */
   getDimensions() {
-    return [this.#grid.rows, this.#grid.columns];
+    return [this.#rows, this.#columns];
   }
 
   /* --- METHOD: getCell --- */
   getCell(loc) {
     this.validateLocation(loc);
-    return this.#grid.get(loc);
+    return this.#grid[loc.x][loc.y];
   }
 
   /* --- METHOD: setWelcomeLocation --- */
@@ -172,8 +201,9 @@ const Room = class extends Element {
 
   /* --- METHOD: clear --- */
   clear() {
-    for (let x = 0; x < this.#grid.columns; x++) {
-      for (let y = 0; y < this.#grid.rows; y++) {
+    const [rows, columns] = this.getDimensions();
+    for (let x = 0; x < columns; x++) {
+      for (let y = 0; y < rows; y++) {
         const loc = new Location(x, y);
         if (this.isOccupied(loc)) {
           this.removeDoor(loc);
@@ -182,9 +212,24 @@ const Room = class extends Element {
     }
   }
 
+  /* --- METHOD: #createGrid --- */
+  #createGrid() {
+    console.assert(this.#grid === undefined); // sanity check
+    const [rows, columns] = this.getDimensions();
+
+    this.#grid = [];
+    for (let x = 0; x < columns; x++) {
+      this.#grid[x] = [];
+      for (let y = 0; y < rows; y++) {
+        this.#grid[x][y] = null;
+      }
+    }
+  }
+
   /* --- METHOD: #createCells --- */
-  #createCells(rows, columns) {
-    console.assert(this.#availableLocs === undefined);
+  #createCells() {
+    console.assert(this.#availableLocs === undefined); // sanity check
+    const [rows, columns] = this.getDimensions();
 
     const availableLocs = {},
       occupiedLocs = {};
@@ -194,10 +239,10 @@ const Room = class extends Element {
       for (let y = 0; y < rows; y++) {
         const loc = new Location(x, y);
         if (this.isWelcomeLocation(loc)) {
-          this.#grid.set(loc, new WelcomeCell());
+          this.#grid[x][y] = new WelcomeCell();
           // NOTE: Welcome location is reserved.
         } else {
-          this.#grid.set(loc, new Cell());
+          this.#grid[x][y] = new Cell();
           availableLocs[x][y] = loc;
         }
       }
