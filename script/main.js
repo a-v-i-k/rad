@@ -48,13 +48,10 @@
 // │   |   ├── door.js
 // │   |   ├── element.js
 // │   |   ├── game.js
-// │   |   ├── grid.js
 // │   |   ├── location.js
-// │   |   ├── network.js
 // │   |   ├── player.js
 // │   |   ├── position.js
 // │   |   ├── room.js
-// │   |   ├── topology.js
 // │   |   └── test
 // │   |       ├── game-tester.js
 // │   |       └── random-walker.js
