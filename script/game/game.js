@@ -38,6 +38,23 @@ const Game = class {
   /* --- INNER: Status --- */
   static Status = GameStatus;
 
+  /* --- INNER: State --- */
+  static State = class {
+    constructor(player) {
+      console.assert(player instanceof Player); // sanity check
+
+      const position = player.getPosition();
+      this.room = position.room;
+      this.loc = position.loc;
+
+      // TODO [ID]
+      // room.id: position.room.getId()
+      // room.welcomeLoc: position.room.getWelcomeLocation()
+      // room.doors: undefined
+      // loc: position.loc
+    }
+  };
+
   /* --- C'TOR: constructor --- */
   constructor(rows = DEFAULT_NUM_ROWS, columns = DEFAULT_NUM_COLUMNS) {
     Game.#validator(rows, columns);
@@ -88,11 +105,11 @@ const Game = class {
     return this.#players.length;
   }
 
-  /* --- METHOD: getPlayerPosition --- */
-  getPlayerPosition(index) {
+  /* --- METHOD: getState --- */
+  getState(index) {
     this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
-    return this.#players[index].getPosition();
+    return new Game.State(this.#players[index]);
   }
 
   /* --- METHOD: play --- */

@@ -35,12 +35,12 @@ const GameTester = class {
       for (let i = 0; i < NUM_PLAYERS; i++) {
         // step
         const walker = walkers[i];
-        const position = game.getPlayerPosition(i);
+        const state = game.getState(i); // TODO [ID]
         const walkerStatus = walker.getStatus();
         if (walkerStatus === RandomWalker.Status.CHOOSING) {
-          walker.choose(position);
+          walker.choose(state); // TODO [ID]
         } else if (walkerStatus === RandomWalker.Status.WALKING) {
-          const direction = walker.walk(position);
+          const direction = walker.walk(state); // TODO [ID]
           if (direction !== null) {
             game.playerMove(i, direction);
           }
@@ -51,7 +51,7 @@ const GameTester = class {
             );
             break test;
           }
-          walker.next(position);
+          walker.next(state); // TODO [ID]
         } else {
           console.assert(false); // sanity check
         }

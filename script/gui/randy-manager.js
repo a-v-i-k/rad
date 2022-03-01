@@ -103,14 +103,14 @@ const RandyManager = class {
   /* --- METHOD: #step --- */
   #step(index) {
     const randy = this.#randys[index];
-    const position = this.#game.getPlayerPosition(index);
-    const prevRoom = position.room;
+    const state = this.#game.getState(index); // TODO [ID]
+    const prevRoom = state.room; // TODO [ID]
 
     const randyStatus = randy.walker.getStatus();
     if (randyStatus === Randy.Status.CHOOSING) {
-      randy.walker.choose(position);
+      randy.walker.choose(state); // TODO [ID]
     } else if (randyStatus === Randy.Status.WALKING) {
-      const direction = randy.walker.walk(position);
+      const direction = randy.walker.walk(state); // TODO [ID]
       if (direction !== null) {
         this.#game.playerMove(index, direction);
       }
@@ -119,14 +119,14 @@ const RandyManager = class {
         this.#doneCallback(index);
         return;
       }
-      randy.walker.next(position);
+      randy.walker.next(state); // TODO [ID]
     } else {
       console.assert(false); // sanity check
     }
 
     // refresh?
-    const playerRoom = this.#game.getPlayerPosition(0).room,
-      nextRoom = this.#game.getPlayerPosition(index).room;
+    const playerRoom = this.#game.getState(0).room, // TODO [ID]
+      nextRoom = this.#game.getState(index).room; // TODO [ID]
     if (nextRoom === playerRoom || prevRoom === playerRoom) {
       this.#refreshCallback();
     }

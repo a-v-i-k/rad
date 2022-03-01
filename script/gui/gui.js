@@ -442,7 +442,7 @@ const GUI = class {
           break;
 
         case "c":
-          const playerRoom = this.#game.getPlayerPosition(0).room;
+          const playerRoom = this.#game.getState(0).room; // TODO [ID]
           const occupiedLocs = playerRoom.getOccupiedLocations();
           this.#playerGoTo(Random.getRandomChoice(occupiedLocs));
           break;
@@ -741,12 +741,13 @@ const GUI = class {
   #playerInspect() {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
-    const room = this.#game.getPlayerPosition(0).room;
+    const room = this.#game.getState(0).room; // TODO [ID]
     if (this.#game.playerInspect(0)) {
       this.#unset();
       this.#playerWon();
     } else {
-      if (this.#game.getPlayerPosition(0).room !== room) {
+      if (this.#game.getState(0).room !== room) {
+        // TODO [ID]
         if (this.#CFGN().sound) {
           this.#HTML().sound.enter.play(); // sound
         }
@@ -792,7 +793,7 @@ const GUI = class {
   #playerGoTo(dst) {
     console.assert(dst instanceof Location); // sanity check
     this.#setStatus(GUI.Status.PATH);
-    const src = this.#game.getPlayerPosition(0).loc;
+    const src = this.#game.getState(0).loc;
     this.#rpath = new RandomPath(
       PLAYER_DELAY,
       src,

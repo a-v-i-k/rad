@@ -250,7 +250,7 @@ const Displayer = class {
     this.#clearDisplay();
 
     // display everything from the 0/main/primary/user player's perspective
-    const room = this.#game.getPlayerPosition(0).room;
+    const room = this.#game.getState(0).room; // TODO [ID]
     this.#displayRoom(room);
     this.#displayPlayers(room);
 
@@ -519,11 +519,12 @@ const Displayer = class {
     // give prmary player (player 0) priority over randys (front display)
     const players = {};
     for (let i = this.#game.getNumPlayers() - 1; i >= 0; i--) {
-      const position = this.#game.getPlayerPosition(i);
-      if (position.room !== room) continue; // display if inside input room
+      // TODO [ID]
+      const state = this.#game.getState(i);
+      if (state.room !== room) continue; // display if inside input room
 
-      const x = position.loc.x,
-        y = position.loc.y;
+      const x = state.loc.x,
+        y = state.loc.y;
       if (!(x in players)) {
         players[x] = {};
       }

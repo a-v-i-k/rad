@@ -1,7 +1,6 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
 import Direction from "../game/direction.js";
-// import Position from "../game/position.js";
 import { StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -22,7 +21,7 @@ Object.freeze(RandyStatus);
 // TODO: Split Randy class into a RandomWalker class wrapped by a Randy class?
 const Randy = class {
   #status;
-  #lastPosition;
+  #lastState;
   #goingTo;
 
   /* --- INNER: Status --- */
@@ -41,30 +40,29 @@ const Randy = class {
 
   /* --- METHOD: start --- */
   start() {
-    // this.#lastPosition = null;
-    // this.#goingTo = null;
     this.#setStatus(Randy.Status.CHOOSING);
   }
 
   /* --- METHOD: choose --- */
-  choose(position) {
+  // TODO [ID]
+  choose(state) {
     this.#validateStatus(Randy.Status.CHOOSING);
 
     let goingTo = null;
-    const occupiedLocs = position.room.getOccupiedLocations();
+    const occupiedLocs = state.room.getOccupiedLocations();
     for (const loc of occupiedLocs) {
       // if there is an exit door in the room, then choose it
-      if (position.room.isExitLocation(loc)) {
+      if (state.room.isExitLocation(loc)) {
         goingTo = loc;
       }
     }
 
     if (goingTo === null) {
       // no exit point found, choose neighbor randomly
-      if (this.#lastPosition != null && occupiedLocs.length > 1) {
+      if (this.#lastState != null && occupiedLocs.length > 1) {
         // don't go back to the room you just came from
         let index = occupiedLocs.findIndex((loc) => {
-          return position.room.peek(loc).open() === this.#lastPosition.room;
+          return state.room.peek(loc).open() === this.#lastState.room;
         });
         if (index != -1) {
           occupiedLocs.splice(index, 1);
@@ -78,18 +76,19 @@ const Randy = class {
   }
 
   /* --- METHOD: walk --- */
-  walk(position) {
+  // TODO [ID]
+  walk(state) {
     this.#validateStatus(Randy.Status.WALKING);
 
     const goingTo = this.#goingTo;
-    if (position.loc.isEqualTo(goingTo)) {
+    if (state.loc.isEqualTo(goingTo)) {
       this.#setStatus(Randy.Status.INSPECTING);
       return null;
     } else {
       let axis;
-      if (position.loc.x == goingTo.x) {
+      if (state.loc.x == goingTo.x) {
         axis = 1;
-      } else if (position.loc.y == goingTo.y) {
+      } else if (state.loc.y == goingTo.y) {
         axis = 0;
       } else {
         axis = Random.getRandomInteger(0, 2); // coin flip
@@ -97,14 +96,14 @@ const Randy = class {
 
       let direction;
       if (axis == 0) {
-        if (position.loc.x < goingTo.x) {
+        if (state.loc.x < goingTo.x) {
           direction = Direction.RIGHT;
         } else {
           direction = Direction.LEFT;
         }
       } else {
         // axis == 1
-        if (position.loc.y < goingTo.y) {
+        if (state.loc.y < goingTo.y) {
           direction = Direction.DOWN;
         } else {
           direction = Direction.UP;
@@ -116,9 +115,10 @@ const Randy = class {
   }
 
   /* --- METHOD: next --- */
-  next(position) {
-    // input is the position before leaving the current room
-    this.#lastPosition = position.clone();
+  next(state) {
+    // TODO [ID]
+    // input is the state before leaving the current room
+    this.#lastState = state; // TODO [ID]
     this.#setStatus(Randy.Status.CHOOSING);
   }
 
@@ -145,7 +145,7 @@ const Randy = class {
 
   /* --- METHOD: #clear --- */
   #clear() {
-    this.#lastPosition = null;
+    this.#lastState = null;
     this.#goingTo = null;
   }
 };
