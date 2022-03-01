@@ -23,13 +23,11 @@ const CELL_STYLE_ARGS = {
   outline: "black",
   cascadeoutline: "lightgray",
   cascadeshape: "rectangle",
-  mark: null,
 };
 const WELCOME_CELL_STYLE_ARGS = {
   outline: "black",
   cascadeoutline: "indigo",
   cascadeshape: "circle",
-  mark: null,
 };
 const ROOM_STYLE_ARGS = { outline: "black", background: "aliceblue" };
 const PLAYER_STYLE_ARGS = {
@@ -75,23 +73,13 @@ const Styler = class {
   /* --- METHOD: getCellStyle --- */
   static getCellStyle() {
     const args = { ...CELL_STYLE_ARGS };
-    return new CellStyle(
-      args.outline,
-      args.cascadeoutline,
-      args.cascadeshape,
-      args.mark
-    );
+    return new CellStyle(args.outline, args.cascadeoutline, args.cascadeshape);
   }
 
   /* --- METHOD: getWelcomeCellStyle --- */
   static getWelcomeCellStyle() {
     const args = { ...WELCOME_CELL_STYLE_ARGS };
-    return new CellStyle(
-      args.outline,
-      args.cascadeoutline,
-      args.cascadeshape,
-      args.mark
-    );
+    return new CellStyle(args.outline, args.cascadeoutline, args.cascadeshape);
   }
 
   /* --- METHOD: getRoomStyle --- */

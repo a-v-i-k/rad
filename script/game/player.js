@@ -108,12 +108,6 @@ const Player = class extends Element {
     }
   }
 
-  /* --- METHOD: toggleMark --- */
-  toggleMark() {
-    this.#validateStatus(Player.Status.PLAYING);
-    this.#room.toggleMark(this.#loc);
-  }
-
   /* --- METHOD: move --- */
   move(dir) {
     this.#validateStatus(Player.Status.PLAYING);

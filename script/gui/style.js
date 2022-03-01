@@ -55,19 +55,15 @@ const DoorStyle = class extends Style {
  *****************************************************************************/
 const CellStyle = class extends Style {
   /* --- C'TOR: constructor --- */
-  constructor(outline, cascadeoutline, cascadeshape, mark) {
+  constructor(outline, cascadeoutline, cascadeshape) {
     Style.validateColor(outline);
     Style.validateColor(cascadeoutline);
     Style.validateShape(cascadeshape);
-    if (mark !== null) {
-      Style.validateColor(mark);
-    }
 
     super();
     this.outline = outline;
     this.cascadeoutline = cascadeoutline;
     this.cascadeshape = cascadeshape;
-    this.mark = mark;
   }
 };
 

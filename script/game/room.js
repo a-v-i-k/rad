@@ -135,12 +135,6 @@ const Room = class extends Element {
     return !(this.isWelcomeLocation(loc) || this.isAvailable(loc));
   }
 
-  /* --- METHOD: isMarked --- */
-  isMarked(loc) {
-    this.validateLocation(loc);
-    return this.getCell(loc).isMarked();
-  }
-
   /* --- METHOD: addDoor --- */
   addDoor(door, loc = null) {
     if (!(door instanceof Door)) {
@@ -181,21 +175,6 @@ const Room = class extends Element {
     this.getCell(loc).detach();
     this.#availableLocs[loc.x][loc.y] = loc;
     delete this.#occupiedLocs[loc.x][loc.y];
-    return true;
-  }
-
-  /* --- METHOD: toggleMark --- */
-  toggleMark(loc) {
-    this.validateLocation(loc);
-
-    if (this.isWelcomeLocation(loc)) {
-      console.log("Cannot mark welcome location.");
-      return false;
-    } else if (this.isOccupied(loc)) {
-      console.log("Cannot mark occupied locations.");
-    } else {
-      this.getCell(loc).toggleMark();
-    }
     return true;
   }
 

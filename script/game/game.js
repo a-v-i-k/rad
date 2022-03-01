@@ -46,6 +46,8 @@ const Game = class {
       this.room = player.getRoom();
       this.loc = player.getLocation();
 
+      this.room;
+
       // TODO [ID]
       // room.id: room.getId()
       // room.welcomeLoc: room.getWelcomeLocation()
@@ -195,13 +197,6 @@ const Game = class {
     this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
     this.#players[index].backtrack();
-  }
-
-  /* --- METHOD: playerToggleMark --- */
-  playerToggleMark(index) {
-    this.#validateStatus(Game.Status.PLAYING);
-    this.#validatePlayerIndex(index);
-    this.#players[index].toggleMark();
   }
 
   /* --- METHOD: #setStatus --- */

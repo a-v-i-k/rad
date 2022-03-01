@@ -425,14 +425,6 @@ const Displayer = class {
     }
     const style = this.#styles.cells[cellId];
 
-    // TODO: Move this to the Styler class, where it is naturally belongs. One
-    // possible solution is to get rid of the cache (this.#styles.cells).
-    if (cell.isMarked()) {
-      style.mark = MARKER_COLOR;
-    } else {
-      style.mark = null;
-    }
-
     // draw cell
     this.#drawCell(bbox, style);
   }
@@ -452,7 +444,7 @@ const Displayer = class {
           cwidth = bbox.width - 2 * i,
           cheight = bbox.height - 2 * i;
         const cbbox = new BoundingBox(cx0, cy0, cwidth, cheight);
-        const outline = style.mark !== null ? style.mark : style.cascadeoutline;
+        const outline = style.cascadeoutline;
         if (style.cascadeshape === "rectangle") {
           this.#drawer.drawRectangle(cbbox, outline);
         } else if (style.cascadeshape === "circle") {

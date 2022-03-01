@@ -11,13 +11,11 @@ export { Cell as default, WelcomeCell };
  *****************************************************************************/
 const Cell = class extends Element {
   #door;
-  #marked;
 
   /* --- C'TOR: constructor --- */
   constructor() {
     super();
     this.#door = null;
-    this.#marked = false;
   }
 
   /* --- METHOD: attach --- */
@@ -47,16 +45,6 @@ const Cell = class extends Element {
       );
     }
     this.#door = null;
-  }
-
-  /* --- METHOD: toggleMark --- */
-  toggleMark() {
-    this.#marked = !this.#marked;
-  }
-
-  /* --- METHOD: isMarked --- */
-  isMarked() {
-    return this.#marked;
   }
 };
 
