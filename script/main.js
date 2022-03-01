@@ -50,7 +50,6 @@
 // │   |   ├── game.js
 // │   |   ├── location.js
 // │   |   ├── player.js
-// │   |   ├── position.js
 // │   |   ├── room.js
 // │   |   └── test
 // │   |       ├── game-tester.js

@@ -3,7 +3,6 @@ import Element from "./element.js";
 import Room from "./room.js";
 // import Location from "./location.js";
 import Direction from "./direction.js";
-import Position from "./position.js";
 import { ETypeError, StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -21,7 +20,8 @@ Object.freeze(PlayerStatus);
  *****************************************************************************/
 const Player = class extends Element {
   #status;
-  #position;
+  #room;
+  #loc;
   #trace;
 
   /* --- INNER: Status --- */
@@ -36,7 +36,8 @@ const Player = class extends Element {
 
   /* --- METHOD: #clear --- */
   #clear() {
-    this.#position = null;
+    this.#room = null;
+    this.#loc = null;
     this.#trace = [];
   }
 
@@ -45,11 +46,16 @@ const Player = class extends Element {
     return this.#status;
   }
 
-  /* --- METHOD: getPosition --- */
-  getPosition() {
+  /* --- METHOD: getRoom --- */
+  getRoom() {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#position !== null); // sanity check
-    return this.#position.clone();
+    return this.#room;
+  }
+
+  /* --- METHOD: getLocation --- */
+  getLocation() {
+    this.#validateStatus(Player.Status.PLAYING);
+    return this.#loc;
   }
 
   /* --- METHOD: play --- */
@@ -61,7 +67,7 @@ const Player = class extends Element {
   /* --- METHOD: enter --- */
   enter(room, loc = null) {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#position === null); // sanity check
+    console.assert(this.#room === null); // sanity check
 
     if (!(room instanceof Room)) {
       throw new ETypeError(`input is not of type Room`, room);
@@ -71,19 +77,19 @@ const Player = class extends Element {
     if (loc === null) {
       loc = room.getWelcomeLocation();
     }
-    this.#position = new Position(room, loc);
+    this.#room = room;
+    this.#loc = loc;
   }
 
   /* --- METHOD: inspect --- */
   inspect() {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#position !== null); // sanity check
 
-    const door = this.#position.room.peek(this.#position.loc);
+    const door = this.#room.peek(this.#loc);
     if (door === null) {
       console.log("Nothing to inspect...");
     } else {
-      const record = this.getPosition();
+      const record = [this.getRoom(), this.getLocation()];
       this.#trace.push(record);
       this.exit();
       this.enter(door.open());
@@ -94,9 +100,9 @@ const Player = class extends Element {
   backtrack() {
     this.#validateStatus(Player.Status.PLAYING);
     if (this.#trace.length > 0) {
-      const position = this.#trace.pop();
+      const [room, loc] = this.#trace.pop();
       this.exit();
-      this.enter(position.room, position.loc);
+      this.enter(room, loc);
     } else {
       console.log("Source room cannot be exited. You are stuck here FOREVER.");
     }
@@ -105,20 +111,19 @@ const Player = class extends Element {
   /* --- METHOD: toggleMark --- */
   toggleMark() {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#position !== null); // sanity check
-    this.#position.room.toggleMark(this.#position.loc);
+    this.#room.toggleMark(this.#loc);
   }
 
   /* --- METHOD: move --- */
   move(dir) {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#position !== null); // sanity check
+
     if (!(dir in Direction)) {
       throw new ETypeError(`input is not of a Direction`, dir);
     }
 
-    const dims = this.#position.room.getDimensions();
-    const loc = this.#position.loc;
+    const dims = this.#room.getDimensions();
+    const loc = this.#loc;
     switch (dir) {
       case Direction.LEFT:
         loc.x = loc.x > 0 ? loc.x - 1 : loc.x;
@@ -141,8 +146,9 @@ const Player = class extends Element {
   /* --- METHOD: exit --- */
   exit() {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#position !== null); // sanity check
-    this.#position = null;
+    console.assert(this.#room !== null); // sanity check
+    this.#room = null;
+    this.#loc = null;
   }
 
   /* ---METHOD:  stop --- */

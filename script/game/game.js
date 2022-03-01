@@ -43,15 +43,14 @@ const Game = class {
     constructor(player) {
       console.assert(player instanceof Player); // sanity check
 
-      const position = player.getPosition();
-      this.room = position.room;
-      this.loc = position.loc;
+      this.room = player.getRoom();
+      this.loc = player.getLocation();
 
       // TODO [ID]
-      // room.id: position.room.getId()
-      // room.welcomeLoc: position.room.getWelcomeLocation()
+      // room.id: room.getId()
+      // room.welcomeLoc: room.getWelcomeLocation()
       // room.doors: undefined
-      // loc: position.loc
+      // loc: loc
     }
   };
 
@@ -183,7 +182,7 @@ const Game = class {
 
     const player = this.#players[index];
     player.inspect();
-    if (player.getPosition().room === this.#exitRoom) {
+    if (player.getRoom() === this.#exitRoom) {
       console.log(`Player ${index} has won the game!`);
       this.stop();
       return true;
