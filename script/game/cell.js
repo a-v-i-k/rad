@@ -4,18 +4,38 @@ import Door from "./door.js";
 import { ETypeError, RuntimeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
-export { Cell as default, WelcomeCell };
+export { Cell as default };
+
+/* --- ENUM: CellType --- */
+const CellType = {
+  PLAIN: "PLAIN",
+  WELCOME: "WELCOME",
+};
+Object.freeze(CellType);
 
 /*
  * CLASS: Cell [UML]
  *****************************************************************************/
 const Cell = class extends Element {
+  #type;
   #door;
 
+  /* --- INNER: Type --- */
+  static Type = CellType;
+
   /* --- C'TOR: constructor --- */
-  constructor() {
+  constructor(type = Cell.Type.PLAIN) {
     super();
+    Cell.#validator(type);
+    this.#type = type;
     this.#door = null;
+  }
+
+  /* --- METHOD: #validator --- */
+  static #validator(type) {
+    if (!(type in Cell.Type)) {
+      throw new ETypeError(`input is not of type Cell.Type`, type);
+    }
   }
 
   /* --- METHOD: attach --- */
@@ -29,6 +49,11 @@ const Cell = class extends Element {
       throw new ETypeError(`input is not of type Door`, door);
     }
     this.#door = door;
+  }
+
+  /* --- METHOD: getType --- */
+  getType() {
+    return this.#type;
   }
 
   /* --- METHOD: getDoor --- */
@@ -47,8 +72,3 @@ const Cell = class extends Element {
     this.#door = null;
   }
 };
-
-/*
- * CLASS: WelcomeCell [UML]
- *****************************************************************************/
-const WelcomeCell = class extends Cell {};

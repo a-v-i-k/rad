@@ -2,7 +2,7 @@
 import Game from "../game/game.js";
 import Location from "../game/location.js";
 import Door, { ExitDoor } from "../game/door.js";
-import Cell, { WelcomeCell } from "../game/cell.js";
+import Cell from "../game/cell.js";
 import Styler from "./styler.js";
 import BoundingBox from "./bounding-box.js";
 import Drawer from "./drawer.js";
@@ -415,9 +415,9 @@ const Displayer = class {
     // cell style
     const cellId = cell.getId();
     if (!(cellId in this.#styles.cells)) {
-      if (cell instanceof WelcomeCell) {
+      if (cell.getType() === Cell.Type.WELCOME) {
         this.#styles.cells[cellId] = Styler.getWelcomeCellStyle();
-      } else if (cell instanceof Cell) {
+      } else if (cell.getType() === Cell.Type.PLAIN) {
         this.#styles.cells[cellId] = Styler.getCellStyle();
       } else {
         console.assert(false); // sanity check

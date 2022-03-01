@@ -2,7 +2,7 @@
 import Random from "../library/random.js";
 import Element from "./element.js";
 import Location from "./location.js";
-import Cell, { WelcomeCell } from "./cell.js";
+import Cell from "./cell.js";
 import Door, { ExitDoor } from "./door.js";
 
 /* --- EXPORTS --- */
@@ -218,7 +218,7 @@ const Room = class extends Element {
       for (let y = 0; y < rows; y++) {
         const loc = new Location(x, y);
         if (this.isWelcomeLocation(loc)) {
-          this.#grid[x][y] = new WelcomeCell();
+          this.#grid[x][y] = new Cell(Cell.Type.WELCOME);
           // NOTE: Welcome location is reserved.
         } else {
           this.#grid[x][y] = new Cell();
