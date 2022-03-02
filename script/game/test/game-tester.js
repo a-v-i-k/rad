@@ -46,9 +46,11 @@ const GameTester = class {
           }
         } else if (walkerStatus === RandomWalker.Status.INSPECTING) {
           if (game.playerInspect(i)) {
-            console.log(
-              `Walker ${i} has emerged as the winner after ${numSteps} steps.`
-            );
+            const message = `Walker ${i} has emerged as the winner after ${numSteps} steps.`;
+            // console.log(message);
+            document.querySelector(
+              "body"
+            ).innerHTML = `<h1>Test: ${message}</h1>`;
             break test;
           }
           walker.next(state);
