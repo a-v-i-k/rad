@@ -27,7 +27,6 @@ const QUOTE_PADDING = 10;
 const PAUSE_FILL_STYLE = "red";
 const ANNOUNCEMENT_BG = "honeydew";
 const ANNOUNCEMENT_FILL_STYLE = "indigo";
-const MARKER_COLOR = "lime";
 const FONT_PR_PER_CELL = 24;
 const FONT_PX_PER_CELL = 5;
 
