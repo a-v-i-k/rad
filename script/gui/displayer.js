@@ -222,26 +222,26 @@ const Displayer = class {
     const status = this.getStatus();
     console.assert(status !== Displayer.Status.IDLE); // sanity check
 
-    // // display big exit door
-    // this.#HTML().idle = this.#HTML().canvas;
-    // this.#setBackground(ROOM_BACKGROUND);
-    // this.#clearDisplay();
-    // const width = this.getWidth(),
-    //   height = this.getHeight();
-    // const bbox = new BoundingBox(0, 0, width, height);
-    // this.#drawCell(
-    //   bbox,
-    //   CELL_OUTLINE,
-    //   CELL_CASCADE_OUTLINE,
-    //   CELL_CASCADE_SHAPE
-    // );
-    // this.#drawDoor(
-    //   bbox,
-    //   DOOR_OUTLINE,
-    //   EXIT_DOOR_FRONT_FILL,
-    //   EXIT_DOOR_WINDOW_FILL,
-    //   EXIT_DOOR_HANDLE_FILL
-    // );
+    // display big exit door
+    this.#HTML().idle = this.#HTML().canvas;
+    this.#setBackground(ROOM_BACKGROUND);
+    this.#clearDisplay();
+    const width = this.getWidth(),
+      height = this.getHeight();
+    const bbox = new BoundingBox(0, 0, width, height);
+    this.#drawCell(
+      bbox,
+      CELL_OUTLINE,
+      CELL_CASCADE_OUTLINE,
+      CELL_CASCADE_SHAPE
+    );
+    this.#drawDoor(
+      bbox,
+      DOOR_OUTLINE,
+      EXIT_DOOR_FRONT_FILL,
+      EXIT_DOOR_WINDOW_FILL,
+      EXIT_DOOR_HANDLE_FILL
+    );
 
     let child = this.#HTML().canvas;
     if (status === Displayer.Status.NONE) {
