@@ -64,8 +64,6 @@
 // │   |   ├── randy.js
 // │   |   ├── randy-manager.js
 // │   |   ├── scheduler.js
-// │   |   ├── style.js
-// │   |   ├── styler.js
 // │   |   ├── timed-iterator.js
 // │   |   └── timer.js
 // │   └── library
