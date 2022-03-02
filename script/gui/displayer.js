@@ -612,7 +612,7 @@ const Displayer = class {
 
   /* --- METHOD: #displayRandyCrowd --- */
   #displayRandyCrowd(states, bbox) {
-    console.assert(states.length > 1); // sanity check
+    // console.assert(states.length > 1); // sanity check
     for (let j = 0; j < states.length; j++) {
       let offset = [
         Random.getRandomInteger(-5, 6),
