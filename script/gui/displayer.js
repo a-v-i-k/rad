@@ -573,7 +573,11 @@ const Displayer = class {
           y0 = y * this.#cellheight;
         const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
 
-        if (states[x][y].length > 1) {
+        const pploc = this.#game.getState(0).player.loc; // pp = primary player
+        if (
+          states[x][y].length > 1 ||
+          states[x][y][0].player.loc.isEqualTo(pploc)
+        ) {
           this.#displayRandyCrowd(states[x][y], bbox);
         } else {
           this.#displayRandy(states[x][y][0], bbox);
@@ -609,14 +613,13 @@ const Displayer = class {
   /* --- METHOD: #displayRandyCrowd --- */
   #displayRandyCrowd(states, bbox) {
     console.assert(states.length > 1); // sanity check
-    for (let j = 0; j < states.length - 1; j++) {
+    for (let j = 0; j < states.length; j++) {
       let offset = [
         Random.getRandomInteger(-5, 6),
         Random.getRandomInteger(-5, 6),
       ];
       this.#displayRandy(states[j], bbox, offset);
     }
-    this.#displayRandy(states[states.length - 1], bbox, [0, 0]);
   }
 
   /* --- METHOD: #displayPlayer --- */
