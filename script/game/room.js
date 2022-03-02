@@ -3,7 +3,7 @@ import Random from "../library/random.js";
 import Element from "./element.js";
 import Location from "./location.js";
 import Cell from "./cell.js";
-import Door, { ExitDoor } from "./door.js";
+import Door from "./door.js";
 
 /* --- EXPORTS --- */
 export { Room as default };
@@ -120,7 +120,8 @@ const Room = class extends Element {
   /* --- METHOD: isExitLocation --- */
   isExitLocation(loc) {
     this.validateLocation(loc);
-    return this.peek(loc) instanceof ExitDoor;
+    const door = this.peek(loc);
+    return door !== null && door.getType() === Door.Type.EXIT;
   }
 
   /* --- METHOD: isAvailable --- */

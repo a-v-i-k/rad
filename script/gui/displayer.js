@@ -1,7 +1,7 @@
 /* --- IMPORTS --- */
 import Game from "../game/game.js";
 import Location from "../game/location.js";
-import Door, { ExitDoor } from "../game/door.js";
+import Door from "../game/door.js";
 import Cell from "../game/cell.js";
 import Styler from "./styler.js";
 import BoundingBox from "./bounding-box.js";
@@ -461,7 +461,7 @@ const Displayer = class {
     // door style
     const doorId = door.getId();
     if (!(doorId in this.#styles.doors)) {
-      if (door instanceof ExitDoor) {
+      if (door.getType() === Door.Type.EXIT) {
         this.#styles.doors[doorId] = Styler.getExitDoorStyle();
       } else if (door instanceof Door) {
         this.#styles.doors[doorId] = Styler.getDoorStyle();

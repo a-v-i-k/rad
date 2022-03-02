@@ -1,7 +1,7 @@
 /* --- IMPORTS --- */
 // import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
-import Door, { ExitDoor } from "./door.js";
+import Door from "./door.js";
 import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
@@ -245,13 +245,8 @@ const Game = class {
       // no doors in exit room
       if (u !== target) {
         graph.neighbors(u).forEach((v) => {
-          let DoorType;
-          if (v === target) {
-            DoorType = ExitDoor;
-          } else {
-            DoorType = Door;
-          }
-          const door = new DoorType(this.#rooms[v]);
+          const type = v === target ? Door.Type.EXIT : Door.Type.PLAIN;
+          const door = new Door(type, this.#rooms[v]);
           this.#rooms[u].addDoor(door);
         });
       }
