@@ -52,6 +52,7 @@ const PLAYER_DELAY = 200; // in milliseconds
 /*
  * CLASS: GUI [UML]
  *****************************************************************************/
+// TODO: Split into smaller classes.
 const GUI = class {
   #status;
   #master;
@@ -382,7 +383,7 @@ const GUI = class {
     if (this.#game.getStatus() === Game.Status.PLAYING) {
       this.#game.stop();
     }
-    this.#displayer.clearStyles();
+    // this.#displayer.clearStyles(); TODO: Needed?
   }
 
   /// EVENTS
@@ -431,9 +432,9 @@ const GUI = class {
           break;
 
         case "c":
-          const playerRoom = this.#game.getState(0).room; // TODO [ID]
-          const occupiedLocs = playerRoom.getOccupiedLocations();
-          this.#playerGoTo(Random.getRandomChoice(occupiedLocs));
+          const state = this.#game.getState(0);
+          console.log(state.doors);
+          this.#playerGoTo(Random.getRandomChoice(state.doors).loc);
           break;
 
         default:
@@ -730,13 +731,12 @@ const GUI = class {
   #playerInspect() {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
-    const room = this.#game.getState(0).room; // TODO [ID]
+    const prevRoomId = this.#game.getState(0).room.id;
     if (this.#game.playerInspect(0)) {
       this.#unset();
       this.#playerWon();
     } else {
-      if (this.#game.getState(0).room !== room) {
-        // TODO [ID]
+      if (this.#game.getState(0).room.id !== prevRoomId) {
         if (this.#CFGN().sound) {
           this.#HTML().sound.enter.play(); // sound
         }
@@ -774,7 +774,7 @@ const GUI = class {
   #playerGoTo(dst) {
     console.assert(dst instanceof Location); // sanity check
     this.#setStatus(GUI.Status.PATH);
-    const src = this.#game.getState(0).loc;
+    const src = this.#game.getState(0).player.loc;
     this.#rpath = new RandomPath(
       PLAYER_DELAY,
       src,

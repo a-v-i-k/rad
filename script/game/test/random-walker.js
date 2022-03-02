@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
 import Random from "../../library/random.js";
 import Direction from "../direction.js";
+import Door from "../door.js";
 import { StatusError } from "../../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -20,7 +21,7 @@ Object.freeze(RandomWalkerStatus);
  *****************************************************************************/
 const RandomWalker = class {
   #status;
-  #lastState;
+  #lastRoomId;
   #goingTo;
 
   /* --- INNER: Status --- */
@@ -44,30 +45,29 @@ const RandomWalker = class {
 
   /* --- METHOD: choose --- */
   choose(state) {
-    // TODO [ID]
     this.#validateStatus(RandomWalker.Status.CHOOSING);
 
     let goingTo = null;
-    const occupiedLocs = state.room.getOccupiedLocations();
-    for (const loc of occupiedLocs) {
+    const doors = state.doors;
+    for (const door of doors) {
       // if there is an exit door in the room, then choose it
-      if (state.room.isExitLocation(loc)) {
-        goingTo = loc;
+      if (door.type === Door.Type.EXIT) {
+        goingTo = door.loc;
       }
     }
 
     if (goingTo === null) {
       // no exit point found, choose neighbor randomly
-      if (this.#lastState != null && occupiedLocs.length > 1) {
+      if (this.#lastRoomId !== null && doors.length > 1) {
         // don't go back to the room you just came from
-        let index = occupiedLocs.findIndex((loc) => {
-          return state.room.peek(loc).open() === this.#lastState.room;
+        const index = doors.findIndex((door) => {
+          return door.ownerId === this.#lastRoomId;
         });
         if (index != -1) {
-          occupiedLocs.splice(index, 1);
+          doors.splice(index, 1);
         }
       }
-      goingTo = Random.getRandomChoice(occupiedLocs);
+      goingTo = Random.getRandomChoice(doors).loc;
     }
 
     this.#goingTo = goingTo;
@@ -76,48 +76,46 @@ const RandomWalker = class {
 
   /* --- METHOD: walk --- */
   walk(state) {
-    // TODO [ID]
     this.#validateStatus(RandomWalker.Status.WALKING);
 
+    const playerLoc = state.player.loc;
     const goingTo = this.#goingTo;
-    if (state.loc.isEqualTo(goingTo)) {
+    let direction = null; // return value
+    if (playerLoc.isEqualTo(goingTo)) {
       this.#setStatus(RandomWalker.Status.INSPECTING);
-      return null;
     } else {
       let axis;
-      if (state.loc.x == goingTo.x) {
+      if (playerLoc.x == goingTo.x) {
         axis = 1;
-      } else if (state.loc.y == goingTo.y) {
+      } else if (playerLoc.y == goingTo.y) {
         axis = 0;
       } else {
         axis = Random.getRandomInteger(0, 2); // coin flip
       }
 
-      let direction;
       if (axis == 0) {
-        if (state.loc.x < goingTo.x) {
+        if (playerLoc.x < goingTo.x) {
           direction = Direction.RIGHT;
         } else {
           direction = Direction.LEFT;
         }
       } else {
         // axis == 1
-        if (state.loc.y < goingTo.y) {
+        if (playerLoc.y < goingTo.y) {
           direction = Direction.DOWN;
         } else {
           direction = Direction.UP;
         }
       }
-
-      return direction;
     }
+
+    return direction;
   }
 
   /* --- METHOD: next --- */
   next(state) {
-    // TODO [ID]
     // input is the state before leaving the current room
-    this.#lastState = state; // TODO [ID]
+    this.#lastRoomId = state.room.id;
     this.#setStatus(RandomWalker.Status.CHOOSING);
   }
 
@@ -144,7 +142,7 @@ const RandomWalker = class {
 
   /* --- METHOD: #clear --- */
   #clear() {
-    this.#lastState = null;
+    this.#lastRoomId = null;
     this.#goingTo = null;
   }
 };

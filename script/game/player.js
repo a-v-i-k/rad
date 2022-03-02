@@ -55,7 +55,7 @@ const Player = class extends Element {
   /* --- METHOD: getLocation --- */
   getLocation() {
     this.#validateStatus(Player.Status.PLAYING);
-    return this.#loc;
+    return this.#loc.clone();
   }
 
   /* --- METHOD: play --- */

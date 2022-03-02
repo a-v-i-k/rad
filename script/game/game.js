@@ -40,19 +40,34 @@ const Game = class {
 
   /* --- INNER: State --- */
   static State = class {
+    // TODO: A lot of information here doesn't change, so maybe we can compute
+    // such information once and store it for later use.
     constructor(player) {
       console.assert(player instanceof Player); // sanity check
 
-      this.room = player.getRoom();
-      this.loc = player.getLocation();
+      // room
+      const room = player.getRoom();
+      this.room = {
+        id: room.getId(),
+        dims: room.getDimensions(),
+        wloc: room.getWelcomeLocation(),
+      };
 
-      this.room;
+      // doors
+      this.doors = [];
+      for (const loc of room.getDoorLocations()) {
+        const door = room.getCell(loc).getDoor();
+        console.assert(door !== null); // sanity check
+        this.doors.push({
+          id: door.getId(),
+          exit: door.getType() === Door.Type.EXIT,
+          ownerId: door.open().getId(),
+          loc: loc,
+        });
+      }
 
-      // TODO [ID]
-      // room.id: room.getId()
-      // room.welcomeLoc: room.getWelcomeLocation()
-      // room.doors: undefined
-      // loc: loc
+      // player
+      this.player = { id: player.getId(), loc: player.getLocation() };
     }
   };
 
@@ -262,8 +277,8 @@ const Game = class {
     console.assert(this.getStatus() === Game.Status.PLAYING); // sanity check
 
     // clear rooms (door detachments prevent circular references)
-    for (const id in this.#rooms) {
-      this.#rooms[id].clear();
+    for (const u in this.#rooms) {
+      this.#rooms[u].clear();
     }
     this.#rooms = null;
   }

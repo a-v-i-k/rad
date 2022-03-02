@@ -4,6 +4,7 @@ import Element from "./element.js";
 import Location from "./location.js";
 import Cell from "./cell.js";
 import Door from "./door.js";
+import { ETypeError, ERangeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Room as default };
@@ -16,8 +17,8 @@ const Room = class extends Element {
   #columns;
   #grid;
   #welcomeLoc;
+  #doorLocs;
   #availableLocs;
-  #occupiedLocs;
 
   /* --- C'TOR: constructor --- */
   constructor(rows, columns) {
@@ -91,24 +92,15 @@ const Room = class extends Element {
     return this.#welcomeLoc.clone();
   }
 
-  /* --- METHOD: getAvailableLocations --- */
-  getAvailableLocations() {
-    const availableLocs = [];
-    for (let x in this.#availableLocs) {
-      for (let y in this.#availableLocs[x])
-        availableLocs.push(this.#availableLocs[x][y]);
+  /* --- METHOD: getDoorLocations --- */
+  getDoorLocations() {
+    const doorLocs = [];
+    for (let x in this.#doorLocs) {
+      for (let y in this.#doorLocs[x]) {
+        doorLocs.push(this.#doorLocs[x][y].clone());
+      }
     }
-    return availableLocs;
-  }
-
-  /* --- METHOD: getOccupiedLocations --- */
-  getOccupiedLocations() {
-    const occupiedLocs = [];
-    for (let x in this.#occupiedLocs) {
-      for (let y in this.#occupiedLocs[x])
-        occupiedLocs.push(this.#occupiedLocs[x][y]);
-    }
-    return occupiedLocs;
+    return doorLocs;
   }
 
   /* --- METHOD: isWelcomeLocation --- */
@@ -117,23 +109,17 @@ const Room = class extends Element {
     return loc.isEqualTo(this.getWelcomeLocation());
   }
 
-  /* --- METHOD: isExitLocation --- */
-  isExitLocation(loc) {
+  /* --- METHOD: isDoorLocation --- */
+  isDoorLocation(loc) {
     this.validateLocation(loc);
-    const door = this.peek(loc);
-    return door !== null && door.getType() === Door.Type.EXIT;
+    return loc.x in this.#doorLocs && loc.y in this.#doorLocs[loc.x];
   }
 
   /* --- METHOD: isAvailable --- */
   isAvailable(loc) {
     this.validateLocation(loc);
+    // return !(this.isWelcomeLocation(loc) || this.isDoorLocation(loc));
     return loc.x in this.#availableLocs && loc.y in this.#availableLocs[loc.x];
-  }
-
-  /* --- METHOD: isOccupied --- */
-  isOccupied(loc) {
-    this.validateLocation(loc);
-    return !(this.isWelcomeLocation(loc) || this.isAvailable(loc));
   }
 
   /* --- METHOD: addDoor --- */
@@ -143,18 +129,33 @@ const Room = class extends Element {
     }
     if (loc !== null) this.validateLocation(loc);
 
-    const availableLocs = this.getAvailableLocations();
+    if (Object.keys(this.#availableLocs).length == 0) {
+      console.log("Cannot add door because there are no available locations.");
+      return false;
+    }
+
+    // if no location specified, choose it randomly
     if (loc === null) {
-      // if no location specified, choose it randomly
-      loc = Random.getRandomChoice(availableLocs);
+      const x = Random.getRandomChoice(Object.keys(this.#availableLocs));
+      const y = Random.getRandomChoice(Object.keys(this.#availableLocs[x]));
+      loc = this.#availableLocs[x][y];
     }
 
     if (!this.isAvailable(loc)) {
-      console.log("Cannot add door because room is not available.");
+      console.log("Cannot add door because location is not available.");
       return false;
     }
-    this.#occupiedLocs[loc.x][loc.y] = loc;
+
+    // update door and available locations
+    if (!(loc.x in this.#doorLocs)) {
+      this.#doorLocs[loc.x] = {};
+    }
+    this.#doorLocs[loc.x][loc.y] = loc;
     delete this.#availableLocs[loc.x][loc.y];
+    if (Object.keys(this.#availableLocs[loc.x]).length == 0) {
+      delete this.#availableLocs[loc.x];
+    }
+
     this.getCell(loc).attach(door);
     return true;
   }
@@ -169,13 +170,22 @@ const Room = class extends Element {
   removeDoor(loc) {
     this.validateLocation(loc);
 
-    if (!this.isOccupied(loc)) {
-      console.log("Cannot remove door because room is not occupied.");
+    if (!this.isDoorLocation(loc)) {
+      console.log("Cannot remove door because location is not occupied.");
       return false;
     }
     this.getCell(loc).detach();
+
+    // update door and available locations
+    if (!(loc.x in this.#availableLocs)) {
+      this.#availableLocs[loc.x] = {};
+    }
     this.#availableLocs[loc.x][loc.y] = loc;
-    delete this.#occupiedLocs[loc.x][loc.y];
+    delete this.#doorLocs[loc.x][loc.y];
+    if (Object.keys(this.#doorLocs[loc.x]).length == 0) {
+      delete this.#doorLocs[loc.x];
+    }
+
     return true;
   }
 
@@ -185,7 +195,7 @@ const Room = class extends Element {
     for (let x = 0; x < columns; x++) {
       for (let y = 0; y < rows; y++) {
         const loc = new Location(x, y);
-        if (this.isOccupied(loc)) {
+        if (this.isDoorLocation(loc)) {
           this.removeDoor(loc);
         }
       }
@@ -209,13 +219,13 @@ const Room = class extends Element {
   /* --- METHOD: #createCells --- */
   #createCells() {
     console.assert(this.#availableLocs === undefined); // sanity check
+    console.assert(this.#doorLocs === undefined); // sanity check
     const [rows, columns] = this.getDimensions();
 
-    const availableLocs = {},
-      occupiedLocs = {};
+    this.#availableLocs = {};
+    this.#doorLocs = {};
     for (let x = 0; x < columns; x++) {
-      availableLocs[x] = {};
-      occupiedLocs[x] = {};
+      this.#availableLocs[x] = {};
       for (let y = 0; y < rows; y++) {
         const loc = new Location(x, y);
         if (this.isWelcomeLocation(loc)) {
@@ -223,12 +233,9 @@ const Room = class extends Element {
           // NOTE: Welcome location is reserved.
         } else {
           this.#grid[x][y] = new Cell();
-          availableLocs[x][y] = loc;
+          this.#availableLocs[x][y] = loc;
         }
       }
     }
-
-    this.#availableLocs = availableLocs;
-    this.#occupiedLocs = occupiedLocs;
   }
 };

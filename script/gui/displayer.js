@@ -1,9 +1,6 @@
 /* --- IMPORTS --- */
 import Game from "../game/game.js";
 import Location from "../game/location.js";
-import Door from "../game/door.js";
-import Cell from "../game/cell.js";
-import Styler from "./styler.js";
 import BoundingBox from "./bounding-box.js";
 import Drawer from "./drawer.js";
 import Random from "../library/random.js";
@@ -34,9 +31,31 @@ const MARKER_COLOR = "lime";
 const FONT_PR_PER_CELL = 24;
 const FONT_PX_PER_CELL = 5;
 
+const ROOM_OUTLINE = "black";
+const ROOM_BACKGROUND = "#f0f0f0"; //"aliceblue";
+
+const CELL_OUTLINE = "black";
+const CELL_CASCADE_OUTLINE = "lightgray";
+const CELL_CASCADE_SHAPE = "rectangle";
+const WELCOME_CELL_CASCADE_OUTLINE = "indigo";
+const WELCOME_CELL_CASCADE_SHAPE = "circle";
+
+const DOOR_OUTLINE = "black";
+const DOOR_WINDOW_FILL = "white";
+const DOOR_HANDLE_FILL = "lightgray";
+const EXIT_DOOR_FRONT_FILL = "goldenrod";
+const EXIT_DOOR_WINDOW_FILL = "gold";
+const EXIT_DOOR_HANDLE_FILL = "gold";
+
+const PLAYER_SCALE = 0.5;
+const PLAYER_OUTLINE = "black";
+const PLAYER_FILL = ["gold", "goldenrod"];
+const RANDY_FILL = ["olive", "goldenrod"];
+
 /*
  * CLASS: Displayer [UML]
  *****************************************************************************/
+// TODO: Split into smaller classes.
 const Displayer = class {
   #status;
   #displayFrame;
@@ -47,7 +66,8 @@ const Displayer = class {
   #height;
   #html;
   #drawer;
-  #styles;
+  #roomColors;
+  #randyFills;
 
   /* --- INNER: Status --- */
   static Status = DisplayerStatus;
@@ -67,7 +87,8 @@ const Displayer = class {
     this.#createHTMLElements();
 
     this.#drawer = new Drawer(this.#HTML().canvas, DEFAULT_CANVAS_BG);
-    this.clearStyles();
+    this.#roomColors = {};
+    this.#randyFills = {};
 
     this.#setStatus(Displayer.Status.NONE);
   }
@@ -234,12 +255,6 @@ const Displayer = class {
 
   /// PLAYING
 
-  /* --- METHOD: clearStyles --- */
-  clearStyles() {
-    // NOTE: Element ID is unique.
-    this.#styles = { rooms: {}, doors: {}, cells: {}, players: {} };
-  }
-
   /* --- METHOD: displayPlay --- */
   displayPlay() {
     if (this.getStatus() === Displayer.Status.IDLE) {
@@ -249,10 +264,13 @@ const Displayer = class {
     }
     this.#clearDisplay();
 
-    // display everything from the 0/main/primary/user player's perspective
-    const room = this.#game.getState(0).room; // TODO [ID]
-    this.#displayRoom(room);
-    this.#displayPlayers(room);
+    // display everything from the perspective of the primary player (index 0),
+    // and give it priority over randys (front display)
+    this.#displayRoom(); // room
+    this.#displayCells(); // cells
+    this.#displayDoors(); // doors
+    this.#displayRandys(); // randys
+    this.#displayPrimaryPlayer(); // primary player
 
     this.#setStatus(Displayer.Status.PLAY);
   }
@@ -363,238 +381,263 @@ const Displayer = class {
     this.#drawer.clearDisplay();
   }
 
-  /* --- METHOD: #displayRoom --- */
-  #displayRoom(room) {
-    this.#displayRoomBackground(room); // room background
-    this.#displayCellsAndDoors(room); // cells and doors
+  /* --- METHOD: #getRoomColor --- */
+  #getRoomColor(id) {
+    if (!(id in this.#roomColors)) {
+      this.#roomColors[id] = Random.getRandomColor();
+    }
+    return this.#roomColors[id];
+  }
+
+  /* --- METHOD: #getRandyFill --- */
+  #getRandyFill(id) {
+    if (!(id in this.#randyFills)) {
+      if (this.#game.getNumPlayers() > 2) {
+        this.#randyFills[id] = [Random.getRandomColor(), null];
+      } else {
+        this.#randyFills[id] = RANDY_FILL;
+      }
+    }
+    return this.#randyFills[id];
   }
 
   /* --- METHOD: #displayRoomBackground --- */
-  #displayRoomBackground(room) {
+  #displayRoom() {
+    const state = this.#game.getState(0);
+
     // room bounding box
     const canvasWidth = this.getWidth(),
       canvasHeight = this.getHeight();
     const bbox = new BoundingBox(0, 0, canvasWidth, canvasHeight);
 
-    // room style
-    const roomId = room.getId();
-    if (!(roomId in this.#styles.rooms)) {
-      this.#styles.rooms[roomId] = Styler.getRoomStyle();
-    }
-    const style = this.#styles.rooms[roomId];
-
     // display room
-    this.#drawer.drawRectangle(bbox, style.outline, style.background);
+    this.#drawer.drawRectangle(bbox, ROOM_OUTLINE, ROOM_BACKGROUND);
   }
 
-  /* --- METHOD: #displayCellsAndDoors --- */
-  #displayCellsAndDoors(room) {
-    const dims = room.getDimensions();
-    for (let x = 0; x < dims[1]; x++) {
-      for (let y = 0; y < dims[0]; y++) {
-        // cell/door bounding box
+  /* --- METHOD: #displayCells --- */
+  #displayCells() {
+    const state = this.#game.getState(0);
+
+    // display cells
+    for (let x = 0; x < state.room.dims[1]; x++) {
+      for (let y = 0; y < state.room.dims[0]; y++) {
+        // cell bounding box
         const x0 = x * this.#cellwidth,
           y0 = y * this.#cellheight;
         const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
 
         // display cell
-        const cell = room.getCell(new Location(x, y));
-        this.#displayCell(cell, bbox);
-
-        // display door
-        const door = cell.getDoor();
-        if (door !== null) {
-          this.#displayDoor(door, bbox);
+        const loc = new Location(x, y);
+        if (loc.isEqualTo(state.room.wloc)) {
+          // welcome cell
+          this.#drawCell(
+            bbox,
+            CELL_OUTLINE,
+            WELCOME_CELL_CASCADE_OUTLINE,
+            WELCOME_CELL_CASCADE_SHAPE
+          );
+        } else {
+          // plain cell
+          this.#drawCell(
+            bbox,
+            CELL_OUTLINE,
+            CELL_CASCADE_OUTLINE,
+            CELL_CASCADE_SHAPE
+          );
         }
       }
     }
-  }
-
-  /* --- METHOD: #displayCell --- */
-  #displayCell(cell, bbox) {
-    // cell style
-    const cellId = cell.getId();
-    if (!(cellId in this.#styles.cells)) {
-      if (cell.getType() === Cell.Type.WELCOME) {
-        this.#styles.cells[cellId] = Styler.getWelcomeCellStyle();
-      } else if (cell.getType() === Cell.Type.PLAIN) {
-        this.#styles.cells[cellId] = Styler.getCellStyle();
-      } else {
-        console.assert(false); // sanity check
-      }
-    }
-    const style = this.#styles.cells[cellId];
-
-    // draw cell
-    this.#drawCell(bbox, style);
   }
 
   /* --- METHOD: #drawCell --- */
-  #drawCell(bbox, style) {
+  #drawCell(bbox, outline, cascadeOutline, cascadeShape) {
     // draw cell outline
-    this.#drawer.drawRectangle(bbox, style.outline);
+    this.#drawer.drawRectangle(bbox, outline);
 
     // draw cascading appearance
-    if (style.cascadeoutline !== null) {
-      const low = 2,
-        high = Math.floor(Math.min(bbox.width, bbox.height) / 2) - 1;
-      for (let i = low; i <= high; i += 4) {
-        const cx0 = bbox.x0 + i,
-          cy0 = bbox.y0 + i,
-          cwidth = bbox.width - 2 * i,
-          cheight = bbox.height - 2 * i;
-        const cbbox = new BoundingBox(cx0, cy0, cwidth, cheight);
-        const outline = style.cascadeoutline;
-        if (style.cascadeshape === "rectangle") {
-          this.#drawer.drawRectangle(cbbox, outline);
-        } else if (style.cascadeshape === "circle") {
-          this.#drawer.drawCircle(cbbox, outline);
-        } else {
-          console.assert(false); // sanity check
-        }
-      }
-    }
-  }
-
-  /* --- METHOD: #displayDoor --- */
-  #displayDoor(door, bbox) {
-    // door style
-    const doorId = door.getId();
-    if (!(doorId in this.#styles.doors)) {
-      if (door.getType() === Door.Type.EXIT) {
-        this.#styles.doors[doorId] = Styler.getExitDoorStyle();
-      } else if (door instanceof Door) {
-        this.#styles.doors[doorId] = Styler.getDoorStyle();
+    const low = 2,
+      high = Math.floor(Math.min(bbox.width, bbox.height) / 2) - 1;
+    for (let i = low; i <= high; i += 4) {
+      const cx0 = bbox.x0 + i,
+        cy0 = bbox.y0 + i,
+        cwidth = bbox.width - 2 * i,
+        cheight = bbox.height - 2 * i;
+      const cbbox = new BoundingBox(cx0, cy0, cwidth, cheight);
+      if (cascadeShape === "rectangle") {
+        this.#drawer.drawRectangle(cbbox, cascadeOutline);
+      } else if (cascadeShape === "circle") {
+        this.#drawer.drawCircle(cbbox, cascadeOutline);
       } else {
         console.assert(false); // sanity check
       }
     }
-    const style = this.#styles.doors[doorId];
+  }
 
-    // draw door
-    this.#drawDoor(bbox, style);
+  /* --- METHOD: #displayCells --- */
+  #displayDoors() {
+    const state = this.#game.getState(0);
+
+    // display doors
+    for (const door of state.doors) {
+      // door bounding box
+      const x0 = door.loc.x * this.#cellwidth,
+        y0 = door.loc.y * this.#cellheight;
+      const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
+
+      // display door
+      if (door.exit) {
+        // exit door
+        this.#drawDoor(
+          bbox,
+          DOOR_OUTLINE,
+          EXIT_DOOR_FRONT_FILL,
+          EXIT_DOOR_WINDOW_FILL,
+          EXIT_DOOR_HANDLE_FILL
+        );
+      } else {
+        // plain door (assumes owner's color)
+        this.#drawDoor(
+          bbox,
+          DOOR_OUTLINE,
+          this.#getRoomColor(door.ownerId),
+          DOOR_WINDOW_FILL,
+          DOOR_HANDLE_FILL
+        );
+      }
+    }
   }
 
   /* --- METHOD: #drawDoor --- */
-  #drawDoor(bbox, style) {
+  #drawDoor(bbox, outline, frontFill, windowFill, handleFill) {
     // TODO: Differet outlines for different door parts?
-    const outline = style.outline;
 
     // display front
     let x0 = bbox.x0 + Math.floor(bbox.width / 5);
     let y0 = bbox.y0 + Math.floor(bbox.height / 20);
     let width = bbox.width - 2 * Math.floor(bbox.width / 5);
     let height = bbox.height - 2 * Math.floor(bbox.height / 20);
-    const frontBbox = new BoundingBox(x0, y0, width, height);
-    this.#drawer.drawRectangle(frontBbox, outline, style.frontfill, 2);
+    const frontBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(frontBBox, outline, frontFill, 2);
 
     // display window
     x0 += Math.floor(bbox.width / 12);
     y0 += Math.floor(bbox.height / 12);
     width -= 2 * Math.floor(bbox.width / 12);
     height = Math.floor(bbox.height / 3);
-    const windowBbox = new BoundingBox(x0, y0, width, height);
-    this.#drawer.drawRectangle(windowBbox, outline, style.windowfill, 2);
+    const windowBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
 
     // display handle
     // x0 doesn't change
     width = Math.floor(bbox.width / 7);
     y0 += Math.floor(bbox.height / 3) + Math.floor(bbox.height / 12);
     height = Math.floor(bbox.height / 7);
-    const handleBbox = new BoundingBox(x0, y0, width, height);
-    this.#drawer.drawCircle(handleBbox, outline, style.handlefill, 2);
+    const handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 
-  /* --- METHOD: #displayPlayers --- */
-  #displayPlayers(room) {
-    // group players (that are inside room) by location
-    // give prmary player (player 0) priority over randys (front display)
-    const players = {};
-    for (let i = this.#game.getNumPlayers() - 1; i >= 0; i--) {
-      // TODO [ID]
+  /* --- METHOD: #displayRandys --- */
+  #displayRandys() {
+    // group Randys (which are inside primary's player room) by location
+    const displayRoomId = this.#game.getState(0).room.id;
+    const states = {};
+    for (let i = this.#game.getNumPlayers() - 1; i >= 1; i--) {
       const state = this.#game.getState(i);
-      if (state.room !== room) continue; // display if inside input room
+      if (state.room.id !== displayRoomId) {
+        // display only if inside primary player's room
+        continue;
+      }
 
-      const x = state.loc.x,
-        y = state.loc.y;
-      if (!(x in players)) {
-        players[x] = {};
+      const [x, y] = [state.player.loc.x, state.player.loc.y];
+      if (!(x in states)) {
+        states[x] = {};
       }
-      if (!(y in players[x])) {
-        players[x][y] = [];
+      if (!(y in states[x])) {
+        states[x][y] = [];
       }
-      players[x][y].push(i);
+      states[x][y].push(state);
     }
 
-    // display players
-    for (const x in players) {
-      for (const y in players[x]) {
-        // players' bounding box
+    // display randys
+    for (const x in states) {
+      for (const y in states[x]) {
+        // randys' bounding box
         const x0 = x * this.#cellwidth,
           y0 = y * this.#cellheight;
         const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
 
-        if (players[x][y].length > 1) {
-          this.#displayCrowdByIndex(players[x][y], bbox);
+        if (states[x][y].length > 1) {
+          this.#displayRandyCrowd(states[x][y], bbox);
         } else {
-          this.#displayPlayerByIndex(players[x][y][0], bbox);
+          this.#displayRandy(states[x][y][0], bbox);
         }
       }
     }
   }
 
-  /* --- METHOD: #displayPlayerByIndex --- */
-  #displayPlayerByIndex(index, bbox, offset = [0, 0]) {
-    // player style
-    // NOTE: Not using player ID here.
-    const numPlayers = this.#game.getNumPlayers();
-    if (!(index in this.#styles.players)) {
-      if (index == 0) {
-        this.#styles.players[index] = Styler.getPlayerStyle();
-      } else if (0 < index && index < numPlayers) {
-        if (numPlayers > 2) {
-          // more than 1 randy => random colors
-          this.#styles.players[index] = Styler.getRandyRandomStyle();
-        } else {
-          this.#styles.players[index] = Styler.getRandyStyle();
-        }
-      } else {
-        console.assert(false); // sanity check
-      }
-    }
-    const style = this.#styles.players[index];
+  /* --- METHOD: #displayPrimaryPlayer --- */
+  #displayPrimaryPlayer() {
+    const state = this.#game.getState(0);
 
-    this.#displayPlayer(bbox, style, offset);
+    // primary player's bounding box
+    const x0 = state.player.loc.x * this.#cellwidth,
+      y0 = state.player.loc.y * this.#cellheight;
+    const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
+
+    this.#displayPlayer(
+      bbox,
+      PLAYER_SCALE,
+      PLAYER_OUTLINE,
+      PLAYER_FILL,
+      [0, 0]
+    );
+  }
+
+  /* --- METHOD: #displayRandy --- */
+  #displayRandy(state, bbox, offset = [0, 0]) {
+    const fill = this.#getRandyFill(state.player.id);
+    this.#displayPlayer(bbox, PLAYER_SCALE, PLAYER_OUTLINE, fill, offset);
+  }
+
+  /* --- METHOD: #displayRandyCrowd --- */
+  #displayRandyCrowd(states, bbox) {
+    console.assert(states.length > 1); // sanity check
+    for (let j = 0; j < states.length - 1; j++) {
+      let offset = [
+        Random.getRandomInteger(-5, 6),
+        Random.getRandomInteger(-5, 6),
+      ];
+      this.#displayRandy(states[j], bbox, offset);
+    }
+    this.#displayRandy(states[states.length - 1], bbox, [0, 0]);
   }
 
   /* --- METHOD: #displayPlayer --- */
-  #displayPlayer(bbox, style, offset) {
-    // this.#displayPlayer1(bbox, style, offset);
-    this.#displayPlayer2(bbox, style, offset);
+  #displayPlayer(bbox, scale, outline, fill, offset) {
+    // this.#displayPlayer1(bbox, scale, outline, fill, offset);
+    this.#displayPlayer2(bbox, scale, outline, fill, offset);
   }
 
   /* --- METHOD: #displayPlayer1 --- */
-  #displayPlayer1(bbox, style, offset) {
-    this.#drawPlayer(bbox, style.scale, style.outline, style.fill[0], offset);
+  #displayPlayer1(bbox, scale, outline, fill, offset) {
+    this.#drawPlayer(bbox, scale, outline, fill[0], offset);
   }
 
   /* --- METHOD: #displayPlayer2 --- */
-  #displayPlayer2(bbox, style, offset) {
+  #displayPlayer2(bbox, scale, outline, fill, offset) {
     // draw walker with primary color first
-    this.#displayPlayer1(bbox, style, offset);
+    this.#displayPlayer1(bbox, scale, outline, fill, offset);
 
-    if (style.fill[1] === null) {
+    if (fill[1] === null) {
       return;
     }
 
     // draw mixture of primary and secondary colors
     const N = 5;
-    let scale = style.scale;
-    let delta = scale / N;
+    const delta = scale / N;
     for (let i = 1; i < N; i++) {
-      scale = i * delta;
-      let color = style.fill[i % 2]; // TODO: What is this?
-      this.#drawPlayer(bbox, scale, "goldenrod", null, offset);
+      const figureScale = i * delta;
+      this.#drawPlayer(bbox, figureScale, fill[1], null, offset);
     }
   }
 
@@ -606,20 +649,7 @@ const Displayer = class {
       heightDiff = bbox.height - walkerHeight;
     let x0 = bbox.x0 + widthDiff / 2 + offset[0],
       y0 = bbox.y0 + heightDiff / 2 + offset[1];
-    const scaledBbox = new BoundingBox(x0, y0, walkerWidth, walkerHeight);
-    this.#drawer.drawCircle(scaledBbox, outline, fill, 2);
-  }
-
-  /* --- METHOD: #displayCrowdByIndex --- */
-  #displayCrowdByIndex(indices, bbox) {
-    console.assert(indices.length > 1); // sanity check
-    for (let j = 0; j < indices.length - 1; j++) {
-      let offset = [
-        Random.getRandomInteger(-5, 6),
-        Random.getRandomInteger(-5, 6),
-      ];
-      this.#displayPlayerByIndex(indices[j], bbox, offset);
-    }
-    this.#displayPlayerByIndex(indices[indices.length - 1], bbox, [0, 0]);
+    const scaledBBox = new BoundingBox(x0, y0, walkerWidth, walkerHeight);
+    this.#drawer.drawCircle(scaledBBox, outline, fill, 2);
   }
 };

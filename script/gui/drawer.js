@@ -1,6 +1,5 @@
 /* --- IMPORTS --- */
 import BoundingBox from "./bounding-box.js";
-import Style from "./style.js";
 import { ETypeError, ERangeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -25,7 +24,20 @@ const Drawer = class {
     if (!(canvas instanceof HTMLElement) || canvas.tagName !== "CANVAS") {
       throw new ETypeError(`canvas is not an HTML canvas element`, canvas);
     }
-    Style.validateColor(background);
+    Drawer.validateColor(background);
+  }
+
+  /* --- METHOD: validateColor --- */
+  static validateColor(color) {
+    // validate CSS color
+    var s = new Option().style;
+    s.color = color;
+    // if (s.color == "") {
+    //   console.log(color);
+    // }
+    if (s.color === "") {
+      throw new ETypeError("input is not a valid color", color);
+    }
   }
 
   /* --- METHOD: getWidth --- */
@@ -45,7 +57,7 @@ const Drawer = class {
 
   /* --- METHOD: setBackground --- */
   setBackground(background) {
-    Style.validateColor(background);
+    Drawer.validateColor(background);
     this.#background = background;
   }
 
@@ -62,9 +74,9 @@ const Drawer = class {
   /* --- METHOD: drawRectangle --- */
   drawRectangle(bbox, strokeStyle, fillStyle = null, lineWidth = 1) {
     this.#validateBoundingBox(bbox);
-    Style.validateColor(strokeStyle);
+    Drawer.validateColor(strokeStyle);
     if (fillStyle !== null) {
-      Style.validateColor(fillStyle);
+      Drawer.validateColor(fillStyle);
     }
     const context = this.#getContext();
 
@@ -82,7 +94,7 @@ const Drawer = class {
   /* --- METHOD: fillRectangle --- */
   fillRectangle(bbox, fillStyle) {
     this.#validateBoundingBox(bbox);
-    Style.validateColor(fillStyle);
+    Drawer.validateColor(fillStyle);
 
     const context = this.#getContext();
     context.beginPath();
@@ -94,9 +106,9 @@ const Drawer = class {
   /* --- METHOD: drawCircle --- */
   drawCircle(bbox, strokeStyle, fillStyle = null, lineWidth = 1) {
     this.#validateBoundingBox(bbox);
-    Style.validateColor(strokeStyle);
+    Drawer.validateColor(strokeStyle);
     if (fillStyle !== null) {
-      Style.validateColor(fillStyle);
+      Drawer.validateColor(fillStyle);
     }
     const context = this.#getContext();
 
@@ -137,7 +149,7 @@ const Drawer = class {
     }
 
     // validate fill style
-    Style.validateColor(fillStyle);
+    Drawer.validateColor(fillStyle);
 
     // validate font size
     if (!Number.isInteger(fontSize)) {
