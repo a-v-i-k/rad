@@ -3,7 +3,7 @@ import Random from "../library/random.js";
 import Game from "../game/game.js";
 import Scheduler from "./scheduler.js";
 import Randy from "./randy.js";
-import { ETypeError, ERangeError } from "../library/errors.js";
+import { ETypeError, ERangeError, RuntimeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { RandyManager as default };
@@ -19,6 +19,7 @@ const RandyManager = class {
   #refreshCallback;
   #doneCallback;
   #randys;
+  #active;
 
   /* --- C'TOR: constructor --- */
   constructor(game, refreshCallback, doneCallback) {
@@ -27,6 +28,7 @@ const RandyManager = class {
     this.#refreshCallback = refreshCallback;
     this.#doneCallback = doneCallback;
     this.#randys = {};
+    this.#active = false;
   }
 
   /* --- METHOD: #validator --- */
@@ -42,6 +44,11 @@ const RandyManager = class {
     }
   }
 
+  /* --- isActive() --- */
+  isActive() {
+    return this.#active;
+  }
+
   /* --- METHOD: start --- */
   start(numRandys) {
     if (!Number.isInteger(numRandys)) {
@@ -50,6 +57,11 @@ const RandyManager = class {
     if (numRandys <= 0) {
       throw new ERangeError(`input is not positive`, numRandys);
     }
+
+    if (this.isActive()) {
+      throw new RuntimeError(`trying to start an active manager`);
+    }
+    this.#active = true;
 
     for (let index = 1; index <= numRandys; index++) {
       const walker = new Randy();
@@ -73,14 +85,24 @@ const RandyManager = class {
 
   /* --- METHOD: pause --- */
   pause() {
+    if (!this.isActive()) {
+      throw new RuntimeError(`trying to pause an inactive manager`);
+    }
+
     for (const index in this.#randys) {
       Scheduler.cancel(this.#randys[index].jobId);
       this.#randys[index].jobId = null;
     }
+    this.#active = false;
   }
 
   /* --- METHOD: resume --- */
   resume() {
+    if (this.isActive()) {
+      throw new RuntimeError(`trying to resume an active manager`);
+    }
+    this.#active = true;
+
     for (const index in this.#randys) {
       this.#randys[index].jobId = Scheduler.after(
         this.#randys[index].delay,
@@ -93,11 +115,16 @@ const RandyManager = class {
 
   /* --- METHOD: halt --- */
   halt() {
+    if (!this.isActive()) {
+      throw new RuntimeError(`trying to halt an inactive manager`);
+    }
+
     for (const index in this.#randys) {
       Scheduler.cancel(this.#randys[index].jobId);
       this.#randys[index].walker.halt();
     }
     this.#randys = {};
+    this.#active = false;
   }
 
   /* --- METHOD: #step --- */

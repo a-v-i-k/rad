@@ -16,11 +16,8 @@ export { GUI as default };
 const GUIStatus = {
   IDLE: "IDLE",
   PLAYING: "PLAYING",
-  PATH: "PATH",
   PAUSE: "PAUSE",
   REWARD: "REWARD",
-  // TODO: Merge TIMEUP and RANDYDONE statuss into one ANNOUNCEMENT status?
-  TIMEUP: "TIMEUP",
   RANDYDONE: "RANDYDONE",
   QUIT: "QUIT",
 };
@@ -282,6 +279,7 @@ const GUI = class {
         this.#game,
         () => this.#refresh(),
         (index) => {
+          this.#setStatus(GUI.Status.RANDYDONE);
           this.#unset();
           this.#randyIsDone(index);
         }
@@ -359,15 +357,15 @@ const GUI = class {
 
   /* --- METHOD: #unset --- */
   #unset() {
-    this.#unsetRandy();
-    this.#unsetClock();
-    if (this.getStatus() === GUI.Status.PATH && this.#rpath !== null) {
+    if (this.#rpath !== null && this.#rpath.isActive()) {
       this.#rpath.cancel();
     }
+    this.#unsetRandy();
+    this.#unsetClock();
+
     if (this.#game.getStatus() === Game.Status.PLAYING) {
       this.#game.stop();
     }
-    // this.#displayer.clearStyles(); TODO: Needed?
   }
 
   /// EVENTS
@@ -569,7 +567,7 @@ const GUI = class {
   /* --- METHOD: #play --- */
   #play() {
     const status = this.getStatus();
-    if (status === GUI.Status.PLAYING || status === GUI.Status.PATH) return;
+    if (status === GUI.Status.PLAYING) return;
 
     this.#set();
     this.#setStatus(GUI.Status.PLAYING);
@@ -578,7 +576,7 @@ const GUI = class {
   /* --- METHOD: #pause --- */
   #pause() {
     const status = this.getStatus();
-    if (!(status === GUI.Status.PLAYING || status === GUI.Status.PATH)) return;
+    if (status !== GUI.Status.PLAYING) return;
 
     // clock
     if (this.#CFGN().clock) {
@@ -658,15 +656,15 @@ const GUI = class {
   /* --- METHOD: #stop --- */
   #stop() {
     if (this.getStatus() === GUI.Status.IDLE) return;
+    this.#setStatus(GUI.Status.IDLE);
     this.#unset();
     this.#displayer.displayIdle();
-    this.#setStatus(GUI.Status.IDLE);
   }
 
   /* --- METHOD: #quit --- */
   #quit() {
     const status = this.getStatus();
-    if (status === GUI.Status.PLAYING || status === GUI.Status.PATH) {
+    if (status === GUI.Status.PLAYING) {
       this.#unset();
     }
     this.#setStatus(GUI.Status.QUIT);
@@ -707,6 +705,7 @@ const GUI = class {
 
     const prevRoomId = this.#game.getState(0).room.id;
     if (this.#game.playerInspect(0)) {
+      this.#setStatus(GUI.Status.REWARD);
       this.#unset();
       this.#playerWon();
     } else {
@@ -726,6 +725,8 @@ const GUI = class {
     this.#refresh();
   }
 
+  /// REWARD
+
   /* --- METHOD: #playerWon --- */
   #playerWon() {
     this.#playSound(this.#HTML().sound.triumph);
@@ -735,13 +736,11 @@ const GUI = class {
   /* --- METHOD: #rewardPlayer --- */
   #rewardPlayer() {
     this.#displayer.displayRandomQuote();
-    this.#setStatus(GUI.Status.REWARD);
   }
 
   /* --- METHOD: #playerGoTo --- */
   #playerGoTo(dst) {
     console.assert(dst instanceof Location); // sanity check
-    this.#setStatus(GUI.Status.PATH);
     const src = this.#game.getState(0).player.loc;
     this.#rpath = new RandomPath(
       PLAYER_DELAY,
@@ -778,7 +777,9 @@ const GUI = class {
   #stopwatchStop() {
     this.#stopwatch.stop();
     const clockWatch = this.#HTML().clock.watch;
-    clockWatch.innerText = "00:00"; // [AK]
+    if (this.getStatus() === GUI.Status.IDLE) {
+      clockWatch.innerText = "00:00";
+    }
     clockWatch.style.color = CLOCK_IDLE_FG;
   }
 
@@ -802,7 +803,7 @@ const GUI = class {
 
   /* --- METHOD: #randyStop --- */
   #randyStop() {
-    if (this.#getNumRandys() > 0) {
+    if (this.#getNumRandys() > 0 && this.#randy.isActive()) {
       this.#randy.halt();
     }
   }
@@ -812,7 +813,6 @@ const GUI = class {
     // TODO: do something with index?
     this.#playSound(this.#HTML().sound.randydone);
     this.#displayer.announce("Randy is done :()");
-    this.#setStatus(GUI.Status.RANDYDONE);
   }
 
   /// SOUND
