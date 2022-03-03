@@ -247,8 +247,8 @@ const GUI = class {
   /* --- METHOD: #setTitle --- */
   #setTitle() {
     // TODO: Separate titles.
-    document.querySelector("title").innerText = TITLE_HEADER_TEXT; // page title
-    this.#HTML().title.header.innerText = TITLE_HEADER_TEXT;
+    const pageTitle = this.#HTML().title.header.innerText;
+    document.querySelector("title").innerText = pageTitle;
   }
 
   /* --- METHOD: #setPanel --- */
