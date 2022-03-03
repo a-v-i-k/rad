@@ -661,8 +661,8 @@ const Displayer = class {
       walkerHeight = Math.round(scale * bbox.height);
     let widthDiff = bbox.width - walkerWidth,
       heightDiff = bbox.height - walkerHeight;
-    let x0 = bbox.x0 + widthDiff / 2 + offset[0],
-      y0 = bbox.y0 + heightDiff / 2 + offset[1];
+    let x0 = bbox.x0 + Math.round(widthDiff / 2) + offset[0],
+      y0 = bbox.y0 + Math.round(heightDiff / 2) + offset[1];
     const scaledBBox = new BoundingBox(x0, y0, walkerWidth, walkerHeight);
     this.#drawer.drawCircle(scaledBBox, outline, fill, 2);
   }
