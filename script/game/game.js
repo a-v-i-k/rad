@@ -200,7 +200,7 @@ const Game = class {
     const player = this.#players[index];
     const cell = player.inspect();
 
-    const finished = false;
+    let finished = false;
     switch (cell.getType()) {
       case Cell.Type.PLAIN: // plain cell
         const door = cell.getDoor();
