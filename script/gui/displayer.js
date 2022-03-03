@@ -524,9 +524,9 @@ const Displayer = class {
 
     // display front
     let x0 = bbox.x0 + Math.floor(bbox.width / 5);
-    let y0 = bbox.y0 + Math.floor(bbox.height / 20);
+    let y0 = bbox.y0 + Math.floor(bbox.height / 15);
     let width = bbox.width - 2 * Math.floor(bbox.width / 5);
-    let height = bbox.height - 2 * Math.floor(bbox.height / 20);
+    let height = bbox.height - 2 * Math.floor(bbox.height / 15);
     const frontBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawRectangle(frontBBox, outline, frontFill, 2);
 
@@ -619,8 +619,8 @@ const Displayer = class {
     // console.assert(states.length > 1); // sanity check
     for (let j = 0; j < states.length; j++) {
       let offset = [
-        Random.getRandomInteger(-5, 6),
-        Random.getRandomInteger(-5, 6),
+        Random.getRandomInteger(-2, 3),
+        Random.getRandomInteger(-2, 3),
       ];
       this.#displayRandy(states[j], bbox, offset);
     }
@@ -647,7 +647,7 @@ const Displayer = class {
     }
 
     // draw mixture of primary and secondary colors
-    const N = 5;
+    const N = 4;
     const delta = scale / N;
     for (let i = 1; i < N; i++) {
       const figureScale = i * delta;
