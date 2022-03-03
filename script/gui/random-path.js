@@ -15,6 +15,7 @@ const RandomPath = class {
   #loc;
   #goingTo;
   #stepCallback;
+  #active;
   #titer;
 
   /* --- C'TOR: constructor --- */
@@ -23,7 +24,15 @@ const RandomPath = class {
     this.#loc = src;
     this.#goingTo = dst;
     this.#stepCallback = stepCallback;
-    this.#titer = new TIterator(delay, () => this.#walk(), endCallback);
+    this.#active = true;
+    this.#titer = new TIterator(
+      delay,
+      () => this.#walk(),
+      () => {
+        endCallback();
+        this.#active = false;
+      }
+    );
   }
 
   /* --- METHOD: #validator --- */
@@ -48,8 +57,14 @@ const RandomPath = class {
     }
   }
 
+  /* --- isActive() --- */
+  isActive() {
+    return this.#active;
+  }
+
   /* --- METHOD: cancel --- */
   cancel() {
+    if (!this.isActive()) return;
     this.#titer.cancel();
   }
 
