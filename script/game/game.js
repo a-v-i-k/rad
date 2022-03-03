@@ -7,7 +7,6 @@ import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
 import { ETypeError, ERangeError, StatusError } from "../library/errors.js";
-import Graph from "../library/graph.js";
 
 /* --- EXPORTS --- */
 export { Game as default };

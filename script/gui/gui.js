@@ -30,8 +30,6 @@ const DEFAULT_RANDY = true;
 const DEFAULT_SOUND = true;
 
 /* --- CONSTANTS --- */
-const TITLE_HEADER_TEXT = "25 Rooms"; // "The RAD Game"; // "Memory Lane";
-
 const CELL_WIDTH = 60;
 const CELL_HEIGHT = 60;
 
