@@ -19,8 +19,8 @@ const GameStatus = {
 Object.freeze(GameStatus);
 
 /* --- DEFAULTS --- */
-const DEFAULT_NUM_ROWS = 5;
-const DEFAULT_NUM_COLUMNS = 5;
+const DEFAULT_NUM_ROWS = 6;
+const DEFAULT_NUM_COLUMNS = 6;
 const DEFAULT_NUM_PLAYERS = 1;
 const DEFAULT_BACKTRACK = true;
 
