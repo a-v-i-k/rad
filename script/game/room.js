@@ -160,12 +160,6 @@ const Room = class extends Element {
     return true;
   }
 
-  /* --- METHOD: peek --- */
-  peek(loc) {
-    this.validateLocation(loc);
-    return this.getCell(loc).getDoor();
-  }
-
   /* --- METHOD: removeDoor --- */
   removeDoor(loc) {
     this.validateLocation(loc);

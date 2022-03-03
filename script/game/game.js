@@ -2,6 +2,7 @@
 // import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
 import Door from "./door.js";
+import Cell from "./cell.js";
 import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
@@ -32,8 +33,7 @@ const Game = class {
   #columns;
   #numRooms;
   #rooms;
-  #entryRoom;
-  #exitRoom;
+  #startRoom;
 
   /* --- INNER: Status --- */
   static Status = GameStatus;
@@ -143,7 +143,7 @@ const Game = class {
     this.#createPlayers(numPlayers);
     for (let i = 0; i < numPlayers; i++) {
       this.#players[i].play(); // start playing
-      this.#players[i].enter(this.#entryRoom); // let player in
+      this.#players[i].enter(this.#startRoom); // let player in
     }
 
     this.#setStatus(Game.Status.PLAYING);
@@ -198,13 +198,39 @@ const Game = class {
     this.#validatePlayerIndex(index);
 
     const player = this.#players[index];
-    player.inspect();
-    if (player.getRoom() === this.#exitRoom) {
-      console.log(`Player ${index} has won the game!`);
-      this.stop();
-      return true;
+    const cell = player.inspect();
+
+    const finished = false;
+    switch (cell.getType()) {
+      case Cell.Type.PLAIN: // plain cell
+        const door = cell.getDoor();
+        if (door === null) {
+          console.log("Nothing to inspect...");
+          break;
+        }
+
+        switch (door.getType()) {
+          case Door.Type.PLAIN: // plain door
+            player.enter(door.open());
+            break;
+          case Door.Type.EXIT: // exit door
+            console.log(`Player ${index} has won the game!`);
+            this.stop();
+            finished = true;
+            break;
+          default:
+            console.assert(false); // sanity check
+        }
+        break;
+
+      case Cell.Type.WELCOME: // welcome cell
+        player.backtrack(); // go back to previous room
+        break;
+
+      default:
+        console.assert(false); // sanity check
     }
-    return false;
+    return finished;
   }
 
   /* --- METHOD: playerUndo --- */
@@ -267,9 +293,8 @@ const Game = class {
       }
     });
 
-    // set entry and exit rooms
-    this.#entryRoom = this.#rooms[source];
-    this.#exitRoom = this.#rooms[target];
+    // set start room
+    this.#startRoom = this.#rooms[source];
   }
 
   /* --- METHOD: #destroyNetwork --- */

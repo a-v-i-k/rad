@@ -55,7 +55,7 @@ const Player = class extends Element {
   /* --- METHOD: getLocation --- */
   getLocation() {
     this.#validateStatus(Player.Status.PLAYING);
-    return this.#loc.clone();
+    return this.#loc === null ? null : this.#loc.clone();
   }
 
   /* --- METHOD: play --- */
@@ -67,15 +67,21 @@ const Player = class extends Element {
   /* --- METHOD: enter --- */
   enter(room, loc = null) {
     this.#validateStatus(Player.Status.PLAYING);
-    console.assert(this.#room === null); // sanity check
 
     if (!(room instanceof Room)) {
       throw new ETypeError(`input is not of type Room`, room);
     }
-    if (loc !== null) room.validateLocation(loc);
-
     if (loc === null) {
       loc = room.getWelcomeLocation();
+    } else {
+      room.validateLocation(loc);
+    }
+
+    const [currRoom, currLoc] = [this.getRoom(), this.getLocation()];
+    if (currRoom !== null) {
+      const record = [currRoom, currLoc];
+      this.#trace.push(record);
+      this.exit();
     }
     this.#room = room;
     this.#loc = loc;
@@ -84,21 +90,8 @@ const Player = class extends Element {
   /* --- METHOD: inspect --- */
   inspect() {
     this.#validateStatus(Player.Status.PLAYING);
-
     const [room, loc] = [this.getRoom(), this.getLocation()];
-    if (room.isWelcomeLocation(loc)) {
-      this.backtrack(); // go back to previous room
-    } else {
-      const door = room.peek(loc);
-      if (door === null) {
-        console.log("Nothing to inspect...");
-      } else {
-        const record = [room, loc];
-        this.#trace.push(record);
-        this.exit();
-        this.enter(door.open());
-      }
-    }
+    return room.getCell(loc);
   }
 
   /* --- METHOD: backtrack --- */
