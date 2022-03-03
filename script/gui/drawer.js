@@ -36,7 +36,7 @@ const Drawer = class {
     //   console.log(color);
     // }
     if (s.color === "") {
-      throw new ETypeError("input is not a valid color", color);
+      throw new ETypeError(`input ${color} is not a valid color`, color);
     }
   }
 

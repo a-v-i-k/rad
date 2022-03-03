@@ -7,6 +7,7 @@ import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
 import { ETypeError, ERangeError, StatusError } from "../library/errors.js";
+import Graph from "../library/graph.js";
 
 /* --- EXPORTS --- */
 export { Game as default };
@@ -289,6 +290,13 @@ const Game = class {
 
     // create underlying graph
     const graph = this.#getGraph(this.getNumRooms());
+    // DEBUG: Shows room full of doors.
+    // const n = this.getNumRooms();
+    // const graph = new Graph(n);
+    // for (let i = 1; i < n; i++) {
+    //   graph.addEdge(0, i);
+    // }
+
     const [source, target] = this.#getEndpoints(graph); // source, target
 
     // create rooms

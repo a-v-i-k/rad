@@ -4,6 +4,7 @@ import Location from "../game/location.js";
 import BoundingBox from "./bounding-box.js";
 import Drawer from "./drawer.js";
 import Random from "../library/random.js";
+import Colors from "./colors.js";
 import QUOTES from "../library/quotes.js";
 
 /* --- EXPORTS --- */
@@ -65,6 +66,7 @@ const Displayer = class {
   #height;
   #html;
   #drawer;
+  #colors;
   #roomColors;
   #randyFills;
 
@@ -86,6 +88,7 @@ const Displayer = class {
     this.#createHTMLElements();
 
     this.#drawer = new Drawer(this.#HTML().canvas, DEFAULT_CANVAS_BG);
+    this.#colors = new Colors();
     this.#roomColors = {};
     this.#randyFills = {};
 
@@ -391,7 +394,8 @@ const Displayer = class {
   /* --- METHOD: #getRoomColor --- */
   #getRoomColor(id) {
     if (!(id in this.#roomColors)) {
-      this.#roomColors[id] = Random.getRandomColor();
+      // this.#roomColors[id] = Random.getRandomColor();
+      this.#roomColors[id] = this.#colors.getNextColor();
     }
     return this.#roomColors[id];
   }

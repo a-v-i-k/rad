@@ -57,6 +57,7 @@
 // │   |       └── random-walker.js
 // │   ├── gui
 // │   |   ├── bounding-box.js
+// │   |   ├── colors.js
 // │   |   ├── displayer.js
 // │   |   ├── drawer.js
 // │   |   ├── gui.js
