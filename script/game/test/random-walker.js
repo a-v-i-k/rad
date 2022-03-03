@@ -1,7 +1,6 @@
 /* --- IMPORTS --- */
 import Random from "../../library/random.js";
 import Direction from "../direction.js";
-import Door from "../door.js";
 import { StatusError } from "../../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -51,7 +50,7 @@ const RandomWalker = class {
     const doors = state.doors;
     for (const door of doors) {
       // if there is an exit door in the room, then choose it
-      if (door.type === Door.Type.EXIT) {
+      if (door.exit) {
         goingTo = door.loc;
       }
     }
