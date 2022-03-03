@@ -60,13 +60,13 @@ main {
   }
 }
 #title-header {
-  font-size: 200%;
+  font-size: 170%;
   font-weight: bold;
 }
 @media only screen and (min-width: 600px) {
   /* RWD */
   #title-header {
-    font-size: 250%;
+    font-size: 190%;
   }
 }
 
