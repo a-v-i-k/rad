@@ -27,7 +27,7 @@ const GUIStatus = {
 Object.freeze(GUIStatus);
 
 /* --- DEFAULTS --- */
-const DEFAULT_UNDO = true; // undo
+const DEFAULT_UNDO = true;
 const DEFAULT_CLOCK = true;
 const DEFAULT_RANDY = true;
 const DEFAULT_SOUND = true;
@@ -395,6 +395,8 @@ const GUI = class {
         case "Backspace":
           if (this.#CFGN().undo) {
             this.#playerUndo();
+          } else {
+            console.log("Undo is off.");
           }
           break;
 
