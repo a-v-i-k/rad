@@ -354,9 +354,7 @@ const GUI = class {
 
     this.#displayer.displayPlay();
 
-    if (this.#CFGN().sound) {
-      this.#HTML().sound.start.play(); // sound
-    }
+    this.#playSound(this.#HTML().sound.start);
   }
 
   /* --- METHOD: #unset --- */
@@ -611,9 +609,7 @@ const GUI = class {
 
     this.#displayer.displayPause(); // pause message
 
-    if (this.#CFGN().sound) {
-      this.#HTML().sound.pause.play(); // sound
-    }
+    this.#playSound(this.#HTML().sound.pause);
 
     this.#setStatus(GUI.Status.PAUSE);
   }
@@ -713,9 +709,7 @@ const GUI = class {
       this.#playerWon();
     } else {
       if (this.#game.getState(0).room.id !== prevRoomId) {
-        if (this.#CFGN().sound) {
-          this.#HTML().sound.enter.play(); // sound
-        }
+        this.#playSound(this.#HTML().sound.enter);
       }
       this.#refresh();
     }
@@ -726,17 +720,13 @@ const GUI = class {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     this.#game.playerBacktrack(0);
-    if (this.#CFGN().sound) {
-      this.#HTML().sound.enter.play(); // sound
-    }
+    this.#playSound(this.#HTML().sound.enter);
     this.#refresh();
   }
 
   /* --- METHOD: #playerWon --- */
   #playerWon() {
-    if (this.#CFGN().sound) {
-      this.#HTML().sound.triumph.play();
-    }
+    this.#playSound(this.#HTML().sound.triumph);
     this.#rewardPlayer();
   }
 
@@ -818,10 +808,16 @@ const GUI = class {
   /* --- METHOD: #randyIsDone --- */
   #randyIsDone(index) {
     // TODO: do something with index?
-    if (this.#CFGN().sound) {
-      this.#HTML().sound.randydone.play(); // sound
-    }
+    this.#playSound(this.#HTML().sound.randydone);
     this.#displayer.announce("Randy is done :()");
     this.#setStatus(GUI.Status.RANDYDONE);
+  }
+
+  /// SOUND
+  #playSound(audio) {
+    console.assert(audio instanceof HTMLElement && audio.tagName === "AUDIO"); // sanity check
+    if (this.#CFGN().sound) {
+      audio.play(); // sound
+    }
   }
 };
