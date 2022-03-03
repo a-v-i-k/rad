@@ -4,7 +4,7 @@ import Game from "../game/game.js";
 import Location from "../game/location.js";
 import Direction from "../game/direction.js";
 import Displayer from "./displayer.js";
-import Timer from "./timer.js";
+import Stopwatch from "./stopwatch.js";
 import RandyManager from "./randy-manager.js";
 import RandomPath from "./random-path.js";
 import { ETypeError } from "../library/errors.js";
@@ -29,7 +29,7 @@ Object.freeze(GUIStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_BACKTRACK = true; // undo
 const DEFAULT_MARK = true;
-const DEFAULT_TIMER = true;
+const DEFAULT_CLOCK = true;
 const DEFAULT_RANDY = true;
 const DEFAULT_SOUND = true;
 
@@ -39,11 +39,8 @@ const TITLE_HEADER_TEXT = "25 Rooms"; // "The RAD Game"; // "Memory Lane";
 const CELL_WIDTH = 60;
 const CELL_HEIGHT = 60;
 
-const TIMER_IDLE_FG = "gray";
-const TIMER_START_TIME = 90; // in seconds
-const TIMER_ALERT_TIME = 5; // in seconds
-const TIMER_COUNT_FG = "lime";
-const TIMER_ALERT_FG = "red";
+const CLOCK_IDLE_FG = "gray";
+const CLOCK_COUNT_FG = "lime";
 
 const MAX_NUM_RANDYS = 10;
 
@@ -60,7 +57,7 @@ const GUI = class {
   #cfgn;
   #game;
   #displayer;
-  #timer;
+  #stopwatch;
   #randy;
   #html;
   #callbacks;
@@ -74,23 +71,23 @@ const GUI = class {
   constructor(
     master,
     backtrack = DEFAULT_BACKTRACK,
-    timer = DEFAULT_TIMER,
+    clock = DEFAULT_CLOCK,
     randy = DEFAULT_RANDY,
     sound = DEFAULT_SOUND
   ) {
-    GUI.#validator(master, backtrack, timer, randy, sound);
+    GUI.#validator(master, backtrack, clock, randy, sound);
     this.#master = master; // slave to be set later...
 
     // configuration
     this.#cfgn = {
       backtrack: backtrack,
-      timer: timer,
+      clock: clock,
       randy: randy,
       sound: sound,
     };
 
     this.#game = new Game(); // game
-    this.#timer = null;
+    this.#stopwatch = null;
     this.#randy = null;
 
     // setting
@@ -121,15 +118,15 @@ const GUI = class {
   /// VALIDATION
 
   /* --- METHOD: #validator --- */
-  static #validator(master, backtrack, timer, randy, sound) {
+  static #validator(master, backtrack, clock, randy, sound) {
     if (!(master instanceof HTMLElement)) {
       throw new ETypeError(`master is not an HTML element`, master);
     }
     if (typeof backtrack !== "boolean") {
       throw new ETypeError(`input is not a boolean`, backtrack);
     }
-    if (typeof timer !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, timer);
+    if (typeof clock !== "boolean") {
+      throw new ETypeError(`input is not a boolean`, clock);
     }
     if (typeof randy !== "boolean") {
       throw new ETypeError(`input is not a boolean`, randy);
@@ -205,11 +202,10 @@ const GUI = class {
         frame: document.querySelector("#display-frame"),
       },
 
-      // timer
-      timer: {
-        frame: document.querySelector("#timer-frame"),
-        watch: document.querySelector("#timer-watch"),
-        checkbox: document.querySelector("#timer-checkbox"),
+      // clock
+      clock: {
+        frame: document.querySelector("#clock-frame"),
+        watch: document.querySelector("#clock-watch"),
       },
 
       // randy
@@ -223,7 +219,6 @@ const GUI = class {
         start: document.querySelector("#start"),
         enter: document.querySelector("#enter"),
         pause: document.querySelector("#pause-sound"),
-        timeup: document.querySelector("#time-is-up"),
         randydone: document.querySelector("#randy-done"),
         triumph: document.querySelector("#triumph"),
       },
@@ -236,7 +231,7 @@ const GUI = class {
     this.#setTop(); // top
     this.#setTitle(); // title
     this.#setPanel(); // panel
-    this.#setTimerWatch(); // timer
+    this.#setStopwatch(); // clock
     this.#setRandyControl(); // randy
   }
 
@@ -265,20 +260,18 @@ const GUI = class {
     // nothing to do here...
   }
 
-  /* --- METHOD: #setTimerWatch --- */
-  #setTimerWatch() {
-    if (this.#CFGN().timer) {
-      // create new timer object
-      this.#timer = new Timer();
+  /* --- METHOD: #setStopwatch --- */
+  #setStopwatch() {
+    if (this.#CFGN().clock) {
+      // create new stopwatch object
+      this.#stopwatch = new Stopwatch();
 
       // html stuff
-      if (this.#HTML().timer.checkbox.checked) {
-        this.#HTML().timer.watch.style.color = TIMER_IDLE_FG;
-      }
+      this.#HTML().clock.watch.style.color = CLOCK_IDLE_FG;
     } else {
-      this.#HTML().top.frame.removeChild(this.#HTML().timer.frame);
-      // this.#HTML().panel.frame.style.gridRow = "2 / 5";
-      // this.#HTML().display.frame.style.gridRow = "2 / 5";
+      this.#HTML().top.frame.removeChild(this.#HTML().clock.frame);
+      // this.#HTML().panel.frame.style.gridRow = "2 / 5"; [AK]
+      // this.#HTML().display.frame.style.gridRow = "2 / 5"; [AK]
     }
   }
 
@@ -321,22 +314,16 @@ const GUI = class {
     );
   }
 
-  /* --- METHOD: #setTimer --- */
-  #setTimer() {
-    if (!this.#CFGN().timer) return;
-    this.#HTML().timer.checkbox.disabled = true;
-    if (this.#HTML().timer.checkbox.checked) {
-      this.#timerStart();
-    }
+  /* --- METHOD: #setClock --- */
+  #setClock() {
+    if (!this.#CFGN().clock) return;
+    this.#stopwatchStart();
   }
 
-  /* --- METHOD: #unsetTimer --- */
-  #unsetTimer() {
-    if (!this.#CFGN().timer) return;
-    this.#HTML().timer.checkbox.disabled = false;
-    if (this.#HTML().timer.checkbox.checked) {
-      this.#timerStop();
-    }
+  /* --- METHOD: #unsetClock --- */
+  #unsetClock() {
+    if (!this.#CFGN().clock) return;
+    this.#stopwatchStop();
   }
 
   /* --- METHOD: #setRandy --- */
@@ -363,7 +350,7 @@ const GUI = class {
     }
     this.#game.play(numPlayers);
 
-    this.#setTimer();
+    this.#setClock();
     this.#setRandy();
 
     this.#displayer.displayPlay();
@@ -376,7 +363,7 @@ const GUI = class {
   /* --- METHOD: #unset --- */
   #unset() {
     this.#unsetRandy();
-    this.#unsetTimer();
+    this.#unsetClock();
     if (this.getStatus() === GUI.Status.PATH && this.#rpath !== null) {
       this.#rpath.cancel();
     }
@@ -482,16 +469,6 @@ const GUI = class {
       this.#stop();
     };
     this.#HTML().panel.stop.addEventListener("click", this.#callbacks.stop);
-
-    // timer checkbox
-    this.#HTML().timer.checkbox.addEventListener("change", () => {
-      const timerWatch = this.#HTML().timer.watch;
-      if (this.#HTML().timer.checkbox.checked) {
-        timerWatch.style.color = TIMER_IDLE_FG;
-      } else {
-        timerWatch.style.color = timerWatch.style.background;
-      }
-    });
 
     // (mouse) click
     this.#HTML().display.frame.addEventListener(
@@ -604,11 +581,11 @@ const GUI = class {
     const status = this.getStatus();
     if (!(status === GUI.Status.PLAYING || status === GUI.Status.PATH)) return;
 
-    // timer
-    if (this.#CFGN().timer && this.#HTML().timer.checkbox.checked) {
-      this.#timer.pause();
-      this.#backup.timerForeground = this.#HTML().timer.watch.style.color;
-      this.#HTML().timer.watch.style.color = TIMER_IDLE_FG;
+    // clock
+    if (this.#CFGN().clock) {
+      this.#stopwatch.pause();
+      this.#backup.stopwatchForeground = this.#HTML().clock.watch.style.color;
+      this.#HTML().clock.watch.style.color = CLOCK_IDLE_FG;
     }
 
     // randy
@@ -658,10 +635,10 @@ const GUI = class {
     window.removeEventListener("keydown", this.#callbacks.space);
     // this.#bindEvents();
 
-    // timer
-    if (this.#CFGN().timer && this.#HTML().timer.checkbox.checked) {
-      this.#HTML().timer.watch.style.color = this.#backup.timerForeground;
-      this.#timer.resume();
+    // clock
+    if (this.#CFGN().clock) {
+      this.#HTML().clock.watch.style.color = this.#backup.stopwatchForeground;
+      this.#stopwatch.resume();
     }
 
     // randy
@@ -790,47 +767,28 @@ const GUI = class {
     );
   }
 
-  /// TIMER
+  /// CLOCK
 
-  /* --- METHOD: #timerStart --- */
-  #timerStart() {
-    const timeStr = GUI.#getWatchTimeString(TIMER_START_TIME * 1000);
-    const timerWatch = this.#HTML().timer.watch;
-    timerWatch.innerText = timeStr;
-    timerWatch.style.color =
-      TIMER_START_TIME <= TIMER_ALERT_TIME ? TIMER_ALERT_FG : TIMER_COUNT_FG;
-    this.#timer.start(
-      TIMER_START_TIME * 1000,
+  /* --- METHOD: #stopwatchStart --- */
+  #stopwatchStart() {
+    const stopwatchStr = GUI.#getWatchTimeString(0);
+    const clockWatch = this.#HTML().clock.watch;
+    clockWatch.innerText = stopwatchStr;
+    clockWatch.style.color = CLOCK_COUNT_FG;
+    this.#stopwatch.start(
       1000, // 1 second
-      (timeLeft) => {
-        const watchColor =
-          timeLeft <= TIMER_ALERT_TIME * 1000 ? TIMER_ALERT_FG : TIMER_COUNT_FG;
-        const timerWatch = this.#HTML().timer.watch;
-        timerWatch.innerText = GUI.#getWatchTimeString(timeLeft);
-        timerWatch.style.color = watchColor;
-      },
-      () => {
-        this.#unset();
-        this.#timeIsUp();
+      (time) => {
+        this.#HTML().clock.watch.innerText = GUI.#getWatchTimeString(time);
       }
     );
   }
 
-  /* --- METHOD: #timerStop --- */
-  #timerStop() {
-    this.#timer.stop();
-    const timerWatch = this.#HTML().timer.watch;
-    timerWatch.innerText = "00:00";
-    timerWatch.style.color = TIMER_IDLE_FG;
-  }
-
-  /* --- METHOD: #timeIsUp --- */
-  #timeIsUp() {
-    if (this.#CFGN().sound) {
-      this.#HTML().sound.timeup.play(); // sound
-    }
-    this.#displayer.announce("Time's Up!");
-    this.#setStatus(GUI.Status.TIMEUP);
+  /* --- METHOD: #stopwatchStop --- */
+  #stopwatchStop() {
+    this.#stopwatch.stop();
+    const clockWatch = this.#HTML().clock.watch;
+    clockWatch.innerText = "00:00"; // [AK]
+    clockWatch.style.color = CLOCK_IDLE_FG;
   }
 
   /* --- METHOD: #getWatchTimeString --- */

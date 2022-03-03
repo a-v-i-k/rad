@@ -39,8 +39,8 @@
     <script type="module" src="script/gui/drawer.js"></script>
     <script type="module" src="script/gui/displayer.js"></script>
     <script type="module" src="script/gui/scheduler.js"></script>
+    <script type="module" src="script/gui/stopwatch.js"></script>
     <script type="module" src="script/gui/timed-iterator.js"></script>
-    <script type="module" src="script/gui/timer.js"></script>
     <script type="module" src="script/gui/random-path.js"></script>
     <script type="module" src="script/gui/randy.js"></script>
     <script type="module" src="script/gui/randy-manager.js"></script>
@@ -112,16 +112,9 @@
           </div>
         </div>
 
-        <!-- TIMER -->
-        <div id="timer-frame" class="widget frame">
-          <label for="timer-checkbox" class="widget label">Timer</label>
-          <input
-            type="checkbox"
-            id="timer-checkbox"
-            class="widget checkbox"
-            checked
-          />
-          <div id="timer-watch" class="widget timer" style="color: gray">
+        <!-- STOPWATCH -->
+        <div id="clock-frame" class="widget frame">
+          <div id="clock-watch" class="widget stopwatch" style="color: gray">
             00:00
           </div>
         </div>
@@ -148,13 +141,6 @@
     <audio
       id="enter"
       src="sound/enter.mp3"
-      preload="auto"
-      controls="none"
-      style="display: none"
-    ></audio>
-    <audio
-      id="time-is-up"
-      src="sound/time-is-up.mp3"
       preload="auto"
       controls="none"
       style="display: none"

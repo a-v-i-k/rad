@@ -22,7 +22,7 @@
  * - Allow to configure number of rows/columns via GUI?
  ******************************************************************************
  * ACK:
- * - Thanks David Naori for the following ideas: coloring doors; timer.
+ * - Thanks David Naori for the following ideas: coloring doors; clock.
  ******************************************************************************
  */
 
@@ -64,8 +64,8 @@
 // │   |   ├── randy.js
 // │   |   ├── randy-manager.js
 // │   |   ├── scheduler.js
-// │   |   ├── timed-iterator.js
-// │   |   └── timer.js
+// │   |   ├── stopwatch.js
+// │   |   └── timed-iterator.js
 // │   └── library
 // │       ├── errors.js
 // │       ├── graph.js
