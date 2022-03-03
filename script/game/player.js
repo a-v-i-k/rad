@@ -85,14 +85,19 @@ const Player = class extends Element {
   inspect() {
     this.#validateStatus(Player.Status.PLAYING);
 
-    const door = this.#room.peek(this.#loc);
-    if (door === null) {
-      console.log("Nothing to inspect...");
+    const [room, loc] = [this.getRoom(), this.getLocation()];
+    if (room.isWelcomeLocation(loc)) {
+      this.backtrack(); // go back to previous room
     } else {
-      const record = [this.getRoom(), this.getLocation()];
-      this.#trace.push(record);
-      this.exit();
-      this.enter(door.open());
+      const door = room.peek(loc);
+      if (door === null) {
+        console.log("Nothing to inspect...");
+      } else {
+        const record = [room, loc];
+        this.#trace.push(record);
+        this.exit();
+        this.enter(door.open());
+      }
     }
   }
 
