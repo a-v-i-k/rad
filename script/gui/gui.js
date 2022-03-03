@@ -27,8 +27,7 @@ const GUIStatus = {
 Object.freeze(GUIStatus);
 
 /* --- DEFAULTS --- */
-const DEFAULT_BACKTRACK = true; // undo
-const DEFAULT_MARK = true;
+const DEFAULT_UNDO = true; // undo
 const DEFAULT_CLOCK = true;
 const DEFAULT_RANDY = true;
 const DEFAULT_SOUND = true;
@@ -70,17 +69,17 @@ const GUI = class {
   /* --- C'TOR: constructor --- */
   constructor(
     master,
-    backtrack = DEFAULT_BACKTRACK,
+    undo = DEFAULT_UNDO,
     clock = DEFAULT_CLOCK,
     randy = DEFAULT_RANDY,
     sound = DEFAULT_SOUND
   ) {
-    GUI.#validator(master, backtrack, clock, randy, sound);
+    GUI.#validator(master, undo, clock, randy, sound);
     this.#master = master; // slave to be set later...
 
     // configuration
     this.#cfgn = {
-      backtrack: backtrack,
+      undo: undo,
       clock: clock,
       randy: randy,
       sound: sound,
@@ -118,12 +117,12 @@ const GUI = class {
   /// VALIDATION
 
   /* --- METHOD: #validator --- */
-  static #validator(master, backtrack, clock, randy, sound) {
+  static #validator(master, undo, clock, randy, sound) {
     if (!(master instanceof HTMLElement)) {
       throw new ETypeError(`master is not an HTML element`, master);
     }
-    if (typeof backtrack !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, backtrack);
+    if (typeof undo !== "boolean") {
+      throw new ETypeError(`input is not a boolean`, undo);
     }
     if (typeof clock !== "boolean") {
       throw new ETypeError(`input is not a boolean`, clock);
@@ -396,7 +395,7 @@ const GUI = class {
           break;
 
         case "Backspace":
-          if (this.#CFGN().backtrack) {
+          if (this.#CFGN().undo) {
             this.#playerUndo();
           }
           break;
@@ -726,7 +725,7 @@ const GUI = class {
   #playerUndo() {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
-    this.#game.playerUndo(0);
+    this.#game.playerBacktrack(0);
     if (this.#CFGN().sound) {
       this.#HTML().sound.enter.play(); // sound
     }

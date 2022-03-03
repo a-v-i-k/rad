@@ -22,6 +22,7 @@ Object.freeze(GameStatus);
 const DEFAULT_NUM_ROWS = 5;
 const DEFAULT_NUM_COLUMNS = 5;
 const DEFAULT_NUM_PLAYERS = 1;
+const DEFAULT_BACKTRACK = true;
 
 /*
  * CLASS: Game [UML]
@@ -32,6 +33,7 @@ const Game = class {
   #rows;
   #columns;
   #numRooms;
+  #backtrack;
   #rooms;
   #startRoom;
 
@@ -72,11 +74,16 @@ const Game = class {
   };
 
   /* --- C'TOR: constructor --- */
-  constructor(rows = DEFAULT_NUM_ROWS, columns = DEFAULT_NUM_COLUMNS) {
-    Game.#validator(rows, columns);
+  constructor(
+    rows = DEFAULT_NUM_ROWS,
+    columns = DEFAULT_NUM_COLUMNS,
+    backtrack = DEFAULT_BACKTRACK
+  ) {
+    Game.#validator(rows, columns, backtrack);
     this.#rows = rows;
     this.#columns = columns;
     this.#numRooms = rows * columns;
+    this.#backtrack = backtrack;
 
     this.#setStatus(Game.Status.IDLE);
     this.#rooms = null;
@@ -84,7 +91,7 @@ const Game = class {
   }
 
   /* --- METHOD: #validator --- */
-  static #validator(rows, columns) {
+  static #validator(rows, columns, backtrack) {
     if (!Number.isInteger(rows)) {
       throw new ETypeError(`input is not an integer`, rows);
     }
@@ -97,6 +104,10 @@ const Game = class {
     }
     if (columns < 0) {
       throw new ERangeError(`input is negative`, columns);
+    }
+
+    if (typeof backtrack !== "boolean") {
+      throw new ETypeError(`input is not a boolean`, backtrack);
     }
   }
 
@@ -224,7 +235,9 @@ const Game = class {
         break;
 
       case Cell.Type.WELCOME: // welcome cell
-        player.backtrack(); // go back to previous room
+        if (this.#backtrack) {
+          this.playerBacktrack(index); // go back to previous room
+        }
         break;
 
       default:
@@ -233,11 +246,15 @@ const Game = class {
     return finished;
   }
 
-  /* --- METHOD: playerUndo --- */
-  playerUndo(index) {
+  /* --- METHOD: playerBacktrack --- */
+  playerBacktrack(index) {
     this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
-    this.#players[index].backtrack();
+    if (this.#backtrack) {
+      this.#players[index].backtrack();
+    } else {
+      console.log("Player backtrack is off.");
+    }
   }
 
   /* --- METHOD: #setStatus --- */
