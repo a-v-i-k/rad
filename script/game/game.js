@@ -112,7 +112,7 @@ const Game = class {
       throw new ETypeError(`input is not an integer`, numRooms);
     }
     if (numRooms <= 1) {
-      throw new ERangeError(`number of rooms must be >= 2`, numRooms);
+      throw new ERangeError(`number of rooms must be at least 2`, numRooms);
     }
 
     if (typeof backtrack !== "boolean") {
