@@ -25,12 +25,12 @@ Object.freeze(DisplayerStatus);
 // const IDLE_BG = "powderblue";
 const DEFAULT_CANVAS_BG = "#f0f0f0";
 const PAUSE_FILL_STYLE = "red";
-const PAUSE_FONT_PX_PER_CELL = 8;
+const PAUSE_FONT_PX_PER_CELL = 9;
 const QUOTE_PADDING = 10;
 const QUOTE_FONT_PR_PER_CELL = 24;
 const ANNOUNCEMENT_BG = "honeydew";
 const ANNOUNCEMENT_FILL_STYLE = "indigo";
-const ANNOUNCEMENT_FONT_PX_PER_CELL = 6;
+const ANNOUNCEMENT_FONT_PX_PER_CELL = 7;
 
 const ROOM_OUTLINE = "black";
 const ROOM_BACKGROUND = "#f0f0f0"; //"aliceblue";
