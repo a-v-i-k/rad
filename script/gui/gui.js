@@ -414,9 +414,11 @@ const GUI = class {
           break;
 
         case "c":
-          const state = this.#game.getState(0);
-          console.log(state.doors);
-          this.#playerGoTo(Random.getRandomChoice(state.doors).loc);
+          if (this.#rpath === null || !this.#rpath.isActive()) {
+            const state = this.#game.getState(0);
+            console.log(state.doors);
+            this.#playerGoTo(Random.getRandomChoice(state.doors).loc);
+          }
           break;
 
         default:
