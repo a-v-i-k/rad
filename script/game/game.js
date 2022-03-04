@@ -21,6 +21,7 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 5;
 const DEFAULT_NUM_COLUMNS = 5;
+const DEFAULT_NUM_ROOMS = DEFAULT_NUM_ROWS * DEFAULT_NUM_COLUMNS;
 const DEFAULT_NUM_PLAYERS = 1;
 const DEFAULT_BACKTRACK = true;
 
@@ -77,12 +78,13 @@ const Game = class {
   constructor(
     rows = DEFAULT_NUM_ROWS,
     columns = DEFAULT_NUM_COLUMNS,
+    numRooms = DEFAULT_NUM_ROOMS,
     backtrack = DEFAULT_BACKTRACK
   ) {
-    Game.#validator(rows, columns, backtrack);
+    Game.#validator(rows, columns, numRooms, backtrack);
     this.#rows = rows;
     this.#columns = columns;
-    this.#numRooms = rows * columns;
+    this.#numRooms = numRooms;
     this.#backtrack = backtrack;
 
     this.#setStatus(Game.Status.IDLE);
@@ -91,7 +93,7 @@ const Game = class {
   }
 
   /* --- METHOD: #validator --- */
-  static #validator(rows, columns, backtrack) {
+  static #validator(rows, columns, numRooms, backtrack) {
     if (!Number.isInteger(rows)) {
       throw new ETypeError(`input is not an integer`, rows);
     }
@@ -104,6 +106,13 @@ const Game = class {
     }
     if (columns < 0) {
       throw new ERangeError(`input is negative`, columns);
+    }
+
+    if (!Number.isInteger(numRooms)) {
+      throw new ETypeError(`input is not an integer`, numRooms);
+    }
+    if (numRooms <= 1) {
+      throw new ERangeError(`number of rooms must be >= 2`, numRooms);
     }
 
     if (typeof backtrack !== "boolean") {
