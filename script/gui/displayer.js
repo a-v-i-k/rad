@@ -24,12 +24,13 @@ Object.freeze(DisplayerStatus);
 /* --- CONSTANTS --- */
 // const IDLE_BG = "powderblue";
 const DEFAULT_CANVAS_BG = "#f0f0f0";
-const QUOTE_PADDING = 10;
 const PAUSE_FILL_STYLE = "red";
+const PAUSE_FONT_PX_PER_CELL = 8;
+const QUOTE_PADDING = 10;
+const QUOTE_FONT_PR_PER_CELL = 24;
 const ANNOUNCEMENT_BG = "honeydew";
 const ANNOUNCEMENT_FILL_STYLE = "indigo";
-const FONT_PR_PER_CELL = 24;
-const FONT_PX_PER_CELL = 10;
+const ANNOUNCEMENT_FONT_PX_PER_CELL = 6;
 
 const ROOM_OUTLINE = "black";
 const ROOM_BACKGROUND = "#f0f0f0"; //"aliceblue";
@@ -290,7 +291,7 @@ const Displayer = class {
     console.assert(this.getStatus() === Displayer.Status.PLAY); // sanity check
 
     const dims = this.#game.getDimensions();
-    const fontSize = Math.min(dims[0], dims[1]) * FONT_PX_PER_CELL;
+    const fontSize = Math.min(dims[0], dims[1]) * PAUSE_FONT_PX_PER_CELL;
     this.#drawer.injectText(
       "Pause",
       this.getWidth() / 2,
@@ -344,7 +345,7 @@ const Displayer = class {
 
     // fonrt size of the qoute element
     const dims = this.#game.getDimensions();
-    const fontSize = Math.min(dims[0], dims[1]) * FONT_PR_PER_CELL;
+    const fontSize = Math.min(dims[0], dims[1]) * QUOTE_FONT_PR_PER_CELL;
     quote.style.fontSize = fontSize.toString() + "%";
 
     this.#setStatus(Displayer.Status.QUOTE);
@@ -367,7 +368,7 @@ const Displayer = class {
     this.#clearDisplay();
 
     const dims = this.#game.getDimensions();
-    const fontSize = Math.min(dims[0], dims[1]) * FONT_PX_PER_CELL;
+    const fontSize = Math.min(dims[0], dims[1]) * ANNOUNCEMENT_FONT_PX_PER_CELL;
     this.#drawer.injectText(
       message,
       this.getWidth() / 2,
