@@ -42,7 +42,7 @@ const WELCOME_CELL_CASCADE_SHAPE = "circle";
 
 const DOOR_OUTLINE = "black";
 const DOOR_WINDOW_FILL = "white";
-const DOOR_HANDLE_FILL = "lightgray";
+const DOOR_HANDLE_FILL = "silver";
 const EXIT_DOOR_FRONT_FILL = "goldenrod";
 const EXIT_DOOR_WINDOW_FILL = "gold";
 const EXIT_DOOR_HANDLE_FILL = "gold";

@@ -50,7 +50,7 @@ const COLORS = [
   "palegreen",
   "rosybrown",
   "saddlebrown",
-  "silver",
+  "dimgray",
   "skyblue",
   "silver",
   "black",
