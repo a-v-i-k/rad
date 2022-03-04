@@ -7,7 +7,9 @@ import Displayer from "./displayer.js";
 import Stopwatch from "./stopwatch.js";
 import RandyManager from "./randy-manager.js";
 import RandomPath from "./random-path.js";
+import TIterator from "./timed-iterator.js";
 import { ETypeError } from "../library/errors.js";
+import cell from "../game/cell.js";
 
 /* --- EXPORTS --- */
 export { GUI as default };
@@ -56,6 +58,7 @@ const GUI = class {
   #html;
   #callbacks;
   #rpath;
+  #auto;
   #backup;
 
   /* --- INNER: Status --- */
@@ -95,6 +98,7 @@ const GUI = class {
     this.#bindEvents(); // events
 
     this.#rpath = null;
+    this.#auto = null;
 
     this.#displayer.displayIdle();
 
@@ -355,6 +359,10 @@ const GUI = class {
 
   /* --- METHOD: #unset --- */
   #unset() {
+    if (this.#auto !== null) {
+      this.#auto.cancel();
+      this.#auto = null;
+    }
     if (this.#activeRandomPath()) {
       this.#rpath.cancel();
     }
@@ -416,6 +424,27 @@ const GUI = class {
           break;
         case "q":
           this.#quit();
+          break;
+
+        case "a":
+          if (this.#auto === null) {
+            this.#auto = new TIterator(
+              PLAYER_DELAY,
+              () => {
+                window.dispatchEvent(
+                  new KeyboardEvent("keydown", { key: "c" })
+                );
+                return true;
+              },
+              () => {}
+            );
+          } else {
+            this.#auto.cancel();
+            this.#auto = null;
+            if (this.#activeRandomPath()) {
+              this.#rpath.cancel();
+            }
+          }
           break;
 
         case "c":
@@ -521,7 +550,7 @@ const GUI = class {
       case GUI.Status.PAUSE:
         this.#resume();
       case GUI.Status.PLAYING:
-        if (!this.#activeRandomPath()) {
+        if (!this.#activeRandomPath() && this.#auto !== null) {
           this.#clientGoTo(clientX, clientY);
         }
         break;
