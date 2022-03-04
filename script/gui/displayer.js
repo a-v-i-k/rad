@@ -620,8 +620,8 @@ const Displayer = class {
     // console.assert(states.length > 1); // sanity check
     for (let j = 0; j < states.length; j++) {
       let offset = [
-        Random.getRandomInteger(-2, 3),
-        Random.getRandomInteger(-2, 3),
+        Random.getRandomInteger(-5, 6),
+        Random.getRandomInteger(-5, 6),
       ];
       this.#displayRandy(states[j], bbox, offset);
     }
