@@ -215,6 +215,7 @@ const Displayer = class {
     quote.setAttribute("id", "quote");
     quote.innerHTML = `<q></q>`;
     quote.style.padding = QUOTE_PADDING.toString() + "px";
+    quote.style.textAlign = "center";
     return quote;
   }
 

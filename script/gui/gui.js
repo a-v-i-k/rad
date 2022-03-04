@@ -30,8 +30,8 @@ const DEFAULT_RANDY = true;
 const DEFAULT_SOUND = true;
 
 /* --- CONSTANTS --- */
-const CELL_WIDTH = 60;
-const CELL_HEIGHT = 60;
+const CELL_WIDTH = 75;
+const CELL_HEIGHT = 75;
 
 const CLOCK_IDLE_FG = "gray";
 const CLOCK_COUNT_FG = "lime";
