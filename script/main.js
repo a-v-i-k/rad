@@ -21,6 +21,12 @@
  * - Scores. (high scores)
  * - Allow to configure number of rows/columns via GUI?
  ******************************************************************************
+ * ACA: (academy)
+ * - Every game can be "reduced" to this game.
+ * - What is the "hardest" tree for a random walker?
+ * - Are there any bounds on the degree/diameter/leaves of a random MST?
+ * -
+ ******************************************************************************
  * ACK:
  * - Thanks David Naori for the following ideas: coloring doors; clock.
  ******************************************************************************
