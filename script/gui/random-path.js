@@ -78,6 +78,7 @@ const RandomPath = class {
   cancel() {
     if (!this.isActive()) return;
     this.#titer.cancel();
+    this.#active = false;
   }
 
   /* --- METHOD: #step --- */
