@@ -43,6 +43,16 @@ const COLORS = [
   "lightskyblue",
   "maroon",
   "darkseagreen",
+  "springgreen",
+  "deepskyblue",
+  "wheat",
+  "turquoise",
+  "palegreen",
+  "rosybrown",
+  "saddlebrown",
+  "silver",
+  "skyblue",
+  "silver",
   "black",
 ];
 
@@ -67,7 +77,7 @@ const Colors = class {
     if (this.#curr == 0) {
       Random.shuffleArray(this.#indices);
     }
-    const color = COLORS[this.#curr];
+    const color = COLORS[this.#indices[this.#curr]];
     this.#curr = (this.#curr + 1) % COLORS.length;
     return color;
   }
