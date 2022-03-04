@@ -14,6 +14,7 @@
  * - Smooth page loading.
  * - Touch.
  * - Responsive web design.
+ * - Cross-Browser Testing (BrowserStack: https://www.browserstack.com/)
  ******************************************************************************
  * RFE:
  * - Multiplayer. [David Naori]
