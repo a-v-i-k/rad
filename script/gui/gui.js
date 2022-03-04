@@ -9,7 +9,6 @@ import RandyManager from "./randy-manager.js";
 import RandomPath from "./random-path.js";
 import TIterator from "./timed-iterator.js";
 import { ETypeError } from "../library/errors.js";
-import cell from "../game/cell.js";
 
 /* --- EXPORTS --- */
 export { GUI as default };
