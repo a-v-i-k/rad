@@ -1,7 +1,7 @@
 
 rem VERSION
 SET version-major=0
-SET version-minor=3
+SET version-minor=4
 
 rem OUTPUT FILE
 SET ZIPFILE=25rooms-v%version-major%.%version-minor%.zip
