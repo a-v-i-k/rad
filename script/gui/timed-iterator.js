@@ -42,6 +42,18 @@ const TIterator = class {
     }
   }
 
+  /* --- METHOD: pause --- */
+  pause() {
+    Scheduler.cancel(this.#jobId);
+  }
+
+  /* --- METHOD: resume --- */
+  resume() {
+    this.#jobId = Scheduler.after(this.#delay, () => {
+      this.#stepWrapper();
+    });
+  }
+
   /* --- METHOD: cancel --- */
   cancel() {
     Scheduler.cancel(this.#jobId);

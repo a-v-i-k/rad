@@ -62,6 +62,18 @@ const RandomPath = class {
     return this.#active;
   }
 
+  /* --- METHOD: pause --- */
+  pause() {
+    if (!this.isActive()) return;
+    this.#titer.pause();
+  }
+
+  /* --- METHOD: resume --- */
+  resume() {
+    if (!this.isActive()) return;
+    this.#titer.resume();
+  }
+
   /* --- METHOD: cancel --- */
   cancel() {
     if (!this.isActive()) return;

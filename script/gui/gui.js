@@ -355,7 +355,7 @@ const GUI = class {
 
   /* --- METHOD: #unset --- */
   #unset() {
-    if (this.#rpath !== null && this.#rpath.isActive()) {
+    if (this.#activeRandomPath()) {
       this.#rpath.cancel();
     }
     this.#unsetRandy();
@@ -368,6 +368,11 @@ const GUI = class {
 
   /// EVENTS
   // TODO: Move to EventManager class...
+
+  /* --- METHOD: #activeRandomPath --- */
+  #activeRandomPath() {
+    return this.#rpath !== null && this.#rpath.isActive();
+  }
 
   /* --- METHOD: #bindEvents --- */
   #bindEvents() {
@@ -414,7 +419,7 @@ const GUI = class {
           break;
 
         case "c":
-          if (this.#rpath === null || !this.#rpath.isActive()) {
+          if (!this.#activeRandomPath()) {
             const state = this.#game.getState(0);
             console.log(state.doors);
             this.#playerGoTo(Random.getRandomChoice(state.doors).loc);
@@ -472,15 +477,7 @@ const GUI = class {
       "click",
       (event) => {
         event.preventDefault();
-        if (this.getStatus() === GUI.Status.PAUSE) {
-          this.#resume();
-        } else if (this.getStatus() === GUI.Status.REWARD) {
-          this.#displayer.displayRandomQuote();
-          return;
-        } else if (this.getStatus() !== GUI.Status.PLAYING) {
-          return;
-        }
-        this.#clientGoTo(event.clientX, event.clientY);
+        this.#processTickEvent(event.clientX, event.clientY);
       },
       false
     );
@@ -507,21 +504,33 @@ const GUI = class {
       "touchend",
       (event) => {
         event.preventDefault();
-        if (this.getStatus() === GUI.Status.PAUSE) {
-          this.#resume();
-        } else if (this.getStatus() === GUI.Status.REWARD) {
-          this.#displayer.displayRandomQuote();
-          return;
-        } else if (this.getStatus() !== GUI.Status.PLAYING) {
-          return;
-        }
-        this.#clientGoTo(
+        this.#processTickEvent(
           lastMove.targetTouches[0].clientX,
           lastMove.targetTouches[0].clientY
         );
       },
       false
     );
+  }
+
+  /* --- METHOD: #processTickEvent() --- */
+  #processTickEvent(clientX, clientY) {
+    switch (this.getStatus()) {
+      case GUI.Status.PAUSE:
+        this.#resume();
+        break;
+      case GUI.Status.REWARD:
+        this.#displayer.displayRandomQuote();
+        break;
+      case GUI.Status.PLAYING:
+        if (!this.#activeRandomPath()) {
+          this.#clientGoTo(clientX, clientY);
+        }
+        break;
+      default:
+        // nothing to do here...
+        break;
+    }
   }
 
   /* --- METHOD: #clientGoTo --- */
@@ -577,6 +586,11 @@ const GUI = class {
   #pause() {
     const status = this.getStatus();
     if (status !== GUI.Status.PLAYING) return;
+
+    // random path
+    if (this.#activeRandomPath()) {
+      this.#rpath.pause();
+    }
 
     // clock
     if (this.#CFGN().clock) {
@@ -639,6 +653,11 @@ const GUI = class {
     // randy
     if (this.#CFGN().randy) {
       this.#randy.resume();
+    }
+
+    // random path
+    if (this.#activeRandomPath()) {
+      this.#rpath.resume();
     }
 
     this.#refresh();
