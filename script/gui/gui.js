@@ -516,12 +516,11 @@ const GUI = class {
   /* --- METHOD: #processTickEvent() --- */
   #processTickEvent(clientX, clientY) {
     switch (this.getStatus()) {
-      case GUI.Status.PAUSE:
-        this.#resume();
-        break;
       case GUI.Status.REWARD:
         this.#displayer.displayRandomQuote();
         break;
+      case GUI.Status.PAUSE:
+        this.#resume();
       case GUI.Status.PLAYING:
         if (!this.#activeRandomPath()) {
           this.#clientGoTo(clientX, clientY);
