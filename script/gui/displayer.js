@@ -29,7 +29,7 @@ const PAUSE_FILL_STYLE = "red";
 const ANNOUNCEMENT_BG = "honeydew";
 const ANNOUNCEMENT_FILL_STYLE = "indigo";
 const FONT_PR_PER_CELL = 24;
-const FONT_PX_PER_CELL = 5;
+const FONT_PX_PER_CELL = 10;
 
 const ROOM_OUTLINE = "black";
 const ROOM_BACKGROUND = "#f0f0f0"; //"aliceblue";
