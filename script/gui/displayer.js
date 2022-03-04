@@ -67,8 +67,6 @@ const Displayer = class {
   #html;
   #drawer;
   #colors;
-  #roomColors;
-  #randyFills;
 
   /* --- INNER: Status --- */
   static Status = DisplayerStatus;
@@ -88,9 +86,10 @@ const Displayer = class {
     this.#createHTMLElements();
 
     this.#drawer = new Drawer(this.#HTML().canvas, DEFAULT_CANVAS_BG);
-    this.#colors = new Colors();
-    this.#roomColors = {};
-    this.#randyFills = {};
+    this.#colors = {
+      rooms: { map: {}, gen: new Colors() },
+      randys: { map: {}, gen: new Colors() },
+    };
 
     this.#setStatus(Displayer.Status.NONE);
   }
@@ -394,23 +393,26 @@ const Displayer = class {
 
   /* --- METHOD: #getRoomColor --- */
   #getRoomColor(id) {
-    if (!(id in this.#roomColors)) {
-      // this.#roomColors[id] = Random.getRandomColor();
-      this.#roomColors[id] = this.#colors.getNextColor();
+    const colmap = this.#colors.rooms.map;
+    if (!(id in colmap)) {
+      // colmap[id] = Random.getRandomColor();
+      colmap[id] = this.#colors.rooms.gen.getNextColor();
     }
-    return this.#roomColors[id];
+    return colmap[id];
   }
 
   /* --- METHOD: #getRandyFill --- */
   #getRandyFill(id) {
-    if (!(id in this.#randyFills)) {
+    const colmap = this.#colors.randys.map;
+    if (!(id in colmap)) {
       if (this.#game.getNumPlayers() > 2) {
-        this.#randyFills[id] = [Random.getRandomColor(), null];
+        // colmap[id] = [Random.getRandomColor(), null];
+        colmap[id] = [this.#colors.rooms.gen.getNextColor(), null];
       } else {
-        this.#randyFills[id] = RANDY_FILL;
+        colmap[id] = RANDY_FILL;
       }
     }
-    return this.#randyFills[id];
+    return colmap[id];
   }
 
   /* --- METHOD: #displayRoomBackground --- */
