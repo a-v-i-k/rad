@@ -5,6 +5,7 @@
  * - Add version number. What about a package?
  * - Stats; e.g., count steps.
  * - GitHub
+ * - README.md
  ******************************************************************************
  * TODOC:
  * - Need documentation throughout the entire code.
