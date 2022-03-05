@@ -253,18 +253,18 @@ select {
   border: 0.5em outset;
 }
 /* Priestly breastplate (חושן): https://he.wikipedia.org/wiki/%D7%97%D7%95%D7%A9%D7%9F
- * - Ruby (אודם): #e0115f
- * - Emerald (ברקת): #50c878
- * - Topaz (פטדה): #ffc87c
- * - Garnet (נופך): #733635
- * - Sapphire (ספיר): #0f52ba
- * - Diamond (יהלום): #b9f2ff
- * - Opal (לשם): #a8c3bc
- * - Agate (שבו): #ccc7bf
- * - Amethyst (אחלמה): #9966cc
- * - Aquamarine (תרשיש): #7fffd4
- * - Onyx (שוהם): #353839
- * - Jasper (ישפה): #d73b3e
+ * - Ruby (אודם): #e0115f - rgb(224, 17, 95) - hsl(337, 86%, 47%)
+ * - Emerald (ברקת): #50c878 - rgb(80, 200, 120) - hsl(140, 52%, 55%)
+ * - Topaz (פטדה): #ffc87c - rgb(255, 200, 124) - hsl(35, 100%, 74%)
+ * - Garnet (נופך): #733635 - rgb(115, 54, 53) - hsl(1, 37%, 33%)
+ * - Sapphire (ספיר): #0f52ba - rgb(15, 82, 186) - hsl(216, 85%, 39%)
+ * - Diamond (יהלום): #b9f2ff - rgb(185, 242, 255) - hsl(191, 100%, 86%)
+ * - Opal (לשם): #a8c3bc - rgb(168, 195, 188) - hsl(164, 18%, 71%)
+ * - Agate (שבו): #ccc7bf - rgb(204, 199, 191) - hsl(37, 11%, 77%)
+ * - Amethyst (אחלמה): #9966cc - rgb(153, 102, 204) - hsl(270, 50%, 60%)
+ * - Aquamarine (תרשיש): #7fffd4 - rgb(127, 255, 212) - hsl(160, 100%, 75%)
+ * - Onyx (שוהם): #353839 - rgb(53, 56, 57) - hsl(195, 4%, 22%)
+ * - Jasper (ישפה): #d73b3e - rgb(215, 59, 62) - hsl(359, 66%, 54%)
  */
 #ruby {
   border-color: #e0115f;
