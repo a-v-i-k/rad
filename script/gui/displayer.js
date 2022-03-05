@@ -471,7 +471,7 @@ const Displayer = class {
 
     // draw cascading appearance
     const low = 2,
-      high = Math.floor(Math.min(bbox.width, bbox.height) / 2) - 1;
+      high = Math.round(Math.min(bbox.width, bbox.height) / 2) - 1;
     for (let i = low; i <= high; i += 4) {
       const cx0 = bbox.x0 + i,
         cy0 = bbox.y0 + i,
@@ -527,26 +527,26 @@ const Displayer = class {
     // TODO: Differet outlines for different door parts?
 
     // display front
-    let x0 = bbox.x0 + Math.floor(bbox.width / 5);
-    let y0 = bbox.y0 + Math.floor(bbox.height / 15);
-    let width = bbox.width - 2 * Math.floor(bbox.width / 5);
-    let height = bbox.height - 2 * Math.floor(bbox.height / 15);
+    let x0 = bbox.x0 + Math.round(bbox.width / 5);
+    let y0 = bbox.y0 + Math.round(bbox.height / 15);
+    let width = bbox.width - 2 * Math.round(bbox.width / 5);
+    let height = bbox.height - 2 * Math.round(bbox.height / 15);
     const frontBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawRectangle(frontBBox, outline, frontFill, 2);
 
     // display window
-    x0 += Math.floor(bbox.width / 12);
-    y0 += Math.floor(bbox.height / 12);
-    width -= 2 * Math.floor(bbox.width / 12);
-    height = Math.floor(bbox.height / 3);
+    x0 += Math.round(bbox.width / 12);
+    y0 += Math.round(bbox.height / 12);
+    width -= 2 * Math.round(bbox.width / 12);
+    height = Math.round(bbox.height / 3);
     const windowBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
 
     // display handle
     // x0 doesn't change
-    width = Math.floor(bbox.width / 7);
-    y0 += Math.floor(bbox.height / 3) + Math.floor(bbox.height / 12);
-    height = Math.floor(bbox.height / 7);
+    width = Math.round(bbox.width / 7);
+    y0 += Math.round(bbox.height / 3) + Math.round(bbox.height / 12);
+    height = Math.round(bbox.height / 7);
     const handleBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
