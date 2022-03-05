@@ -53,6 +53,7 @@
 // │   |   ├── location.js
 // │   |   ├── player.js
 // │   |   ├── room.js
+// │   |   ├── stone.js
 // │   |   └── test
 // │   |       ├── game-tester.js
 // │   |       └── random-walker.js
@@ -62,6 +63,7 @@
 // │   |   ├── displayer.js
 // │   |   ├── drawer.js
 // │   |   ├── gui.js
+// │   |   ├── polyline.js
 // │   |   ├── random-path.js
 // │   |   ├── randy.js
 // │   |   ├── randy-manager.js
@@ -75,7 +77,8 @@
 // │       ├── linkedlist.js
 // │       ├── quotes.js
 // │       ├── random.js
-// │       └── unionfind.js
+// │       ├── unionfind.js
+// │       └── webcolors.js
 // └── sound
 //     ├── ...
 //     └── ...
