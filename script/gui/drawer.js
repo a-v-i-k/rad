@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
 import BoundingBox from "./bounding-box.js";
-import { ETypeError, ERangeError } from "../library/errors.js";
+import Polyline from "./polyline.js";
+import { ETypeError, ValueError, ERangeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Drawer as default };
@@ -127,6 +128,32 @@ const Drawer = class {
     context.closePath();
   }
 
+  /* --- METHOD: drawPolygon --- */
+  drawPolygon(polyline, strokeStyle, fillStyle = null, lineWidth = 1) {
+    this.#validatePolyline(polyline);
+    Drawer.validateColor(strokeStyle);
+    if (fillStyle !== null) {
+      Drawer.validateColor(fillStyle);
+    }
+    const context = this.#getContext();
+
+    context.lineWidth = lineWidth;
+    context.strokeStyle = strokeStyle;
+
+    context.beginPath();
+    context.moveTo(polyline.points[0], polyline.points[1]);
+    for (let i = polyline.points.length - 1; i >= 0; i--) {
+      context.lineTo(polyline.points[i][0], polyline.points[i][1]);
+    }
+    context.closePath();
+
+    context.stroke();
+    if (fillStyle !== null) {
+      context.fillStyle = fillStyle;
+      context.fill();
+    }
+  }
+
   /* --- METHOD: injectText --- */
   injectText(text, x, y, fillStyle, fontSize) {
     // validate text
@@ -185,6 +212,31 @@ const Drawer = class {
         `bounding box is not contained in [${0}, ${width}] x [${0}, ${height}]`,
         bbox
       );
+    }
+  }
+
+  /* --- METHOD: #validatePolyline --- */
+  #validatePolyline(polyline) {
+    if (!(polyline instanceof Polyline)) {
+      throw new ETypeError(`input is not of type Polyline`, polyline);
+    }
+    if (polyline.points.length < 2) {
+      throw new ValueError(`polyline contains less than 2 points`);
+    }
+    const width = this.#canvas.width,
+      height = this.#canvas.height;
+    for (const point of polyline.points) {
+      if (
+        point[0] < 0 ||
+        point[0] > width - 1 ||
+        point[1] < 0 ||
+        point[1] > height - 1
+      ) {
+        throw new ERangeError(
+          `polyline is not contained in [0, ${width - 1}] x [0, ${height - 1}]`,
+          polyline
+        );
+      }
     }
   }
 
