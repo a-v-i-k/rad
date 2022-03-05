@@ -549,7 +549,7 @@ const GUI = class {
       case GUI.Status.PAUSE:
         this.#resume();
       case GUI.Status.PLAYING:
-        if (!this.#activeRandomPath() && this.#auto !== null) {
+        if (!this.#activeRandomPath() && this.#auto === null) {
           this.#clientGoTo(clientX, clientY);
         }
         break;
