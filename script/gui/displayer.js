@@ -2,6 +2,7 @@
 import Game from "../game/game.js";
 import Location from "../game/location.js";
 import BoundingBox from "./bounding-box.js";
+import Polyline from "./polyline.js";
 import Drawer from "./drawer.js";
 import Random from "../library/random.js";
 import Colors from "./colors.js";
@@ -549,6 +550,37 @@ const Displayer = class {
     height = Math.round(bbox.height / 7);
     const handleBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawStone --- */
+  #drawStone(bbox, outline, hsl) {
+    // draw stone
+    const x0 = bbox.x0 + Math.round((5 / 16) * bbox.width);
+    const y0 = bbox.y0 + Math.round((3 / 8) * bbox.height);
+    const width = Math.round(((4 / 3) * bbox.width) / 4);
+    const height = Math.round(bbox.height / 4);
+    const stoneBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(stoneBBox, outline, hsl, 1);
+
+    // draw outset
+    const polyline = new Polyline();
+    polyline.addPoint(x0 + width, y0 + 1);
+    polyline.addPoint(x0 + width, y0 + height);
+    polyline.addPoint(x0 + 1, y0 + height);
+    polyline.addPoint(x0 + 4, y0 + height - 3);
+    polyline.addPoint(x0 + width - 3, y0 + height - 3);
+    polyline.addPoint(x0 + width - 3, y0 + 4);
+
+    let [hue, saturation, lightness] = hsl.split(", ");
+    lightness = Math.floor(
+      parseInt(lightness.slice(0, lightness.length - 2)) * (2 / 3)
+    ).toString();
+    saturation = Math.floor(
+      parseInt(saturation.slice(0, saturation.length - 1)) * (1 / 3)
+    ).toString();
+    const shadow = hue + ", " + saturation + "%, " + lightness + "%)";
+
+    this.#drawer.drawPolygon(polyline, shadow, shadow);
   }
 
   /* --- METHOD: #displayRandys --- */
