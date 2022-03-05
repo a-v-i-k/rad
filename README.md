@@ -12,6 +12,6 @@
 
 - Quality Assurance [test cases, unit testing]
 
-- Responsive Web Design
+- User Interface/Experience [GUI, Responsive Web Design]
 
 - Cross-Browser Testing [BrowserStack]
