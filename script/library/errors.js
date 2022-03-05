@@ -1,5 +1,5 @@
 /* --- EXPORTS --- */
-export { ETypeError, ERangeError, RuntimeError, StatusError };
+export { ETypeError, ValueError, ERangeError, RuntimeError, StatusError };
 
 /*
  * ERROR: ETypeError
@@ -10,6 +10,18 @@ const ETypeError = class extends TypeError {
   constructor(message, input, fileName, lineNumber) {
     super(message, fileName, lineNumber);
     this.input = input;
+  }
+};
+
+/*
+ * ERROR: ValueError
+ *****************************************************************************/
+const ValueError = class extends Error {
+  /* --- C'TOR: constructor --- */
+  constructor(message, value, fileName, lineNumber) {
+    super(message, fileName, lineNumber);
+    this.name = "ValueError";
+    this.value = value;
   }
 };
 
