@@ -1,3 +1,6 @@
 
+# Ignore notes.txt
+notes.txt
+
 # Ignore backup zip files
 25rooms*.zip

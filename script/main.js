@@ -16,13 +16,6 @@
  * - Responsive web design.
  * - Cross-Browser Testing (BrowserStack: https://www.browserstack.com/)
  ******************************************************************************
- * RFE:
- * - Multiplayer. [David Naori]
- * - Legend.
- * - Pickup 12 foundation stones.
- * - Scores. (high scores)
- * - Allow to configure number of rows/columns via GUI?
- ******************************************************************************
  * ACA: (academy)
  * - Every game can be "reduced" to this game.
  * - What is the "hardest" tree for a random walker?
