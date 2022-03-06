@@ -297,17 +297,6 @@ const GUI = class {
   /* --- METHOD: #setRandyControl --- */
   #setRandyControl() {
     if (this.#CFGN().randy) {
-      // create new Randy object
-      this.#randy = new RandyManager(
-        this.#game,
-        () => this.#refresh(),
-        (index) => {
-          this.#setStatus(GUI.Status.RANDYDONE);
-          this.#unset();
-          this.#randyIsDone(index);
-        }
-      );
-
       // html stuff
       for (let i = 1; i <= MAX_NUM_RANDYS; i++) {
         let option = document.createElement("option");
@@ -350,14 +339,29 @@ const GUI = class {
   #setRandy() {
     if (!this.#CFGN().randy) return;
     this.#HTML().randy.control.disabled = true;
-    this.#randyStart();
+    if (this.#getNumRandys() > 0) {
+      // create new Randy object
+      this.#randy = new RandyManager(
+        this.#game,
+        () => this.#refresh(),
+        (index) => {
+          this.#setStatus(GUI.Status.RANDYDONE);
+          this.#unset();
+          this.#randyIsDone(index);
+        }
+      );
+      this.#randyStart();
+    }
   }
 
   /* --- METHOD: #unsetRandy --- */
   #unsetRandy() {
     if (!this.#CFGN().randy) return;
+    if (this.#getNumRandys() > 0) {
+      this.#randyStop();
+    }
+    this.#randy = null;
     this.#HTML().randy.control.disabled = false;
-    this.#randyStop();
   }
 
   /* --- METHOD: #setStopwatch --- */
@@ -680,7 +684,7 @@ const GUI = class {
     }
 
     // randy
-    if (this.#CFGN().randy) {
+    if (this.#CFGN().randy && this.#randy !== null) {
       this.#randy.pause();
     }
 
@@ -731,7 +735,7 @@ const GUI = class {
     }
 
     // randy
-    if (this.#CFGN().randy) {
+    if (this.#CFGN().randy && this.#randy !== null) {
       this.#randy.resume();
     }
 
