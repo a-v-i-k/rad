@@ -451,18 +451,24 @@ const GUI = class {
         case "ArrowRight":
         case "ArrowUp":
         case "ArrowDown":
-          this.#playerMove(event);
+          if (!this.#activeRandomPath() && this.#auto === null) {
+            this.#playerMove(event);
+          }
           break;
 
         case "Enter":
-          this.#playerInspect();
+          if (!this.#activeRandomPath() && this.#auto === null) {
+            this.#playerInspect();
+          }
           break;
 
         case "Backspace":
-          if (this.#CFGN().undo) {
-            this.#playerUndo();
-          } else {
-            console.log("Undo is off.");
+          if (!this.#activeRandomPath() && this.#auto === null) {
+            if (this.#CFGN().undo) {
+              this.#playerUndo();
+            } else {
+              console.log("Undo is off.");
+            }
           }
           break;
 
