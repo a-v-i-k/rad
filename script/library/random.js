@@ -23,6 +23,25 @@ const Random = class {
     return array[randomIndex];
   }
 
+  /* --- Random: getRandomChoices --- */
+  static getRandomChoices(array, size) {
+    validateArray(array);
+    if (!Number.isInteger(size)) {
+      throw TypeError(`sample size must be an integer`);
+    }
+    if (size < 0 || size > array.length) {
+      const message = `sample size cannot be negative or larger than population`;
+      throw RangeError(message);
+    }
+
+    const temp = [];
+    for (const item of array) {
+      temp.push(item);
+    }
+    Random.shuffleArray(temp);
+    return temp.slice(0, size);
+  }
+
   /* --- Random: shuffleArray --- */
   static shuffleArray(array) {
     validateArray(array);
@@ -59,7 +78,7 @@ function validateRange(min, max) {
     throw TypeError(`min and max should be numbers`);
   }
   if (min > max) {
-    throw TypeError(`min cannot exceed than max`);
+    throw RangeError(`min cannot exceed than max`);
   }
 }
 
