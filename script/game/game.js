@@ -234,21 +234,25 @@ const Game = class {
     const player = this.#players[index];
     const cell = player.inspect();
 
-    let finished = false;
     switch (cell.getType()) {
       case Cell.Type.PLAIN: // plain cell
         const element = cell.getElement();
         if (element === null) {
           console.log("Nothing to inspect...");
-          break;
         } else if (element instanceof Door) {
-          if (this.#playerInspectDoor(player, element)) {
+          const doorType = element.getType();
+          if (doorType === Door.Type.PLAIN) {
+            player.enter(element.open());
+          } else if (doorType === Door.Type.EXIT) {
             console.log(`Player ${index} has won the game!`);
             this.stop();
-            finished = true;
+          } else {
+            console.assert(false); // sanity check
           }
+          return doorType;
         } else if (element instanceof Stone) {
-          this.#playerInspectStone(player, element);
+          player.getRoom().removeStone(player.getLocation());
+          return element.getType();
         }
         break;
 
@@ -261,33 +265,7 @@ const Game = class {
       default:
         console.assert(false); // sanity check
     }
-    return finished;
-  }
-
-  /* --- #playerInspectDoor --- */
-  #playerInspectDoor(player, door) {
-    console.assert(player instanceof Player); // sanity check
-    console.assert(door instanceof Door); // sanity check
-
-    switch (door.getType()) {
-      case Door.Type.PLAIN: // plain door
-        player.enter(door.open());
-        break;
-      case Door.Type.EXIT: // exit door
-        return true;
-      default:
-        console.assert(false); // sanity check
-    }
-    return false;
-  }
-
-  /* --- #playerInspectStone --- */
-  #playerInspectStone(player, stone) {
-    console.assert(player instanceof Player); // sanity check
-    console.assert(stone instanceof Stone); // sanity check
-
-    // remove stone
-    player.getRoom().removeStone(player.getLocation());
+    return null;
   }
 
   /* --- METHOD: playerBacktrack --- */

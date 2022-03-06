@@ -1,4 +1,5 @@
 /* --- IMPORTS --- */
+import Door from "../door.js";
 import Game from "../game.js";
 import RandomWalker from "./random-walker.js";
 
@@ -45,7 +46,8 @@ const GameTester = class {
             game.playerMove(i, direction);
           }
         } else if (walkerStatus === RandomWalker.Status.INSPECTING) {
-          if (game.playerInspect(i)) {
+          const result = game.playerInspect(i);
+          if (result === Door.Type.EXIT) {
             const message = `Walker ${i} has emerged as the winner after ${numSteps} steps.`;
             // console.log(message);
             document.querySelector(

@@ -9,6 +9,7 @@ import Drawer from "./drawer.js";
 import Random from "../library/random.js";
 import Colors from "./colors.js";
 import QUOTES from "../library/quotes.js";
+import { ETypeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Displayer as default };
@@ -188,7 +189,8 @@ const Displayer = class {
   /* --- METHOD: #createLogoElement --- */
   #createLogoElement() {
     const logo = document.createElement("div");
-    logo.setAttribute("id", "stones-grid");
+    logo.setAttribute("id", "stones-logo");
+    logo.classList.add("stones-grid");
     logo.setAttribute("title", "Priestly Breastplate");
     logo.classList.add("widget", "logo");
 
@@ -285,7 +287,10 @@ const Displayer = class {
   /// PLAYING
 
   /* --- METHOD: displayPlay --- */
-  displayPlay() {
+  displayPlay(stones) {
+    if (typeof stones !== "boolean") {
+      throw new ETypeError(`input is not a boolean`, stones);
+    }
     if (this.getStatus() === Displayer.Status.IDLE) {
       this.#clearIdle();
     } else if (this.getStatus() === Displayer.Status.QUOTE) {
@@ -298,7 +303,7 @@ const Displayer = class {
     this.#displayRoom(); // room
     this.#displayCells(); // cells
     this.#displayDoors(); // doors
-    this.#displayStones(); // stones
+    if (stones) this.#displayStones(); // stones
     this.#displayRandys(); // randys
     this.#displayPrimaryPlayer(); // primary player
 

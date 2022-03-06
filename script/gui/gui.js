@@ -1,8 +1,10 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
-import Game from "../game/game.js";
 import Location from "../game/location.js";
 import Direction from "../game/direction.js";
+import Door from "../game/door.js";
+import Stone from "../game/stone.js";
+import Game from "../game/game.js";
 import Displayer from "./displayer.js";
 import Stopwatch from "./stopwatch.js";
 import RandyManager from "./randy-manager.js";
@@ -28,6 +30,7 @@ Object.freeze(GUIStatus);
 const DEFAULT_UNDO = true;
 const DEFAULT_CLOCK = true;
 const DEFAULT_RANDY = true;
+const DEFAULT_STONES = true;
 const DEFAULT_SOUND = true;
 
 /* --- CONSTANTS --- */
@@ -54,6 +57,7 @@ const GUI = class {
   #displayer;
   #stopwatch;
   #randy;
+  #stoneCount;
   #html;
   #callbacks;
   #rpath;
@@ -69,9 +73,10 @@ const GUI = class {
     undo = DEFAULT_UNDO,
     clock = DEFAULT_CLOCK,
     randy = DEFAULT_RANDY,
+    stones = DEFAULT_STONES,
     sound = DEFAULT_SOUND
   ) {
-    GUI.#validator(master, undo, clock, randy, sound);
+    GUI.#validator(master, undo, clock, randy, stones, sound);
     this.#master = master; // slave to be set later...
 
     // configuration
@@ -79,12 +84,14 @@ const GUI = class {
       undo: undo,
       clock: clock,
       randy: randy,
+      stones: stones,
       sound: sound,
     };
 
     this.#game = new Game(); // game
     this.#stopwatch = null;
     this.#randy = null;
+    this.#stoneCount = 0;
 
     // setting
     this.#setStatus(GUI.Status.IDLE); // status
@@ -115,7 +122,7 @@ const GUI = class {
   /// VALIDATION
 
   /* --- METHOD: #validator --- */
-  static #validator(master, undo, clock, randy, sound) {
+  static #validator(master, undo, clock, randy, stones, sound) {
     if (!(master instanceof HTMLElement)) {
       throw new ETypeError(`master is not an HTML element`, master);
     }
@@ -128,6 +135,9 @@ const GUI = class {
     if (typeof randy !== "boolean") {
       throw new ETypeError(`input is not a boolean`, randy);
     }
+    if (typeof stones !== "boolean") {
+      throw new ETypeError(`input is not a boolean`, stones);
+    }
     if (typeof sound !== "boolean") {
       throw new ETypeError(`input is not a boolean`, sound);
     }
@@ -135,7 +145,12 @@ const GUI = class {
 
   /* --- METHOD: #refresh --- */
   #refresh() {
-    this.#displayer.displayPlay();
+    this.#display();
+  }
+
+  /* --- METHOD: #display --- */
+  #display() {
+    this.#displayer.displayPlay(this.#CFGN().stones);
   }
 
   /// GETTERS
@@ -211,11 +226,17 @@ const GUI = class {
         control: document.querySelector("#randy-control"),
       },
 
+      // stones
+      stones: {
+        frame: document.querySelector("#plate-frame"),
+      },
+
       // sound
       sound: {
         start: document.querySelector("#start"),
         enter: document.querySelector("#enter"),
         stonecollect: document.querySelector("#stone-collect"),
+        whoareyou: document.querySelector("#who-are-you"),
         pause: document.querySelector("#pause-sound"),
         randydone: document.querySelector("#randy-done"),
         triumph: document.querySelector("#triumph"),
@@ -339,6 +360,36 @@ const GUI = class {
     this.#randyStop();
   }
 
+  /* --- METHOD: #setStopwatch --- */
+  #setStones() {
+    if (!this.#CFGN().stones) {
+      this.#HTML().top.frame.removeChild(this.#HTML().stones.frame);
+    }
+    this.#clearPlate();
+  }
+
+  /* --- METHOD: #unsetStones --- */
+  #unsetStones() {
+    if (!this.#CFGN().stones) return;
+    if (this.getStatus() === GUI.Status.IDLE) {
+      this.#clearPlate();
+    }
+  }
+
+  /* --- METHOD: #clearPlate --- */
+  #clearPlate() {
+    if (this.#stoneCount === 0) return;
+    for (const stoneType in Stone.Type) {
+      const stoneName = stoneType.toLowerCase();
+      const placeholder = document.querySelector("#" + stoneName);
+      console.log(stoneName, placeholder);
+      if (placeholder === null) continue;
+      placeholder.setAttribute("id", "plate-" + stoneName);
+      placeholder.style.borderStyle = "inset";
+    }
+    this.#stoneCount = 0;
+  }
+
   /* --- METHOD: #set --- */
   #set() {
     let numPlayers;
@@ -351,8 +402,9 @@ const GUI = class {
 
     this.#setClock();
     this.#setRandy();
+    this.#setStones();
 
-    this.#displayer.displayPlay();
+    this.#display();
 
     this.#playSound(this.#HTML().sound.start);
   }
@@ -366,6 +418,7 @@ const GUI = class {
     if (this.#activeRandomPath()) {
       this.#rpath.cancel();
     }
+    this.#unsetStones();
     this.#unsetRandy();
     this.#unsetClock();
 
@@ -751,8 +804,8 @@ const GUI = class {
 
     const state = this.#game.getState(0);
     const prevRoomId = state.room.id;
-    const prevStoneCount = state.stones.length;
-    if (this.#game.playerInspect(0)) {
+    const result = this.#game.playerInspect(0);
+    if (result === Door.Type.EXIT) {
       this.#setStatus(GUI.Status.REWARD);
       this.#unset();
       this.#playerWon();
@@ -761,9 +814,19 @@ const GUI = class {
       if (newState.room.id !== prevRoomId) {
         // player entered a new room
         this.#playSound(this.#HTML().sound.enter);
-      } else if (newState.stones.length != prevStoneCount) {
-        // player collected stone
-        this.#playSound(this.#HTML().sound.stonecollect);
+      } else if (this.#CFGN().stones && result in Stone.Type) {
+        // player collected a stone
+        const stoneName = result.toLowerCase();
+        const placeholder = document.querySelector("#plate-" + stoneName);
+        placeholder.setAttribute("id", stoneName);
+        placeholder.style.borderStyle = "outset";
+
+        this.#stoneCount++;
+        if (this.#stoneCount == Object.keys(Stone.Type).length) {
+          this.#playSound(this.#HTML().sound.whoareyou);
+        } else {
+          this.#playSound(this.#HTML().sound.stonecollect);
+        }
       }
       this.#refresh();
     }

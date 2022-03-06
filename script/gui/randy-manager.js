@@ -1,5 +1,6 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
+import Door from "../game/door.js";
 import Game from "../game/game.js";
 import Scheduler from "./scheduler.js";
 import Randy from "./randy.js";
@@ -143,7 +144,8 @@ const RandyManager = class {
         this.#game.playerMove(index, direction);
       }
     } else if (randyStatus === Randy.Status.INSPECTING) {
-      if (this.#game.playerInspect(index)) {
+      const result = this.#game.playerInspect(index);
+      if (result === Door.Type.EXIT) {
         this.#doneCallback(index);
         return;
       }
