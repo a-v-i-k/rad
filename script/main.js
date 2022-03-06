@@ -20,7 +20,9 @@
  * - Every game can be "reduced" to this game.
  * - What is the "hardest" tree for a random walker?
  * - Are there any bounds on the degree/diameter/leaves of a random MST?
- * -
+ * - Only rooms and doors is a bit borring and too general; adding stones makes
+ * it more interesting but somewhat specific. What is the most general game we
+ * can come up with that is still interesting? What is the "essence" of gaming?
  ******************************************************************************
  * ACK:
  * - Thanks David Naori for the following ideas: coloring doors; clock.
