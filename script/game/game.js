@@ -365,14 +365,14 @@ const Game = class {
 
     // create and add stones to rooms
     const numStones = Object.keys(Stone.Type).length;
-    // Note: +2 b/c no stones in source & target.
-    const S = Random.getRandomChoices(graph.V(), numStones + 2);
+    const U = graph.V();
+    U.splice(U.indexOf(source), 1); // no stone in source room
+    U.splice(U.indexOf(target), 1); // no stone in target room
+    // const S = Random.getRandomChoices(U, numStones, false); // without replacement
+    const S = Random.getRandomChoices(U, numStones, true); // with replacement
     for (const stoneType in Stone.Type) {
       const stone = new Stone(stoneType);
       let u = S.pop();
-      while (u === source || u === target) {
-        u = S.pop();
-      }
       this.#rooms[u].addStone(stone);
     }
 
