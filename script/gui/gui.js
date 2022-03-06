@@ -837,10 +837,9 @@ const GUI = class {
         placeholder.style.borderStyle = "outset";
 
         this.#stoneCount++;
+        this.#playSound(this.#HTML().sound.stonecollect);
         if (this.#stoneCount == Object.keys(Stone.Type).length) {
           this.#playSound(this.#HTML().sound.whoareyou);
-        } else {
-          this.#playSound(this.#HTML().sound.stonecollect);
         }
       }
       this.#refresh();
