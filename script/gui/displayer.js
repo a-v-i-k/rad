@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
 import Location from "../game/location.js";
 import Door from "../game/door.js";
+import Stone from "../game/stone.js";
 import Game from "../game/game.js";
 import BoundingBox from "./bounding-box.js";
 import Polyline from "./polyline.js";
@@ -54,6 +55,21 @@ const PLAYER_SCALE = 0.5;
 const PLAYER_OUTLINE = "black";
 const PLAYER_FILL = ["gold", "goldenrod"];
 const RANDY_FILL = ["olive", "goldenrod"];
+
+const STONE_OUTLINE = "goldenrod";
+const STONE_ALPHA = 0.7;
+const STONE_RUBY_COLOR = `hsla(337, 86%, 47%, ${STONE_ALPHA})`;
+const STONE_EMERALD_COLOR = `hsla(140, 52%, 55%, ${STONE_ALPHA})`;
+const STONE_TOPAZ_COLOR = `hsla(35, 100%, 74%, ${STONE_ALPHA})`;
+const STONE_GARNET_COLOR = `hsla(1, 37%, 33%, ${STONE_ALPHA})`;
+const STONE_SAPPHIRE_COLOR = `hsla(216, 85%, 39%, ${STONE_ALPHA})`;
+const STONE_DIAMOND_COLOR = `hsla(191, 100%, 86%, ${STONE_ALPHA})`;
+const STONE_OPAL_COLOR = `hsla(164, 18%, 71%, ${STONE_ALPHA})`;
+const STONE_AGATE_COLOR = `hsla(37, 11%, 77%, ${STONE_ALPHA})`;
+const STONE_AMETHYST_COLOR = `hsla(270, 50%, 60%, ${STONE_ALPHA})`;
+const STONE_AQUAMARINE_COLOR = `hsla(160, 100%, 75%, ${STONE_ALPHA})`;
+const STONE_ONYX_COLOR = `hsla(195, 4%, 22%, ${STONE_ALPHA})`;
+const STONE_JASPER_COLOR = `hsla(359, 66%, 54%, ${STONE_ALPHA})`;
 
 /*
  * CLASS: Displayer [UML]
@@ -282,6 +298,7 @@ const Displayer = class {
     this.#displayRoom(); // room
     this.#displayCells(); // cells
     this.#displayDoors(); // doors
+    this.#displayStones(); // stones
     this.#displayRandys(); // randys
     this.#displayPrimaryPlayer(); // primary player
 
@@ -490,7 +507,7 @@ const Displayer = class {
     }
   }
 
-  /* --- METHOD: #displayCells --- */
+  /* --- METHOD: #displayDoors --- */
   #displayDoors() {
     const state = this.#game.getState(0);
 
@@ -553,28 +570,86 @@ const Displayer = class {
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 
+  /* --- METHOD: #displayStones --- */
+  #displayStones() {
+    const state = this.#game.getState(0);
+
+    // display stones
+    for (const stone of state.stones) {
+      // stone bounding box
+      const x0 = stone.loc.x * this.#cellwidth,
+        y0 = stone.loc.y * this.#cellheight;
+      const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
+
+      // display stone
+      let color;
+      switch (stone.type) {
+        case Stone.Type.RUBY:
+          color = STONE_RUBY_COLOR;
+          break;
+        case Stone.Type.EMERALD:
+          color = STONE_EMERALD_COLOR;
+          break;
+        case Stone.Type.TOPAZ:
+          color = STONE_TOPAZ_COLOR;
+          break;
+        case Stone.Type.GARNET:
+          color = STONE_GARNET_COLOR;
+          break;
+        case Stone.Type.SAPPHIRE:
+          color = STONE_SAPPHIRE_COLOR;
+          break;
+        case Stone.Type.DIAMOND:
+          color = STONE_DIAMOND_COLOR;
+          break;
+        case Stone.Type.OPAL:
+          color = STONE_OPAL_COLOR;
+          break;
+        case Stone.Type.AGATE:
+          color = STONE_AGATE_COLOR;
+          break;
+        case Stone.Type.AMETHYST:
+          color = STONE_AMETHYST_COLOR;
+          break;
+        case Stone.Type.AQUAMARINE:
+          color = STONE_AQUAMARINE_COLOR;
+          break;
+        case Stone.Type.ONYX:
+          color = STONE_ONYX_COLOR;
+          break;
+        case Stone.Type.JASPER:
+          color = STONE_JASPER_COLOR;
+          break;
+        default:
+          console.assert(false); // sanity check
+      }
+
+      this.#drawStone(bbox, STONE_OUTLINE, color);
+    }
+  }
+
   /* --- METHOD: #drawStone --- */
-  #drawStone(bbox, outline, hsl) {
+  #drawStone(bbox, outline, hsla) {
     // draw stone
     const x0 = bbox.x0 + Math.round((5 / 16) * bbox.width);
     const y0 = bbox.y0 + Math.round((3 / 8) * bbox.height);
     const width = Math.round(((4 / 3) * bbox.width) / 4);
     const height = Math.round(bbox.height / 4);
     const stoneBBox = new BoundingBox(x0, y0, width, height);
-    this.#drawer.drawRectangle(stoneBBox, outline, hsl, 1);
+    this.#drawer.drawRectangle(stoneBBox, outline, hsla, 2);
 
     // draw outset
     const polyline = new Polyline();
-    polyline.addPoint(x0 + width, y0 + 1);
-    polyline.addPoint(x0 + width, y0 + height);
-    polyline.addPoint(x0 + 1, y0 + height);
-    polyline.addPoint(x0 + 4, y0 + height - 3);
-    polyline.addPoint(x0 + width - 3, y0 + height - 3);
-    polyline.addPoint(x0 + width - 3, y0 + 4);
+    polyline.addPoint(x0 + width - 1, y0 + 1);
+    polyline.addPoint(x0 + width - 1, y0 + height - 1);
+    polyline.addPoint(x0 + 1, y0 + height - 1);
+    polyline.addPoint(x0 + 4, y0 + height - 4);
+    polyline.addPoint(x0 + width - 4, y0 + height - 4);
+    polyline.addPoint(x0 + width - 4, y0 + 4);
 
-    let [hue, saturation, lightness] = hsl.split(", ");
+    let [hue, saturation, lightness, alpha] = hsla.split(", ");
     lightness = Math.floor(
-      parseInt(lightness.slice(0, lightness.length - 2)) * (2 / 3)
+      parseInt(lightness.slice(0, lightness.length - 1)) * (2 / 3)
     ).toString();
     saturation = Math.floor(
       parseInt(saturation.slice(0, saturation.length - 1)) * (1 / 3)
