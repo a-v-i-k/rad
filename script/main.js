@@ -33,6 +33,7 @@
 // 25rooms
 // ├── Backup.bat
 // ├── index.html
+// ├── README.md
 // ├── css
 // │   └── styles.css
 // ├── design
@@ -40,8 +41,9 @@
 // │   ├── game.gaphor
 // │   └── gui.gaphor
 // ├── quotes
-// │   ├── ...
-// │   └── ...
+// │   ├── JakubPetriska.zip
+// │   ├── quotes.csv
+// │   └── quotes.py
 // ├── script
 // │   ├── main.js
 // │   ├── game
@@ -80,8 +82,14 @@
 // │       ├── unionfind.js
 // │       └── webcolors.js
 // └── sound
-//     ├── ...
-//     └── ...
+//     ├── enter.mp3
+//     ├── enter-at-your-own-risk.mp3
+//     ├── pause-sound.mp3
+//     ├── randy-done.mp3
+//     ├── stone-collect.mp3
+//     ├── triumph.mp3
+//     ├── triumph-2.mp3
+//     └── welcome.mp3
 // ============================================================================
 
 import GUI from "./gui/gui.js";
