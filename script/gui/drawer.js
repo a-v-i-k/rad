@@ -100,7 +100,7 @@ const Drawer = class {
     const context = this.#getContext();
     context.beginPath();
     context.fillStyle = fillStyle;
-    context.fillRect(0, 0, bbox.width, bbox.height);
+    context.fillRect(bbox.x0, bbox.y0, bbox.width, bbox.height);
     context.closePath();
   }
 
