@@ -241,9 +241,13 @@ const Game = class {
           console.log("Nothing to inspect...");
           break;
         } else if (element instanceof Door) {
-          finished = this.#inspectDoor(index, element);
+          if (this.#playerInspectDoor(player, element)) {
+            console.log(`Player ${index} has won the game!`);
+            this.stop();
+            finished = true;
+          }
         } else if (element instanceof Stone) {
-          this.#inspectStone(index, element);
+          this.#playerInspectStone(player, element);
         }
         break;
 
@@ -259,16 +263,16 @@ const Game = class {
     return finished;
   }
 
-  /* --- #inspectDoor --- */
-  #inspectDoor(index, door) {
+  /* --- #playerInspectDoor --- */
+  #playerInspectDoor(player, door) {
+    console.assert(player instanceof Player); // sanity check
     console.assert(door instanceof Door); // sanity check
+
     switch (door.getType()) {
       case Door.Type.PLAIN: // plain door
-        this.#players[index].enter(door.open());
+        player.enter(door.open());
         break;
       case Door.Type.EXIT: // exit door
-        console.log(`Player ${index} has won the game!`);
-        this.stop();
         return true;
       default:
         console.assert(false); // sanity check
@@ -276,9 +280,12 @@ const Game = class {
     return false;
   }
 
-  /* --- #inspectStone --- */
-  #inspectStone(index, stone) {
+  /* --- #playerInspectStone --- */
+  #playerInspectStone(player, stone) {
+    console.assert(player instanceof Player); // sanity check
     console.assert(stone instanceof Stone); // sanity check
+
+    // TODO
   }
 
   /* --- METHOD: playerBacktrack --- */
