@@ -235,7 +235,7 @@ select {
   #plate-frame {
     width: 120px;
     height: 120px;
-    margin: 0;
+    margin: 0 0 10px 0;
     grid-row: 4;
     grid-column: 1;
   }
