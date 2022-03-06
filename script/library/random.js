@@ -29,7 +29,7 @@ const Random = class {
     if (!Number.isInteger(size)) {
       throw TypeError(`sample size must be an integer`);
     }
-    if (size < 0 || size > array.length) {
+    if (size < 0) {
       throw RangeError(`sample size cannot be negative`);
     }
     if (!withReplacement && size > array.length) {
