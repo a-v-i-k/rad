@@ -64,7 +64,7 @@ const Game = class {
         console.assert(door !== null); // sanity check
         this.doors.push({
           id: door.getId(),
-          exit: door.getType() === Door.Type.EXIT,
+          exit: door.getType(),
           ownerId: door.open().getId(),
           loc: loc,
         });

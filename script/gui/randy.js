@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
 import Direction from "../game/direction.js";
+import Door from "../game/door.js";
 import { StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -50,7 +51,7 @@ const Randy = class {
     const doors = state.doors;
     for (const door of doors) {
       // if there is an exit door in the room, then choose it
-      if (door.exit) {
+      if (door === Door.Type.EXIT) {
         goingTo = door.loc;
       }
     }

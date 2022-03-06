@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
-import Game from "../game/game.js";
 import Location from "../game/location.js";
+import Door from "../game/door.js";
+import Game from "../game/game.js";
 import BoundingBox from "./bounding-box.js";
 import Polyline from "./polyline.js";
 import Drawer from "./drawer.js";
@@ -501,7 +502,7 @@ const Displayer = class {
       const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
 
       // display door
-      if (door.exit) {
+      if (door.type === Door.Type.EXIT) {
         // exit door
         this.#drawDoor(
           bbox,
