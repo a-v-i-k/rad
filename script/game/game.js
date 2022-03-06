@@ -1,4 +1,5 @@
 /* --- IMPORTS --- */
+import Random from "../library/random.js";
 // import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
 import Door from "./door.js";
@@ -76,8 +77,8 @@ const Game = class {
         const stone = room.getCell(loc).getElement();
         console.assert(stone !== null); // sanity check
         this.stones.push({
-          id: stones.getId(),
-          type: stones.getType(),
+          id: stone.getId(),
+          type: stone.getType(),
           loc: loc,
         });
       }
@@ -361,6 +362,19 @@ const Game = class {
         });
       }
     });
+
+    // create and add stones to rooms
+    const numStones = Object.keys(Stone.Type).length;
+    // Note: +2 b/c no stones in source & target.
+    const S = Random.getRandomChoices(graph.V(), numStones + 2);
+    for (const stoneType in Stone.Type) {
+      const stone = new Stone(stoneType);
+      let u = S.pop();
+      while (u === source || u === target) {
+        u = S.pop();
+      }
+      this.#rooms[u].addStone(stone);
+    }
 
     // set start room
     this.#startRoom = this.#rooms[source];
