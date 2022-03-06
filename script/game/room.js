@@ -140,6 +140,12 @@ const Room = class extends Element {
     return loc.x in this.#availableLocs && loc.y in this.#availableLocs[loc.x];
   }
 
+  /* --- METHOD: isOccupied --- */
+  isOccupied(loc) {
+    this.validateLocation(loc);
+    return this.isDoorLocation(loc) || this.isStoneLocation(loc);
+  }
+
   /* --- METHOD: addDoor --- */
   addDoor(door, loc = null) {
     return this.#addElement(door, loc, this.#doorLocs);
@@ -204,7 +210,7 @@ const Room = class extends Element {
   #removeElement(loc, elementList) {
     this.validateLocation(loc);
 
-    if (!this.isDoorLocation(loc)) {
+    if (!this.isOccupied(loc)) {
       console.log("Cannot remove element because location is not occupied.");
       return false;
     }
