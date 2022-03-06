@@ -286,7 +286,8 @@ const Game = class {
     console.assert(player instanceof Player); // sanity check
     console.assert(stone instanceof Stone); // sanity check
 
-    // TODO
+    // remove stone
+    player.getRoom().removeStone(player.getLocation());
   }
 
   /* --- METHOD: playerBacktrack --- */

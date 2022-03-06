@@ -215,6 +215,7 @@ const GUI = class {
       sound: {
         start: document.querySelector("#start"),
         enter: document.querySelector("#enter"),
+        stonecollect: document.querySelector("#stone-collect"),
         pause: document.querySelector("#pause-sound"),
         randydone: document.querySelector("#randy-done"),
         triumph: document.querySelector("#triumph"),
@@ -748,14 +749,21 @@ const GUI = class {
   #playerInspect() {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
-    const prevRoomId = this.#game.getState(0).room.id;
+    const state = this.#game.getState(0);
+    const prevRoomId = state.room.id;
+    const prevStoneCount = state.stones.length;
     if (this.#game.playerInspect(0)) {
       this.#setStatus(GUI.Status.REWARD);
       this.#unset();
       this.#playerWon();
     } else {
-      if (this.#game.getState(0).room.id !== prevRoomId) {
+      const newState = this.#game.getState(0);
+      if (newState.room.id !== prevRoomId) {
+        // player entered a new room
         this.#playSound(this.#HTML().sound.enter);
+      } else if (newState.stones.length != prevStoneCount) {
+        // player collected stone
+        this.#playSound(this.#HTML().sound.stonecollect);
       }
       this.#refresh();
     }
@@ -864,7 +872,7 @@ const GUI = class {
   #playSound(audio) {
     console.assert(audio instanceof HTMLElement && audio.tagName === "AUDIO"); // sanity check
     if (this.#CFGN().sound) {
-      audio.play(); // sound
+      audio.play();
     }
   }
 };
