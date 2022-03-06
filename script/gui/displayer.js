@@ -641,7 +641,8 @@ const Displayer = class {
     const width = Math.round(((4 / 3) * bbox.width) / 4);
     const height = Math.round(bbox.height / 4);
     const stoneBBox = new BoundingBox(x0, y0, width, height);
-    this.#drawer.drawRectangle(stoneBBox, outline, hsla, 2);
+    // this.#drawer.drawRectangle(stoneBBox, outline, hsla, 2);
+    this.#drawer.fillRectangle(stoneBBox, hsla);
 
     // draw outset
     const polyline = new Polyline();
