@@ -386,7 +386,6 @@ const GUI = class {
     for (const stoneType in Stone.Type) {
       const stoneName = stoneType.toLowerCase();
       const placeholder = document.querySelector("#" + stoneName);
-      console.log(stoneName, placeholder);
       if (placeholder === null) continue;
       placeholder.setAttribute("id", "plate-" + stoneName);
       placeholder.style.borderStyle = "inset";
