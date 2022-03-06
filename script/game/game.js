@@ -309,6 +309,9 @@ const Game = class {
 
   /* --- #validatePlayerIndex --- */
   #validatePlayerIndex(index) {
+    if (!Number.isInteger(index)) {
+      throw new ETypeError(`input is not an integer`, index);
+    }
     const numPlayers = this.getNumPlayers();
     if (index < 0 || index >= numPlayers) {
       throw new ERangeError(
