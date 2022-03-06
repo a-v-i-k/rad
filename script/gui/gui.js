@@ -252,6 +252,7 @@ const GUI = class {
     this.#setPanel(); // panel
     this.#setStopwatch(); // clock
     this.#setRandyControl(); // randy
+    this.#setStonePlate(); // stones
   }
 
   /* --- METHOD: #unsetWidgets --- */
@@ -312,6 +313,13 @@ const GUI = class {
     }
   }
 
+  /* --- METHOD: #setStonePlate --- */
+  #setStonePlate() {
+    if (!this.#CFGN().stones) {
+      this.#HTML().top.frame.removeChild(this.#HTML().stones.frame);
+    }
+  }
+
   /* --- METHOD: #setDisplay --- */
   #setDisplay() {
     // displayer
@@ -366,9 +374,7 @@ const GUI = class {
 
   /* --- METHOD: #setStopwatch --- */
   #setStones() {
-    if (!this.#CFGN().stones) {
-      this.#HTML().top.frame.removeChild(this.#HTML().stones.frame);
-    }
+    if (!this.#CFGN().stones) return;
     this.#clearPlate();
   }
 
