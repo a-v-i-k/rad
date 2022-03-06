@@ -4,6 +4,7 @@ import Element from "./element.js";
 import Location from "./location.js";
 import Cell from "./cell.js";
 import Door from "./door.js";
+import Stone from "./stone.js";
 import { ETypeError, ERangeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -18,6 +19,7 @@ const Room = class extends Element {
   #grid;
   #welcomeLoc;
   #doorLocs;
+  #stoneLocs;
   #availableLocs;
 
   /* --- C'TOR: constructor --- */
@@ -94,13 +96,23 @@ const Room = class extends Element {
 
   /* --- METHOD: getDoorLocations --- */
   getDoorLocations() {
-    const doorLocs = [];
-    for (let x in this.#doorLocs) {
-      for (let y in this.#doorLocs[x]) {
-        doorLocs.push(this.#doorLocs[x][y].clone());
+    return this.#getElementLocations(this.#doorLocs);
+  }
+
+  /* --- METHOD: getStoneLocations --- */
+  getStoneLocations() {
+    return this.#getElementLocations(this.#stoneLocs);
+  }
+
+  /* --- METHOD: getElementLocations --- */
+  #getElementLocations(elementList) {
+    const elementLocs = [];
+    for (let x in elementList) {
+      for (let y in elementList[x]) {
+        elementLocs.push(elementList[x][y].clone());
       }
     }
-    return doorLocs;
+    return elementLocs;
   }
 
   /* --- METHOD: isWelcomeLocation --- */
@@ -115,6 +127,12 @@ const Room = class extends Element {
     return loc.x in this.#doorLocs && loc.y in this.#doorLocs[loc.x];
   }
 
+  /* --- METHOD: isStoneLocation --- */
+  isStoneLocation(loc) {
+    this.validateLocation(loc);
+    return loc.x in this.#stoneLocs && loc.y in this.#stoneLocs[loc.x];
+  }
+
   /* --- METHOD: isAvailable --- */
   isAvailable(loc) {
     this.validateLocation(loc);
@@ -124,13 +142,25 @@ const Room = class extends Element {
 
   /* --- METHOD: addDoor --- */
   addDoor(door, loc = null) {
-    if (!(door instanceof Door)) {
-      throw new ETypeError(`input is not of type Door`, door);
+    return this.#addElement(door, loc, this.#doorLocs);
+  }
+
+  /* --- METHOD: addStone --- */
+  addStone(stone, loc = null) {
+    return this.#addElement(stone, loc, this.#stoneLocs);
+  }
+
+  /* --- METHOD: addElement --- */
+  #addElement(element, loc, elementList) {
+    if (!(element instanceof Door || element instanceof Stone)) {
+      throw new ETypeError(`input is not of type Door or Stone`, element);
     }
     if (loc !== null) this.validateLocation(loc);
 
     if (Object.keys(this.#availableLocs).length == 0) {
-      console.log("Cannot add door because there are no available locations.");
+      console.log(
+        "Cannot add element because there are no available locations."
+      );
       return false;
     }
 
@@ -142,42 +172,52 @@ const Room = class extends Element {
     }
 
     if (!this.isAvailable(loc)) {
-      console.log("Cannot add door because location is not available.");
+      console.log("Cannot add element because location is not available.");
       return false;
     }
 
-    // update door and available locations
-    if (!(loc.x in this.#doorLocs)) {
-      this.#doorLocs[loc.x] = {};
+    // update door/stone and available locations
+    if (!(loc.x in elementList)) {
+      elementList[loc.x] = {};
     }
-    this.#doorLocs[loc.x][loc.y] = loc;
+    elementList[loc.x][loc.y] = loc;
     delete this.#availableLocs[loc.x][loc.y];
     if (Object.keys(this.#availableLocs[loc.x]).length == 0) {
       delete this.#availableLocs[loc.x];
     }
 
-    this.getCell(loc).attach(door);
+    this.getCell(loc).attach(element);
     return true;
   }
 
   /* --- METHOD: removeDoor --- */
   removeDoor(loc) {
+    return this.#removeElement(loc, this.#doorLocs);
+  }
+
+  /* --- METHOD: removeStone --- */
+  removeStone(loc) {
+    return this.#removeElement(loc, this.#stoneLocs);
+  }
+
+  /* --- METHOD: removeElement --- */
+  #removeElement(loc, elementList) {
     this.validateLocation(loc);
 
     if (!this.isDoorLocation(loc)) {
-      console.log("Cannot remove door because location is not occupied.");
+      console.log("Cannot remove element because location is not occupied.");
       return false;
     }
     this.getCell(loc).detach();
 
-    // update door and available locations
+    // update door/stone and available locations
     if (!(loc.x in this.#availableLocs)) {
       this.#availableLocs[loc.x] = {};
     }
     this.#availableLocs[loc.x][loc.y] = loc;
-    delete this.#doorLocs[loc.x][loc.y];
-    if (Object.keys(this.#doorLocs[loc.x]).length == 0) {
-      delete this.#doorLocs[loc.x];
+    delete elementList[loc.x][loc.y];
+    if (Object.keys(elementList[loc.x]).length == 0) {
+      delete elementList[loc.x];
     }
 
     return true;
@@ -191,6 +231,8 @@ const Room = class extends Element {
         const loc = new Location(x, y);
         if (this.isDoorLocation(loc)) {
           this.removeDoor(loc);
+        } else if (this.isStoneLocation(loc)) {
+          this.removeStone(loc);
         }
       }
     }
@@ -214,10 +256,12 @@ const Room = class extends Element {
   #createCells() {
     console.assert(this.#availableLocs === undefined); // sanity check
     console.assert(this.#doorLocs === undefined); // sanity check
+    console.assert(this.#stoneLocs === undefined); // sanity check
     const [rows, columns] = this.getDimensions();
 
     this.#availableLocs = {};
     this.#doorLocs = {};
+    this.#stoneLocs = {};
     for (let x = 0; x < columns; x++) {
       this.#availableLocs[x] = {};
       for (let y = 0; y < rows; y++) {

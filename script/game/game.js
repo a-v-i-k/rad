@@ -2,6 +2,7 @@
 // import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
 import Door from "./door.js";
+import Stone from "./stone.js";
 import Cell from "./cell.js";
 import Room from "./room.js";
 import Player from "./player.js";
@@ -59,12 +60,24 @@ const Game = class {
       // doors
       this.doors = [];
       for (const loc of room.getDoorLocations()) {
-        const door = room.getCell(loc).getDoor();
+        const door = room.getCell(loc).getElement();
         console.assert(door !== null); // sanity check
         this.doors.push({
           id: door.getId(),
           exit: door.getType() === Door.Type.EXIT,
           ownerId: door.open().getId(),
+          loc: loc,
+        });
+      }
+
+      // stones
+      this.stones = [];
+      for (const loc of room.getStoneLocations()) {
+        const stone = room.getCell(loc).getElement();
+        console.assert(stone !== null); // sanity check
+        this.stones.push({
+          id: stones.getId(),
+          type: stones.getType(),
           loc: loc,
         });
       }
@@ -223,23 +236,14 @@ const Game = class {
     let finished = false;
     switch (cell.getType()) {
       case Cell.Type.PLAIN: // plain cell
-        const door = cell.getDoor();
-        if (door === null) {
+        const element = cell.getElement();
+        if (element === null) {
           console.log("Nothing to inspect...");
           break;
-        }
-
-        switch (door.getType()) {
-          case Door.Type.PLAIN: // plain door
-            player.enter(door.open());
-            break;
-          case Door.Type.EXIT: // exit door
-            console.log(`Player ${index} has won the game!`);
-            this.stop();
-            finished = true;
-            break;
-          default:
-            console.assert(false); // sanity check
+        } else if (element instanceof Door) {
+          finished = this.#inspectDoor(index, element);
+        } else if (element instanceof Stone) {
+          this.#inspectStone(index, element);
         }
         break;
 
@@ -253,6 +257,28 @@ const Game = class {
         console.assert(false); // sanity check
     }
     return finished;
+  }
+
+  /* --- #inspectDoor --- */
+  #inspectDoor(index, door) {
+    console.assert(door instanceof Door); // sanity check
+    switch (door.getType()) {
+      case Door.Type.PLAIN: // plain door
+        this.#players[index].enter(door.open());
+        break;
+      case Door.Type.EXIT: // exit door
+        console.log(`Player ${index} has won the game!`);
+        this.stop();
+        return true;
+      default:
+        console.assert(false); // sanity check
+    }
+    return false;
+  }
+
+  /* --- #inspectStone --- */
+  #inspectStone(index, stone) {
+    console.assert(stone instanceof Stone); // sanity check
   }
 
   /* --- METHOD: playerBacktrack --- */

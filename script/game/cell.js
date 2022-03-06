@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
 import Element from "./element.js";
 import Door from "./door.js";
+import Stone from "./stone.js";
 import { ETypeError, RuntimeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
@@ -18,7 +19,7 @@ Object.freeze(CellType);
  *****************************************************************************/
 const Cell = class extends Element {
   #type;
-  #door;
+  #element;
 
   /* --- INNER: Type --- */
   static Type = CellType;
@@ -28,7 +29,7 @@ const Cell = class extends Element {
     super();
     Cell.#validator(type);
     this.#type = type;
-    this.#door = null;
+    this.#element = null;
   }
 
   /* --- METHOD: #validator --- */
@@ -39,16 +40,14 @@ const Cell = class extends Element {
   }
 
   /* --- METHOD: attach --- */
-  attach(door) {
-    if (this.getDoor() !== null) {
-      throw new RuntimeError(
-        `trying to attach a door while one already exists`
-      );
+  attach(element) {
+    if (this.getElement() !== null) {
+      throw new RuntimeError(`cannot attach elements to an occupied cell`);
     }
-    if (!(door instanceof Door)) {
-      throw new ETypeError(`input is not of type Door`, door);
+    if (!(element instanceof Door || element instanceof Stone)) {
+      throw new ETypeError(`element is not of type Door or Stone`, element);
     }
-    this.#door = door;
+    this.#element = element;
   }
 
   /* --- METHOD: getType --- */
@@ -56,19 +55,17 @@ const Cell = class extends Element {
     return this.#type;
   }
 
-  /* --- METHOD: getDoor --- */
-  getDoor() {
-    return this.#door;
+  /* --- METHOD: getElement --- */
+  getElement() {
+    return this.#element;
   }
 
   // NOTE: this method will be useful in breaking circular references
   /* --- METHOD: detach --- */
   detach() {
-    if (this.getDoor() === null) {
-      throw new RuntimeError(
-        `trying to detach a door while one does not exist`
-      );
+    if (this.getElement() === null) {
+      throw new RuntimeError(`trying to detach an element from an empty cell`);
     }
-    this.#door = null;
+    this.#element = null;
   }
 };
