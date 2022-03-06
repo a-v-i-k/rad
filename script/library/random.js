@@ -24,22 +24,33 @@ const Random = class {
   }
 
   /* --- Random: getRandomChoices --- */
-  static getRandomChoices(array, size) {
+  static getRandomChoices(array, size, withReplacement = false) {
     validateArray(array);
     if (!Number.isInteger(size)) {
       throw TypeError(`sample size must be an integer`);
     }
     if (size < 0 || size > array.length) {
-      const message = `sample size cannot be negative or larger than population`;
-      throw RangeError(message);
+      throw RangeError(`sample size cannot be negative`);
+    }
+    if (!withReplacement && size > array.length) {
+      throw RangeError(
+        `sampling without replacement: sample size cannot exceed population`
+      );
     }
 
-    const temp = [];
-    for (const item of array) {
-      temp.push(item);
+    let sample = [];
+    if (withReplacement) {
+      for (let i = 0; i < size; i++) {
+        sample.push(Random.getRandomChoice(array));
+      }
+    } else {
+      for (const item of array) {
+        sample.push(item);
+      }
+      Random.shuffleArray(sample);
+      sample = sample.slice(0, size);
     }
-    Random.shuffleArray(temp);
-    return temp.slice(0, size);
+    return sample;
   }
 
   /* --- Random: shuffleArray --- */
