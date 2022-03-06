@@ -129,6 +129,7 @@ const RandyManager = class {
 
   /* --- METHOD: #step --- */
   #step(index) {
+    index = parseInt(index); // FIXME?
     const randy = this.#randys[index];
     const state = this.#game.getState(index);
     const prevRoomId = state.room.id;
