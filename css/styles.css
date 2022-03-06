@@ -16,6 +16,7 @@ main {
 /* --- TOP --- */
 #top-frame {
   background: #3399ff; /* royalblue; */
+  padding: 0 10px 5px 10px;
   border: 3px solid saddlebrown;
   border-radius: 10px;
   border-style: groove; /* ridge; */
