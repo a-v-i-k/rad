@@ -383,9 +383,7 @@ const GUI = class {
   /* --- METHOD: #unsetStones --- */
   #unsetStones() {
     if (!this.#CFGN().stones) return;
-    if (this.getStatus() === GUI.Status.IDLE) {
-      this.#clearPlate();
-    }
+    this.#clearPlate();
   }
 
   /* --- METHOD: #clearPlate --- */
@@ -811,17 +809,23 @@ const GUI = class {
 
   /* --- METHOD: #reset --- */
   #reset() {
-    if (this.getStatus() === GUI.Status.IDLE) return;
-    this.#unset();
+    const status = this.getStatus();
+    if (status === GUI.Status.IDLE) return;
+    if (status !== GUI.Status.REWARD && status !== GUI.Status.RANDYDONE) {
+      this.#unset();
+    }
     this.#set();
     this.#setStatus(GUI.Status.PLAYING);
   }
 
   /* --- METHOD: #stop --- */
   #stop() {
-    if (this.getStatus() === GUI.Status.IDLE) return;
+    const status = this.getStatus();
+    if (status === GUI.Status.IDLE) return;
+    if (status !== GUI.Status.REWARD && status !== GUI.Status.RANDYDONE) {
+      this.#unset();
+    }
     this.#setStatus(GUI.Status.IDLE);
-    this.#unset();
     this.#displayer.displayIdle();
   }
 
@@ -983,7 +987,7 @@ const GUI = class {
 
   /* --- METHOD: #randyStop --- */
   #randyStop() {
-    if (this.#getNumRandys() > 0 && this.#randy.isActive()) {
+    if (this.#randy.isActive()) {
       this.#randy.halt();
     }
   }
