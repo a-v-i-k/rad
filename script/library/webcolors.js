@@ -1,4 +1,4 @@
-const COLORS = [
+const WEBCOLORS = [
   // 140 colors (http://www.javascripter.net/faq/colornam.htm)"
   "aliceblue",
   "lightsalmon",
@@ -142,4 +142,4 @@ const COLORS = [
   "yellowgreen",
 ];
 
-export default COLORS;
+export default WEBCOLORS;

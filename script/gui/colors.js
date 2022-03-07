@@ -1,12 +1,12 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
-// import COLORS from "../library/webcolors.js";
+import WEBCOLORS from "../library/webcolors.js";
 
 /* --- EXPORTS --- */
 export { Colors as default };
 
 /* --- CONSTANTS --- */
-const COLORS = [
+const COLORS47 = [
   "red",
   "green",
   "blue",
@@ -55,6 +55,9 @@ const COLORS = [
   "silver",
   "black",
 ];
+
+// const COLORS = COLORS47;
+const COLORS = WEBCOLORS;
 
 /*
  * CLASS: Colors
