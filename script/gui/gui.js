@@ -62,6 +62,7 @@ const GUI = class {
   #callbacks;
   #rpath;
   #auto;
+  #lastRoomId;
   #backup;
 
   /* --- INNER: Status --- */
@@ -105,6 +106,7 @@ const GUI = class {
 
     this.#rpath = null;
     this.#auto = null;
+    this.#lastRoomId = null;
 
     this.#displayer.displayIdle();
 
@@ -426,7 +428,9 @@ const GUI = class {
     }
     if (this.#activeRandomPath()) {
       this.#rpath.cancel();
+      this.#rpath = null;
     }
+    this.#lastRoomId = null;
     this.#unsetStones();
     this.#unsetRandy();
     this.#unsetClock();
@@ -511,14 +515,14 @@ const GUI = class {
             this.#auto = null;
             if (this.#activeRandomPath()) {
               this.#rpath.cancel();
+              this.#rpath = null;
             }
           }
           break;
 
         case "c":
           if (!this.#activeRandomPath()) {
-            const state = this.#game.getState(0);
-            this.#playerGoTo(Random.getRandomChoice(state.doors).loc);
+            this.#simulatePseudoRandomPlayerMove();
           }
           break;
 
@@ -609,7 +613,53 @@ const GUI = class {
     );
   }
 
-  /* --- METHOD: #processTickEvent() --- */
+  /* --- METHOD: #simulatePseudoRandomPlayerMove --- */
+  #simulatePseudoRandomPlayerMove() {
+    const state = this.#game.getState(0);
+    const player = state.player;
+    const stones = state.stones;
+    if (stones.length > 0) {
+      const dist = function (loc1, loc2) {
+        return Math.abs(loc1.x - loc2.x) + Math.abs(loc1.y - loc2.y);
+      };
+
+      // go for the nearest stone (Manhattan distance)
+      let nearest = stones[0].loc;
+      for (let i = 1; i < stones.length; i++) {
+        if (dist(player.loc, stones[i].loc) < dist(player.loc, nearest)) {
+          nearest = stones[i].loc;
+        }
+      }
+      this.#playerGoTo(nearest);
+    } else {
+      const doors = state.doors;
+      let choices = [];
+      for (const door of doors) {
+        if (door.type === Door.Type.EXIT) {
+          // exit door appears? go for it, but not before collecting all stones
+          if (this.#stoneCount === Object.keys(Stone.Type).length) {
+            choices = [door];
+            break;
+          }
+        } else {
+          choices.push(door);
+        }
+
+        // don't go back right away to the room you came from (if possible)
+        if (choices.length > 1) {
+          for (let i = 0; i < choices.length; i++) {
+            if (choices[i].ownerId === this.#lastRoomId) {
+              choices.splice(i, 1);
+              break;
+            }
+          }
+        }
+      }
+      this.#playerGoTo(Random.getRandomChoice(choices).loc);
+    }
+  }
+
+  /* --- METHOD: #processTickEvent --- */
   #processTickEvent(clientX, clientY) {
     switch (this.getStatus()) {
       case GUI.Status.REWARD:
@@ -818,7 +868,7 @@ const GUI = class {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     const state = this.#game.getState(0);
-    const prevRoomId = state.room.id;
+    this.#lastRoomId = state.room.id;
     const result = this.#game.playerInspect(0);
     if (result === Door.Type.EXIT) {
       this.#setStatus(GUI.Status.REWARD);
@@ -826,7 +876,7 @@ const GUI = class {
       this.#playerWon();
     } else {
       const newState = this.#game.getState(0);
-      if (newState.room.id !== prevRoomId) {
+      if (newState.room.id !== this.#lastRoomId) {
         // player entered a new room
         this.#playSound(this.#HTML().sound.enter);
       } else if (this.#CFGN().stones && result in Stone.Type) {
