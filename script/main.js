@@ -42,6 +42,8 @@
 // │   ├── game.bmp
 // │   ├── game.gaphor
 // │   └── gui.gaphor
+// ├── images
+// │   └── favicon.ico
 // ├── quotes
 // │   ├── JakubPetriska.zip
 // │   ├── quotes.csv
