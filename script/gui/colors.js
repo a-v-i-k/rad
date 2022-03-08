@@ -1,6 +1,6 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
-import WEBCOLORS from "../library/webcolors.js";
+// import WEBCOLORS from "../library/webcolors.js";
 
 /* --- EXPORTS --- */
 export { Colors as default };
@@ -52,12 +52,12 @@ const COLORS47 = [
   "saddlebrown",
   "dimgray",
   "skyblue",
-  "silver",
+  "lightseagreen",
   "black",
 ];
 
-// const COLORS = COLORS47;
-const COLORS = WEBCOLORS;
+const COLORS = COLORS47;
+// const COLORS = WEBCOLORS;
 
 /*
  * CLASS: Colors
