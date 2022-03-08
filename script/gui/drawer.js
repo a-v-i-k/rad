@@ -72,6 +72,23 @@ const Drawer = class {
     // this.#getContext().clearRect(0, 0, this.#canvas.width, this.#canvas.height);
   }
 
+  /* --- METHOD: drawLine --- */
+  drawLine(pt1, pt2, strokeStyle, lineWidth = 1) {
+    this.#validatePoint(pt1);
+    this.#validatePoint(pt2);
+    Drawer.validateColor(strokeStyle);
+
+    const context = this.#getContext();
+    context.lineWidth = lineWidth;
+    context.strokeStyle = strokeStyle;
+
+    context.beginPath();
+    context.moveTo(pt1[0], pt1[1]);
+    context.lineTo(pt2[0], pt2[1]);
+    context.closePath();
+    context.stroke();
+  }
+
   /* --- METHOD: drawRectangle --- */
   drawRectangle(bbox, strokeStyle, fillStyle = null, lineWidth = 1) {
     this.#validateBoundingBox(bbox);
@@ -215,6 +232,29 @@ const Drawer = class {
     }
   }
 
+  /* --- METHOD: #validatePoint --- */
+  #validatePoint(point) {
+    if (!Array.isArray(point) || point.length != 2) {
+      throw new ETypeError(`given point is not an array of length 2`, point);
+    }
+    if (!Number.isInteger(point[0]) || !Number.isInteger(point[1])) {
+      throw new ValueError(`given point has non-integer coordinates`, point);
+    }
+    const width = this.#canvas.width,
+      height = this.#canvas.height;
+    if (
+      point[0] < 0 ||
+      point[0] > width - 1 ||
+      point[1] < 0 ||
+      point[1] > height - 1
+    ) {
+      throw new ERangeError(
+        `point is not contained in [0, ${width - 1}] x [0, ${height - 1}]`,
+        point
+      );
+    }
+  }
+
   /* --- METHOD: #validatePolyline --- */
   #validatePolyline(polyline) {
     if (!(polyline instanceof Polyline)) {
@@ -223,20 +263,8 @@ const Drawer = class {
     if (polyline.points.length < 2) {
       throw new ValueError(`polyline contains less than 2 points`);
     }
-    const width = this.#canvas.width,
-      height = this.#canvas.height;
     for (const point of polyline.points) {
-      if (
-        point[0] < 0 ||
-        point[0] > width - 1 ||
-        point[1] < 0 ||
-        point[1] > height - 1
-      ) {
-        throw new ERangeError(
-          `polyline is not contained in [0, ${width - 1}] x [0, ${height - 1}]`,
-          polyline
-        );
-      }
+      this.#validatePoint(point);
     }
   }
 

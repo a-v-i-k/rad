@@ -26,6 +26,8 @@ const DisplayerStatus = {
 Object.freeze(DisplayerStatus);
 
 /* --- CONSTANTS --- */
+const DOOR_SHAPES = true;
+
 // const IDLE_BG = "powderblue";
 const DEFAULT_CANVAS_BG = "#f0f0f0";
 const PAUSE_FILL_STYLE = "red";
@@ -259,7 +261,7 @@ const Displayer = class {
     //   CELL_CASCADE_OUTLINE,
     //   CELL_CASCADE_SHAPE
     // );
-    // this.#drawDoor(
+    // this.#drawExitDoor(
     //   bbox,
     //   DOOR_OUTLINE,
     //   EXIT_DOOR_FRONT_FILL,
@@ -526,7 +528,7 @@ const Displayer = class {
       // display door
       if (door.type === Door.Type.EXIT) {
         // exit door
-        this.#drawDoor(
+        this.#drawExitDoor(
           bbox,
           DOOR_OUTLINE,
           EXIT_DOOR_FRONT_FILL,
@@ -534,22 +536,42 @@ const Displayer = class {
           EXIT_DOOR_HANDLE_FILL
         );
       } else {
-        // plain door (assumes owner's color)
-        this.#drawDoor(
-          bbox,
-          DOOR_OUTLINE,
-          this.#getRoomColor(door.ownerId),
-          DOOR_WINDOW_FILL,
-          DOOR_HANDLE_FILL
-        );
+        const outline = DOOR_OUTLINE;
+        // door assumes its owner's color (front fill)
+        const frontFill = this.#getRoomColor(door.ownerId);
+        const windowFill = DOOR_WINDOW_FILL;
+        const handleFill = DOOR_HANDLE_FILL;
+
+        const numRooms = this.#game.getNumRooms();
+        const rank = this.#game.getRoomRank(door.ownerId);
+        if (!DOOR_SHAPES || rank < Math.ceil((numRooms - 1) / 3)) {
+          this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
+        } else if (rank < 2 * Math.ceil((numRooms - 1) / 3)) {
+          this.#drawArchedDoor(
+            bbox,
+            outline,
+            frontFill,
+            windowFill,
+            handleFill
+          );
+        } else {
+          this.#drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill);
+        }
       }
     }
   }
 
-  /* --- METHOD: #drawDoor --- */
-  #drawDoor(bbox, outline, frontFill, windowFill, handleFill) {
-    // TODO: Differet outlines for different door parts?
+  /* --- METHOD: #drawExitDoor --- */
+  #drawExitDoor(bbox, outline, frontFill, windowFill, handleFill) {
+    if (DOOR_SHAPES) {
+      this.#drawFancyDoor(bbox, outline, frontFill, windowFill, handleFill);
+    } else {
+      this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
+    }
+  }
 
+  /* --- METHOD: #drawPlainDoor --- */
+  #drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill) {
     // display front
     let x0 = bbox.x0 + Math.round(bbox.width / 5);
     let y0 = bbox.y0 + Math.round(bbox.height / 15);
@@ -572,6 +594,133 @@ const Displayer = class {
     y0 += Math.round(bbox.height / 3) + Math.round(bbox.height / 12);
     height = Math.round(bbox.height / 7);
     const handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawArchedDoor --- */
+  #drawArchedDoor(bbox, outline, frontFill, windowFill, handleFill) {
+    // display front
+    let x0 = bbox.x0 + Math.round(bbox.width / 5);
+    let y0 = bbox.y0 + Math.round(bbox.height / 15);
+    let width = bbox.width - 2 * Math.round(bbox.width / 5);
+    let height = bbox.height - 2 * Math.round(bbox.height / 15);
+    let polyline = new Polyline();
+    let delta = 1;
+    for (let i = 10; i < bbox.width - 9; i++) {
+      const d = (i * delta) / bbox.width;
+      const x = Math.round(d * bbox.width);
+      const y =
+        Math.round(bbox.width * Math.abs(Math.pow(2.5 * (d - 0.5), 3))) + 8;
+      polyline.addPoint(bbox.x0 + x, bbox.y0 + y);
+    }
+    this.#drawer.drawPolygon(polyline, outline, frontFill, 4);
+
+    // display window
+    polyline = new Polyline();
+    for (let i = 23; i < bbox.width - 22; i++) {
+      const d = (i * delta) / bbox.width;
+      const x = Math.round(d * bbox.width);
+      const y =
+        Math.round(bbox.width * Math.abs(Math.pow(3.5 * (d - 0.5), 3))) + 15;
+      polyline.addPoint(bbox.x0 + x, bbox.y0 + y);
+    }
+    this.#drawer.drawPolygon(polyline, outline, windowFill, 4);
+
+    // display handle
+    x0 += 5;
+    width = Math.round(bbox.width / 7);
+    y0 += 8 + Math.round(bbox.height / 3) + Math.round(bbox.height / 12);
+    height = Math.round(bbox.height / 7);
+    const handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawRoundDoor --- */
+  #drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill) {
+    // display front
+    let x0 = bbox.x0 + Math.round(bbox.width / 15);
+    let y0 = bbox.y0 + Math.round(bbox.height / 15);
+    let width = bbox.width - 2 * Math.round(bbox.width / 15);
+    let height = bbox.height - 2 * Math.round(bbox.height / 15);
+    const frontBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(frontBBox, outline, frontFill, 2);
+
+    // display window
+    x0 = bbox.x0 + Math.round(bbox.width * (4 / 15));
+    y0 = bbox.y0 + Math.round(bbox.height * (4 / 15)) - 10;
+    width = Math.round(bbox.width / 2.2);
+    height = Math.round(bbox.height / 2.2);
+    const windowBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(windowBBox, outline, windowFill, 2);
+
+    // display handle
+    x0 = bbox.x0 + Math.round(bbox.width / 5);
+    width = Math.round(bbox.width / 7);
+    y0 = bbox.y0 + Math.round(bbox.width * (4 / 7));
+    height = Math.round(bbox.height / 7);
+    const handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawFancyDoor --- */
+  #drawFancyDoor(bbox, outline, frontFill, windowFill, handleFill) {
+    // display front
+    const polyline = new Polyline();
+    polyline.addPoint(
+      bbox.x0 + Math.round(bbox.width / 6),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height / 10)
+    );
+    polyline.addPoint(
+      bbox.x0 + Math.round(bbox.width / 4),
+      bbox.y0 + Math.round(bbox.height / 4)
+    );
+    polyline.addPoint(
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + Math.round(bbox.height / 8)
+    );
+    polyline.addPoint(
+      bbox.x0 + bbox.width - 1 - Math.round(bbox.width / 4),
+      bbox.y0 + Math.round(bbox.height / 4)
+    );
+    polyline.addPoint(
+      bbox.x0 + bbox.width - 1 - Math.round(bbox.width / 6),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height / 10)
+    );
+    this.#drawer.drawPolygon(polyline, outline, frontFill, 4);
+
+    // display gap between doors
+    const point1 = [
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + Math.round(bbox.height / 8),
+    ];
+    const point2 = [
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height / 10),
+    ];
+    this.#drawer.drawLine(point1, point2, outline, 2);
+
+    // display windows
+    let x0 = bbox.x0 + Math.round((5 / 16) * bbox.width);
+    let y0 = bbox.y0 + Math.round((5 / 16) * bbox.height);
+    let width = Math.round(bbox.width / 8);
+    let height = Math.round(bbox.height / 4);
+    let windowBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
+    // only x0 changes in the second window
+    x0 += Math.round(bbox.width / 4) + 1;
+    windowBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
+
+    // display handles
+    x0 = bbox.x0 + Math.round(bbox.width * (5 / 16));
+    width = Math.round(bbox.width / 10);
+    y0 = bbox.y0 + Math.round(bbox.width * (5 / 8));
+    height = Math.round(bbox.height / 8);
+    let handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+    // only x0 changes in the second handle
+    x0 += Math.round(bbox.width / 4) + 2;
+    handleBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 
