@@ -51,7 +51,7 @@ const Randy = class {
     const doors = state.doors;
     for (const door of doors) {
       // if there is an exit door in the room, then choose it
-      if (door === Door.Type.EXIT) {
+      if (door.type === Door.Type.EXIT) {
         goingTo = door.loc;
       }
     }
