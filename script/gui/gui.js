@@ -388,6 +388,9 @@ const GUI = class {
 
   /* --- METHOD: #clearPlate --- */
   #clearPlate() {
+    const status = this.getStatus();
+    if (status === GUI.Status.REWARD || status === GUI.Status.RANDYDONE) return;
+
     if (this.#stoneCount === 0) return;
     for (const stoneType in Stone.Type) {
       const stoneName = stoneType.toLowerCase();
@@ -721,8 +724,8 @@ const GUI = class {
     const status = this.getStatus();
     if (status === GUI.Status.PLAYING) return;
 
-    this.#set();
     this.#setStatus(GUI.Status.PLAYING);
+    this.#set();
   }
 
   /* --- METHOD: #pause --- */
@@ -814,8 +817,8 @@ const GUI = class {
     if (status !== GUI.Status.REWARD && status !== GUI.Status.RANDYDONE) {
       this.#unset();
     }
-    this.#set();
     this.#setStatus(GUI.Status.PLAYING);
+    this.#set();
   }
 
   /* --- METHOD: #stop --- */
@@ -828,6 +831,7 @@ const GUI = class {
       this.#unset();
     } else {
       this.#unsetClock(); // to reset it
+      this.#unsetStones(); // to clear it
     }
 
     this.#displayer.displayIdle();
@@ -965,10 +969,10 @@ const GUI = class {
   #stopwatchStop() {
     this.#stopwatch.stop();
     const clockWatch = this.#HTML().clock.watch;
-    if (this.getStatus() === GUI.Status.IDLE) {
-      clockWatch.innerText = "00:00";
-    }
     clockWatch.style.color = CLOCK_IDLE_FG;
+    const status = this.getStatus();
+    if (status === GUI.Status.REWARD || status === GUI.Status.RANDYDONE) return;
+    clockWatch.innerText = "00:00";
   }
 
   /* --- METHOD: #getWatchTimeString --- */
