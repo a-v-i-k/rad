@@ -826,6 +826,8 @@ const GUI = class {
     this.#setStatus(GUI.Status.IDLE);
     if (status !== GUI.Status.REWARD && status !== GUI.Status.RANDYDONE) {
       this.#unset();
+    } else {
+      this.#unsetClock(); // to reset it
     }
 
     this.#displayer.displayIdle();
