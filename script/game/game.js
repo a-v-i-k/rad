@@ -8,7 +8,12 @@ import Cell from "./cell.js";
 import Room from "./room.js";
 import Player from "./player.js";
 import Direction from "./direction.js";
-import { ETypeError, ERangeError, StatusError } from "../library/errors.js";
+import {
+  ETypeError,
+  ERangeError,
+  StatusError,
+  ValueError,
+} from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Game as default };
@@ -37,8 +42,7 @@ const Game = class {
   #columns;
   #numRooms;
   #backtrack;
-  #rooms;
-  #startRoom;
+  #roomsInfo;
 
   /* --- INNER: Status --- */
   static Status = GameStatus;
@@ -52,8 +56,9 @@ const Game = class {
 
       // room
       const room = player.getRoom();
+      const roomId = room.getId();
       this.room = {
-        id: room.getId(),
+        id: roomId,
         dims: room.getDimensions(),
         wloc: room.getWelcomeLocation(),
       };
@@ -102,7 +107,7 @@ const Game = class {
     this.#backtrack = backtrack;
 
     this.#setStatus(Game.Status.IDLE);
-    this.#rooms = null;
+    this.#roomsInfo = null;
     this.#players = [];
   }
 
@@ -162,6 +167,14 @@ const Game = class {
     return new Game.State(this.#players[index]);
   }
 
+  /* --- METHOD: getRoomRank --- */
+  getRoomRank(roomId) {
+    if (!(roomId in this.#roomsInfo.ranks)) {
+      throw new ValueError(`illegal room ID ${roomId}`);
+    }
+    return this.#roomsInfo.ranks[roomId];
+  }
+
   /* --- METHOD: play --- */
   play(numPlayers = DEFAULT_NUM_PLAYERS) {
     if (this.getStatus() === Game.Status.PLAYING) {
@@ -177,7 +190,7 @@ const Game = class {
     this.#createPlayers(numPlayers);
     for (let i = 0; i < numPlayers; i++) {
       this.#players[i].play(); // start playing
-      this.#players[i].enter(this.#startRoom); // let player in
+      this.#players[i].enter(this.#roomsInfo.startRoom); // let player in
     }
 
     this.#setStatus(Game.Status.PLAYING);
@@ -322,12 +335,13 @@ const Game = class {
     // }
 
     const [source, target] = this.#getEndpoints(graph); // source, target
+    const ranks = this.#getRanks(graph, source, target); // ranks
 
     // create rooms
     const [rows, columns] = this.getDimensions();
-    this.#rooms = {};
+    const rooms = {};
     graph.V().forEach((u) => {
-      this.#rooms[u] = new Room(rows, columns);
+      rooms[u] = new Room(rows, columns);
     });
 
     // create and add doors to rooms
@@ -336,8 +350,8 @@ const Game = class {
       if (u !== target) {
         graph.neighbors(u).forEach((v) => {
           const type = v === target ? Door.Type.EXIT : Door.Type.PLAIN;
-          const door = new Door(type, this.#rooms[v]);
-          this.#rooms[u].addDoor(door);
+          const door = new Door(type, rooms[v]);
+          rooms[u].addDoor(door);
         });
       }
     });
@@ -352,11 +366,16 @@ const Game = class {
     for (const stoneType in Stone.Type) {
       const stone = new Stone(stoneType);
       let u = S.pop();
-      this.#rooms[u].addStone(stone);
+      rooms[u].addStone(stone);
     }
 
-    // set start room
-    this.#startRoom = this.#rooms[source];
+    // store information about rooms
+    this.#roomsInfo = { startRoom: rooms[source], rooms: {}, ranks: {} };
+    graph.V().forEach((u) => {
+      const roomId = rooms[u].getId();
+      this.#roomsInfo.rooms[roomId] = rooms[u];
+      this.#roomsInfo.ranks[roomId] = ranks[u];
+    });
   }
 
   /* --- METHOD: #destroyNetwork --- */
@@ -364,10 +383,10 @@ const Game = class {
     console.assert(this.getStatus() === Game.Status.PLAYING); // sanity check
 
     // clear rooms (door detachments prevent circular references)
-    for (const u in this.#rooms) {
-      this.#rooms[u].clear();
+    for (const roomId in this.#roomsInfo.rooms) {
+      this.#roomsInfo.rooms[roomId].clear();
     }
-    this.#rooms = null;
+    this.#roomsInfo = null;
   }
 
   /* --- METHOD: #createPlayers --- */
@@ -378,6 +397,8 @@ const Game = class {
     }
   }
 
+  /// GRAPH
+
   /* --- METHOD: #getGraph --- */
   #getGraph(n) {
     return GraphUtils.getRandomTree(n);
@@ -386,5 +407,21 @@ const Game = class {
   /* --- METHOD: #getEndpoints --- */
   #getEndpoints(graph) {
     return GraphUtils.findTreeDiameterEndpoints(graph)[0];
+  }
+
+  /* --- METHOD: #getRanks --- */
+  #getRanks(graph, source, target) {
+    // source is ignored for now
+    const dists = GraphUtils.shortestPaths(graph, target)[1];
+    const items = [];
+    graph.V().forEach((u) => {
+      items.push({ vertex: u, dist: dists[u] });
+    });
+    items.sort((a, b) => a.dist - b.dist);
+    const ranks = {};
+    for (let i = 0; i < items.length; i++) {
+      ranks[items[i].vertex] = i;
+    }
+    return ranks;
   }
 };
