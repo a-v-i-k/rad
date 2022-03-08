@@ -417,7 +417,7 @@ const Game = class {
     graph.V().forEach((u) => {
       items.push({ vertex: u, dist: dists[u] });
     });
-    items.sort((a, b) => a.dist - b.dist);
+    items.sort((a, b) => b.dist - a.dist);
     const ranks = {};
     for (let i = 0; i < items.length; i++) {
       ranks[items[i].vertex] = i;
