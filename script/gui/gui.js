@@ -822,10 +822,12 @@ const GUI = class {
   #stop() {
     const status = this.getStatus();
     if (status === GUI.Status.IDLE) return;
+
+    this.#setStatus(GUI.Status.IDLE);
     if (status !== GUI.Status.REWARD && status !== GUI.Status.RANDYDONE) {
       this.#unset();
     }
-    this.#setStatus(GUI.Status.IDLE);
+
     this.#displayer.displayIdle();
   }
 
