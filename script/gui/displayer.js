@@ -546,7 +546,7 @@ const Displayer = class {
         const rank = this.#game.getRoomRank(door.ownerId);
         if (!DOOR_SHAPES || rank < Math.ceil((numRooms - 1) / 3)) {
           this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
-        } else if (rank < 2 * Math.ceil((numRooms - 1) / 3)) {
+        } else if (rank < Math.ceil((numRooms - 1) * (2 / 3))) {
           this.#drawArchedDoor(
             bbox,
             outline,
