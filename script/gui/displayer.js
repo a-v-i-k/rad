@@ -544,9 +544,9 @@ const Displayer = class {
 
         const numRooms = this.#game.getNumRooms();
         const rank = this.#game.getRoomRank(door.ownerId);
-        if (!DOOR_SHAPES || rank < Math.ceil((numRooms - 1) / 3)) {
+        if (!DOOR_SHAPES || rank < Math.ceil((numRooms - 1) / 4)) {
           this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
-        } else if (rank < Math.ceil((numRooms - 1) * (2 / 3))) {
+        } else if (rank < Math.ceil((numRooms - 1) * (1 / 2))) {
           this.#drawArchedDoor(
             bbox,
             outline,
@@ -554,8 +554,16 @@ const Displayer = class {
             windowFill,
             handleFill
           );
-        } else {
+        } else if (rank < Math.ceil((numRooms - 1) * (3 / 4))) {
           this.#drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill);
+        } else {
+          this.#drawTwoWindowDoor(
+            bbox,
+            outline,
+            frontFill,
+            windowFill,
+            handleFill
+          );
         }
       }
     }
@@ -659,6 +667,52 @@ const Displayer = class {
     y0 = bbox.y0 + Math.round(bbox.width * (4 / 7));
     height = Math.round(bbox.height / 7);
     const handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawTwoWindowDoor --- */
+  #drawTwoWindowDoor(bbox, outline, frontFill, windowFill, handleFill) {
+    // display front
+    let x0 = bbox.x0 + Math.round(bbox.width * (1 / 8));
+    let y0 = bbox.y0 + Math.round(bbox.height * (1 / 16));
+    let width = bbox.width - 2 * Math.round(bbox.width * (1 / 8));
+    let height = Math.round(bbox.height * (14 / 16));
+    let frontBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(frontBBox, outline, frontFill, 2);
+
+    // display gap between doors
+    const point1 = [
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + Math.round(bbox.height * (1 / 16)),
+    ];
+    const point2 = [
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height * (1 / 16)),
+    ];
+    this.#drawer.drawLine(point1, point2, outline, 2);
+
+    // display windows
+    x0 = bbox.x0 + Math.round((3 / 16) * bbox.width);
+    y0 = bbox.y0 + Math.round((1 / 4) * bbox.height);
+    width = Math.round(bbox.width / 4);
+    height = Math.round(bbox.height / 3);
+    let windowBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
+    // only x0 changes in the second window
+    x0 += Math.round(bbox.width * (3 / 8)) + 1;
+    windowBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
+
+    // display handles
+    x0 = bbox.x0 + Math.round(bbox.width * (1 / 4));
+    width = Math.round(bbox.width / 10);
+    y0 = bbox.y0 + Math.round(bbox.width * (5 / 8));
+    height = Math.round(bbox.height / 8);
+    let handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+    // only x0 changes in the second handle
+    x0 += Math.round(bbox.width * (3 / 8)) + 2;
+    handleBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 
