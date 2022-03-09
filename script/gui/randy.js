@@ -56,18 +56,30 @@ const Randy = class {
       }
     }
 
+    // no exit point found, choose neighbor randomly
     if (goingTo === null) {
-      // no exit point found, choose neighbor randomly
-      if (this.#lastRoomId !== null && doors.length > 1) {
-        // don't go back to the room you just came from
-        const index = doors.findIndex((door) => {
+      // choose neighbor from the highest level
+      let choices = [doors[0]];
+      for (let i = 1; i < doors.length; i++) {
+        if (doors[i].level > choices[0].level) {
+          choices = [doors[i]];
+        } else if (doors[i].level == choices[0].level) {
+          choices.push(doors[i]);
+        }
+      }
+
+      // don't go back to the room you just came from, if possible
+      if (this.#lastRoomId !== null && choices.length > 1) {
+        const index = choices.findIndex((door) => {
           return door.ownerId === this.#lastRoomId;
         });
         if (index != -1) {
-          doors.splice(index, 1);
+          choices.splice(index, 1);
         }
       }
-      goingTo = Random.getRandomChoice(doors).loc;
+
+      // make the choice
+      goingTo = Random.getRandomChoice(choices).loc;
     }
 
     this.#goingTo = goingTo;

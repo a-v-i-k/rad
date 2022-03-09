@@ -641,7 +641,7 @@ const GUI = class {
     const stonesPerLevel = Math.floor(numStones / this.#game.getNumLevels());
 
     const doors = state.doors;
-    const currLevel = this.#game.getRoomLevel(state.room.id);
+    const currLevel = state.room.level;
     const currLevelChoices = [];
     const nextLevelChoices = [];
     for (const door of doors) {
@@ -659,10 +659,9 @@ const GUI = class {
       // NOTE: Auto pilot will go to the next level only if it collected
       // all the stones of the current level; moreover, it will not go
       // back to a previous level if it has advanced to the next one.
-      const ownerLevel = this.#game.getRoomLevel(door.ownerId);
-      if (ownerLevel == currLevel) {
+      if (door.level == currLevel) {
         currLevelChoices.push(door);
-      } else if (ownerLevel == currLevel + 1) {
+      } else if (door.level == currLevel + 1) {
         nextLevelChoices.push(door);
       } else {
         // nothing - auto pilot should never go back a level

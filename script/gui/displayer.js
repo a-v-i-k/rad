@@ -552,12 +552,11 @@ const Displayer = class {
         const windowFill = DOOR_WINDOW_FILL;
         const handleFill = DOOR_HANDLE_FILL;
 
-        const level = this.#game.getRoomLevel(door.ownerId);
-        if (!DOOR_SHAPES || level == 1) {
+        if (!DOOR_SHAPES || door.level == 1) {
           // door assumes its owner's color (front fill)
           const frontFill = this.#getRoomColor(door.ownerId, "plain");
           this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
-        } else if (level == 2) {
+        } else if (door.level == 2) {
           const frontFill = this.#getRoomColor(door.ownerId, "arched");
           this.#drawArchedDoor(
             bbox,
@@ -566,11 +565,11 @@ const Displayer = class {
             windowFill,
             handleFill
           );
-        } else if (level == 3) {
+        } else if (door.level == 3) {
           const frontFill = this.#getRoomColor(door.ownerId, "round");
           this.#drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill);
         } else {
-          // level > 3
+          // door.level > 3
           const frontFill = this.#getRoomColor(door.ownerId, "twowindow");
           this.#drawTwoWindowDoor(
             bbox,

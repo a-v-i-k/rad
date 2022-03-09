@@ -54,8 +54,12 @@ const Game = class {
   static State = class {
     // TODO: A lot of information here doesn't change, so maybe we can compute
     // such information once and store it for later use.
-    constructor(player) {
+    constructor(game, player) {
       console.assert(player instanceof Player); // sanity check
+      console.assert(player instanceof Player); // sanity check
+
+      // player
+      this.player = { id: player.getId(), loc: player.getLocation() };
 
       // room
       const room = player.getRoom();
@@ -64,18 +68,21 @@ const Game = class {
         id: roomId,
         dims: room.getDimensions(),
         wloc: room.getWelcomeLocation(),
+        level: game.getRoomLevel(roomId),
       };
 
       // doors
       this.doors = [];
       for (const loc of room.getDoorLocations()) {
         const door = room.getCell(loc).getElement();
+        const ownerId = door.open().getId();
         console.assert(door !== null); // sanity check
         this.doors.push({
           id: door.getId(),
           type: door.getType(),
-          ownerId: door.open().getId(),
+          ownerId: ownerId,
           loc: loc,
+          level: game.getRoomLevel(ownerId),
         });
       }
 
@@ -90,9 +97,6 @@ const Game = class {
           loc: loc,
         });
       }
-
-      // player
-      this.player = { id: player.getId(), loc: player.getLocation() };
     }
   };
 
@@ -187,7 +191,7 @@ const Game = class {
   getState(index) {
     this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
-    return new Game.State(this.#players[index]);
+    return new Game.State(this, this.#players[index]);
   }
 
   /* --- METHOD: getRoomLevel --- */
