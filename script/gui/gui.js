@@ -40,6 +40,8 @@ const CELL_HEIGHT = 75;
 const CLOCK_IDLE_FG = "gray";
 const CLOCK_COUNT_FG = "lime";
 
+const PLATE_COMPLETE_COLOR = "gold";
+
 const MAX_NUM_RANDYS = 10;
 
 const PLAYER_DELAY = 200; // in milliseconds
@@ -57,6 +59,7 @@ const GUI = class {
   #displayer;
   #stopwatch;
   #randy;
+  #numStones;
   #stoneCount;
   #html;
   #callbacks;
@@ -92,6 +95,7 @@ const GUI = class {
     this.#game = new Game(); // game
     this.#stopwatch = null;
     this.#randy = null;
+    this.#numStones = Object.keys(Stone.Type).length;
     this.#stoneCount = 0;
 
     // setting
@@ -228,8 +232,8 @@ const GUI = class {
         control: document.querySelector("#randy-control"),
       },
 
-      // stones
-      stones: {
+      // plate
+      plate: {
         frame: document.querySelector("#plate-frame"),
       },
 
@@ -238,7 +242,7 @@ const GUI = class {
         start: document.querySelector("#start"),
         enter: document.querySelector("#enter"),
         stonecollect: document.querySelector("#stone-collect"),
-        whoareyou: document.querySelector("#who-are-you"),
+        complete: document.querySelector("#complete"),
         pause: document.querySelector("#pause-sound"),
         randydone: document.querySelector("#randy-done"),
         triumph: document.querySelector("#triumph"),
@@ -318,7 +322,7 @@ const GUI = class {
   /* --- METHOD: #setStonePlate --- */
   #setStonePlate() {
     if (!this.#CFGN().stones) {
-      this.#HTML().top.frame.removeChild(this.#HTML().stones.frame);
+      this.#HTML().top.frame.removeChild(this.#HTML().plate.frame);
     }
   }
 
@@ -399,6 +403,7 @@ const GUI = class {
       placeholder.setAttribute("id", "plate-" + stoneName);
       placeholder.style.borderStyle = "inset";
     }
+    this.#HTML().plate.frame.style.outlineColor = this.#backup.plateOutline;
     this.#stoneCount = 0;
   }
 
@@ -636,9 +641,10 @@ const GUI = class {
       return;
     }
 
-    const numStones = Object.keys(Stone.Type).length;
     // NOTE: This is stones per level except final level.
-    const stonesPerLevel = Math.floor(numStones / this.#game.getNumLevels());
+    const stonesPerLevel = Math.floor(
+      this.#numStones / this.#game.getNumLevels()
+    );
 
     const doors = state.doors;
     const currLevel = state.room.level;
@@ -648,7 +654,7 @@ const GUI = class {
       if (door.type === Door.Type.EXIT) {
         // NOTE: Auto pilot will go fo the exit door, but only after
         // collecting all them stones.
-        if (this.#stoneCount === Object.keys(Stone.Type).length) {
+        if (this.#stoneCount === this.#numStones) {
           this.#playerGoTo(door.loc);
           return;
         } else {
@@ -926,8 +932,11 @@ const GUI = class {
 
         this.#stoneCount++;
         this.#playSound(this.#HTML().sound.stonecollect);
-        if (this.#stoneCount == Object.keys(Stone.Type).length) {
-          this.#playSound(this.#HTML().sound.whoareyou);
+        if (this.#stoneCount == this.#numStones) {
+          this.#backup.plateOutline =
+            this.#HTML().plate.frame.style.outlineColor;
+          this.#HTML().plate.frame.style.outlineColor = PLATE_COMPLETE_COLOR;
+          this.#playSound(this.#HTML().sound.complete);
         }
       }
       this.#refresh();

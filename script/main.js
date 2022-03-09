@@ -86,6 +86,7 @@
 // │       ├── unionfind.js
 // │       └── webcolors.js
 // └── sound
+//     ├── complete.mp3
 //     ├── enter.mp3
 //     ├── enter-at-your-own-risk.mp3
 //     ├── pause-sound.mp3
@@ -93,8 +94,7 @@
 //     ├── stone-collect.mp3
 //     ├── triumph.mp3
 //     ├── triumph-2.mp3
-//     ├── welcome.mp3
-//     └── wow-who-are-you.mp3
+//     └── welcome.mp3
 // ============================================================================
 
 import GUI from "./gui/gui.js";
