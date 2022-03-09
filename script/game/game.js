@@ -414,16 +414,28 @@ const Game = class {
     });
 
     // create and add stones to rooms
-    const numStones = Object.keys(Stone.Type).length;
-    const U = network.V();
-    U.splice(U.indexOf(source), 1); // no stone in source room
-    U.splice(U.indexOf(target), 1); // no stone in target room
-    // const S = Random.getRandomChoices(U, numStones, false); // without replacement
-    const S = Random.getRandomChoices(U, numStones, true); // with replacement
+    // NOTE: Stones are scattered evenly (as much as possible) between levels.
+    const buckets = {};
+    network.V().forEach((nu) => {
+      // NOTE: No stones in source and target room.
+      if (nu !== source && nu !== target) {
+        const level = levels[nu];
+        if (!(level in buckets)) {
+          buckets[level] = [];
+        }
+        buckets[level].push(nu);
+      }
+    });
+    let level = 1;
     for (const stoneType in Stone.Type) {
       const stone = new Stone(stoneType);
-      let nu = S.pop();
+
+      const bucket = buckets[level];
+      const nu = Random.getRandomChoice(bucket);
+      bucket.splice(bucket.indexOf(nu), 1); // without replacement
+
       rooms[nu].addStone(stone);
+      level = (level % numLevels) + 1;
     }
 
     // store information about rooms (switch from vertices to room IDs)

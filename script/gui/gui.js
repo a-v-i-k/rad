@@ -619,12 +619,13 @@ const GUI = class {
     const state = this.#game.getState(0);
     const player = state.player;
     const stones = state.stones;
-    if (stones.length > 0) {
+    // NOTE: Auto pilot will go for a stone if one present.
+    if (this.#CFGN().stones && stones.length > 0) {
       const dist = function (loc1, loc2) {
         return Math.abs(loc1.x - loc2.x) + Math.abs(loc1.y - loc2.y);
       };
 
-      // go for the nearest stone (Manhattan distance)
+      // NOTE: Auto pilot will go for the nearest stone (Manhattan distance).
       let nearest = stones[0].loc;
       for (let i = 1; i < stones.length; i++) {
         if (dist(player.loc, stones[i].loc) < dist(player.loc, nearest)) {
@@ -632,32 +633,58 @@ const GUI = class {
         }
       }
       this.#playerGoTo(nearest);
-    } else {
-      const doors = state.doors;
-      let choices = [];
-      for (const door of doors) {
-        if (door.type === Door.Type.EXIT) {
-          // exit door appears? go for it, but not before collecting all stones
-          if (this.#stoneCount === Object.keys(Stone.Type).length) {
-            choices = [door];
-            break;
-          }
-        } else {
-          choices.push(door);
-        }
+      return;
+    }
 
-        // don't go back right away to the room you came from (if possible)
-        if (choices.length > 1) {
-          for (let i = 0; i < choices.length; i++) {
-            if (choices[i].ownerId === this.#lastRoomId) {
-              choices.splice(i, 1);
-              break;
-            }
-          }
+    const numStones = Object.keys(Stone.Type).length;
+    // NOTE: This is stones per level except final level.
+    const stonesPerLevel = Math.floor(numStones / this.#game.getNumLevels());
+
+    const doors = state.doors;
+    const currLevel = this.#game.getRoomLevel(state.room.id);
+    const currLevelChoices = [];
+    const nextLevelChoices = [];
+    for (const door of doors) {
+      if (door.type === Door.Type.EXIT) {
+        // NOTE: Auto pilot will go fo the exit door, but only after
+        // collecting all them stones.
+        if (this.#stoneCount === Object.keys(Stone.Type).length) {
+          this.#playerGoTo(door.loc);
+          return;
+        } else {
+          continue; // skip it
         }
       }
-      this.#playerGoTo(Random.getRandomChoice(choices).loc);
+
+      // NOTE: Auto pilot will go to the next level only if it collected
+      // all the stones of the current level; moreover, it will not go
+      // back to a previous level if it has advanced to the next one.
+      const ownerLevel = this.#game.getRoomLevel(door.ownerId);
+      if (ownerLevel == currLevel) {
+        currLevelChoices.push(door);
+      } else if (ownerLevel == currLevel + 1) {
+        nextLevelChoices.push(door);
+      } else {
+        // nothing - auto pilot should never go back a level
+      }
     }
+
+    let choices = currLevelChoices;
+    const advance = this.#stoneCount >= stonesPerLevel * currLevel;
+    if (advance && nextLevelChoices.length > 0) {
+      choices = nextLevelChoices;
+    }
+
+    // NOTE: Auto pilot will not go to the room it just came from, if possible.
+    if (choices.length > 1) {
+      for (let i = 0; i < choices.length; i++) {
+        if (choices[i].ownerId === this.#lastRoomId) {
+          choices.splice(i, 1);
+          break;
+        }
+      }
+    }
+    this.#playerGoTo(Random.getRandomChoice(choices).loc);
   }
 
   /* --- METHOD: #processTickEvent --- */
