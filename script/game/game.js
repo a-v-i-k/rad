@@ -28,7 +28,7 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 4;
 const DEFAULT_NUM_COLUMNS = 4;
-const DEFAULT_NUM_ROOMS = 47 * 3 + 1;
+const DEFAULT_NUM_ROOMS = 100;
 const DEFAULT_NUM_PLAYERS = 1;
 const DEFAULT_BACKTRACK = true;
 
@@ -420,7 +420,7 @@ const Game = class {
     items.sort((a, b) => b.dist - a.dist);
     const ranks = {};
     for (let i = 0; i < items.length; i++) {
-      ranks[items[i].vertex] = i;
+      ranks[items[i].vertex] = items[i].dist;
     }
     return ranks;
   }
