@@ -426,9 +426,11 @@ const Game = class {
         buckets[level].push(nu);
       }
     });
+    const stoneTypes = Object.keys(Stone.Type);
+    Random.shuffleArray(stoneTypes);
     let level = 1;
-    for (const stoneType in Stone.Type) {
-      const stone = new Stone(stoneType);
+    for (const type of stoneTypes) {
+      const stone = new Stone(type);
 
       const bucket = buckets[level];
       const nu = Random.getRandomChoice(bucket);
