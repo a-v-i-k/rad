@@ -446,7 +446,7 @@ const Displayer = class {
     if (!(id in colmap)) {
       if (this.#game.getNumPlayers() > 2) {
         // colmap[id] = [Random.getRandomColor(), null];
-        colmap[id] = [this.#colors.rooms.gen.getNextColor(), null];
+        colmap[id] = [this.#colors.randys.gen.getNextColor(), null];
       } else {
         colmap[id] = RANDY_FILL;
       }
@@ -552,13 +552,12 @@ const Displayer = class {
         const windowFill = DOOR_WINDOW_FILL;
         const handleFill = DOOR_HANDLE_FILL;
 
-        const numRooms = this.#game.getNumRooms();
-        const rank = this.#game.getRoomRank(door.ownerId);
-        if (!DOOR_SHAPES || rank < Math.ceil((numRooms - 1) / 4)) {
+        const level = this.#game.getRoomLevel(door.ownerId);
+        if (!DOOR_SHAPES || level == 1) {
           // door assumes its owner's color (front fill)
           const frontFill = this.#getRoomColor(door.ownerId, "plain");
           this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
-        } else if (rank < Math.ceil((numRooms - 1) * (1 / 2))) {
+        } else if (level == 2) {
           const frontFill = this.#getRoomColor(door.ownerId, "arched");
           this.#drawArchedDoor(
             bbox,
@@ -567,10 +566,11 @@ const Displayer = class {
             windowFill,
             handleFill
           );
-        } else if (rank < Math.ceil((numRooms - 1) * (3 / 4))) {
+        } else if (level == 3) {
           const frontFill = this.#getRoomColor(door.ownerId, "round");
           this.#drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill);
         } else {
+          // level > 3
           const frontFill = this.#getRoomColor(door.ownerId, "twowindow");
           this.#drawTwoWindowDoor(
             bbox,
@@ -689,20 +689,20 @@ const Displayer = class {
   #drawTwoWindowDoor(bbox, outline, frontFill, windowFill, handleFill) {
     // display front
     let x0 = bbox.x0 + Math.round(bbox.width * (1 / 8));
-    let y0 = bbox.y0 + Math.round(bbox.height * (1 / 16));
-    let width = bbox.width - 2 * Math.round(bbox.width * (1 / 8));
-    let height = Math.round(bbox.height * (14 / 16));
+    let y0 = bbox.y0 + Math.round(bbox.height * (1 / 8));
+    let width = bbox.width - 2 * Math.round(bbox.width * (1 / 8)) + 1;
+    let height = bbox.height - 2 * Math.round(bbox.height * (1 / 8));
     let frontBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawRectangle(frontBBox, outline, frontFill, 2);
 
     // display gap between doors
     const point1 = [
       bbox.x0 + Math.round(bbox.width / 2),
-      bbox.y0 + Math.round(bbox.height * (1 / 16)),
+      bbox.y0 + Math.round(bbox.height * (1 / 8)),
     ];
     const point2 = [
       bbox.x0 + Math.round(bbox.width / 2),
-      bbox.y0 + bbox.height - 1 - Math.round(bbox.height * (1 / 16)),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height * (1 / 8)),
     ];
     this.#drawer.drawLine(point1, point2, outline, 2);
 
@@ -748,7 +748,7 @@ const Displayer = class {
       bbox.y0 + Math.round(bbox.height / 8)
     );
     polyline.addPoint(
-      bbox.x0 + bbox.width - 1 - Math.round(bbox.width / 4),
+      bbox.x0 + bbox.width - Math.round(bbox.width / 4),
       bbox.y0 + Math.round(bbox.height / 4)
     );
     polyline.addPoint(

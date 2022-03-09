@@ -1,6 +1,6 @@
 /* --- IMPORTS --- */
 import Random from "../library/random.js";
-// import Graph from "../library/graph.js";
+import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
 import Door from "./door.js";
 import Stone from "./stone.js";
@@ -28,7 +28,8 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 4;
 const DEFAULT_NUM_COLUMNS = 4;
-const DEFAULT_NUM_ROOMS = 100;
+const DEFAULT_NUM_LEVELS = 4;
+const DEFAULT_ROOMS_PER_LEVEL = 47;
 const DEFAULT_NUM_PLAYERS = 1;
 const DEFAULT_BACKTRACK = true;
 
@@ -40,6 +41,8 @@ const Game = class {
   #players;
   #rows;
   #columns;
+  #numLevels;
+  #roomsPerLevel;
   #numRooms;
   #backtrack;
   #roomsInfo;
@@ -97,13 +100,15 @@ const Game = class {
   constructor(
     rows = DEFAULT_NUM_ROWS,
     columns = DEFAULT_NUM_COLUMNS,
-    numRooms = DEFAULT_NUM_ROOMS,
+    numLevels = DEFAULT_NUM_LEVELS,
+    roomsPerLevel = DEFAULT_ROOMS_PER_LEVEL,
     backtrack = DEFAULT_BACKTRACK
   ) {
-    Game.#validator(rows, columns, numRooms, backtrack);
+    Game.#validator(rows, columns, numLevels, roomsPerLevel, backtrack);
     this.#rows = rows;
     this.#columns = columns;
-    this.#numRooms = numRooms;
+    this.#numLevels = numLevels;
+    this.#roomsPerLevel = roomsPerLevel;
     this.#backtrack = backtrack;
 
     this.#setStatus(Game.Status.IDLE);
@@ -112,14 +117,13 @@ const Game = class {
   }
 
   /* --- METHOD: #validator --- */
-  static #validator(rows, columns, numRooms, backtrack) {
+  static #validator(rows, columns, numLevels, roomsPerLevel, backtrack) {
     if (!Number.isInteger(rows)) {
       throw new ETypeError(`input is not an integer`, rows);
     }
     if (rows < 0) {
       throw new ERangeError(`input is negative`, rows);
     }
-
     if (!Number.isInteger(columns)) {
       throw new ETypeError(`input is not an integer`, columns);
     }
@@ -127,11 +131,20 @@ const Game = class {
       throw new ERangeError(`input is negative`, columns);
     }
 
-    if (!Number.isInteger(numRooms)) {
-      throw new ETypeError(`input is not an integer`, numRooms);
+    if (!Number.isInteger(numLevels)) {
+      throw new ETypeError(`input is not an integer`, numLevels);
     }
-    if (numRooms <= 1) {
-      throw new ERangeError(`number of rooms must be at least 2`, numRooms);
+    if (numLevels < 1) {
+      throw new ERangeError(`number of levels must be at least 1`, numLevels);
+    }
+    if (!Number.isInteger(roomsPerLevel)) {
+      throw new ETypeError(`input is not an integer`, roomsPerLevel);
+    }
+    if (roomsPerLevel < 2) {
+      throw new ERangeError(
+        `rooms per level must be at least 2`,
+        roomsPerLevel
+      );
     }
 
     if (typeof backtrack !== "boolean") {
@@ -147,6 +160,16 @@ const Game = class {
   /* --- METHOD: getDimensions --- */
   getDimensions() {
     return [this.#rows, this.#columns];
+  }
+
+  /* --- METHOD: getNumLevels --- */
+  getNumLevels() {
+    return this.#numLevels;
+  }
+
+  /* --- METHOD: getRoomsPerLevel --- */
+  getRoomsPerLevel() {
+    return this.#roomsPerLevel;
   }
 
   /* --- METHOD: getNumRooms --- */
@@ -167,12 +190,12 @@ const Game = class {
     return new Game.State(this.#players[index]);
   }
 
-  /* --- METHOD: getRoomRank --- */
-  getRoomRank(roomId) {
-    if (!(roomId in this.#roomsInfo.ranks)) {
+  /* --- METHOD: getRoomLevel --- */
+  getRoomLevel(roomId) {
+    if (!(roomId in this.#roomsInfo.levels)) {
       throw new ValueError(`illegal room ID ${roomId}`);
     }
-    return this.#roomsInfo.ranks[roomId];
+    return this.#roomsInfo.levels[roomId];
   }
 
   /* --- METHOD: play --- */
@@ -321,60 +344,94 @@ const Game = class {
     }
   }
 
+  /// NETWORK
+
   /* --- METHOD: #createNetwork --- */
   #createNetwork() {
     console.assert(this.getStatus() === Game.Status.IDLE); // sanity check
 
-    // create underlying graph
-    const graph = this.#getGraph(this.getNumRooms());
-    // DEBUG: Shows room full of doors.
-    // const n = this.getNumRooms();
-    // const graph = new Graph(n);
-    // for (let i = 1; i < n; i++) {
-    //   graph.addEdge(0, i);
-    // }
+    // set number of rooms
+    const [numLevels, roomsPerLevel] = [
+      this.getNumLevels(),
+      this.getRoomsPerLevel(),
+    ];
+    this.#numRooms = numLevels * roomsPerLevel;
 
-    const [source, target] = this.#getEndpoints(graph); // source, target
-    const ranks = this.#getRanks(graph, source, target); // ranks
+    // create underlying graphs
+    const graphs = [];
+    const endpoints = [];
+    for (let i = 0; i < numLevels; i++) {
+      graphs[i] = this.#getGraph(roomsPerLevel);
+      endpoints[i] = this.#getEndpoints(graphs[i]);
+    }
+
+    // merge graphs (and set levels)
+    const network = new Graph(this.#numRooms);
+    const levels = {};
+    for (let i = 0; i < numLevels; i++) {
+      // embed graph in network
+      graphs[i].V().forEach((u) => {
+        // NOTE: Assumes vertices are integers.
+        const nu = i * roomsPerLevel + u; // nu stands for network u
+        graphs[i].neighbors(u).forEach((v) => {
+          const nv = i * roomsPerLevel + v;
+          if (u < v) {
+            // undirected graph
+            network.addEdge(nu, nv);
+          }
+        });
+        levels[nu] = i + 1;
+      });
+
+      // connect endpoints
+      if (i > 0) {
+        const ep1 = (i - 1) * roomsPerLevel + endpoints[i - 1][1];
+        const ep2 = i * roomsPerLevel + endpoints[i][0];
+        network.addEdge(ep1, ep2);
+      }
+    }
+    const source = endpoints[0][0];
+    const target =
+      (numLevels - 1) * roomsPerLevel + endpoints[numLevels - 1][1];
 
     // create rooms
     const [rows, columns] = this.getDimensions();
     const rooms = {};
-    graph.V().forEach((u) => {
-      rooms[u] = new Room(rows, columns);
+    network.V().forEach((nu) => {
+      rooms[nu] = new Room(rows, columns);
     });
 
     // create and add doors to rooms
-    graph.V().forEach((u) => {
+    network.V().forEach((nu) => {
       // no doors in exit room
-      if (u !== target) {
-        graph.neighbors(u).forEach((v) => {
-          const type = v === target ? Door.Type.EXIT : Door.Type.PLAIN;
-          const door = new Door(type, rooms[v]);
-          rooms[u].addDoor(door);
+      if (nu !== target) {
+        network.neighbors(nu).forEach((nv) => {
+          const type = nv === target ? Door.Type.EXIT : Door.Type.PLAIN;
+          const door = new Door(type, rooms[nv]);
+          rooms[nu].addDoor(door);
         });
       }
     });
 
     // create and add stones to rooms
     const numStones = Object.keys(Stone.Type).length;
-    const U = graph.V();
+    const U = network.V();
     U.splice(U.indexOf(source), 1); // no stone in source room
     U.splice(U.indexOf(target), 1); // no stone in target room
     // const S = Random.getRandomChoices(U, numStones, false); // without replacement
     const S = Random.getRandomChoices(U, numStones, true); // with replacement
     for (const stoneType in Stone.Type) {
       const stone = new Stone(stoneType);
-      let u = S.pop();
-      rooms[u].addStone(stone);
+      let nu = S.pop();
+      rooms[nu].addStone(stone);
     }
 
-    // store information about rooms
-    this.#roomsInfo = { startRoom: rooms[source], rooms: {}, ranks: {} };
-    graph.V().forEach((u) => {
-      const roomId = rooms[u].getId();
-      this.#roomsInfo.rooms[roomId] = rooms[u];
-      this.#roomsInfo.ranks[roomId] = ranks[u];
+    // store information about rooms (switch from vertices to room IDs)
+    this.#roomsInfo = { startRoom: rooms[source], rooms: {}, levels: {} };
+    network.V().forEach((nu) => {
+      const roomId = rooms[nu].getId();
+      this.#roomsInfo.rooms[roomId] = rooms[nu];
+      this.#roomsInfo.levels[roomId] = levels[nu];
     });
   }
 
@@ -407,21 +464,5 @@ const Game = class {
   /* --- METHOD: #getEndpoints --- */
   #getEndpoints(graph) {
     return GraphUtils.findTreeDiameterEndpoints(graph)[0];
-  }
-
-  /* --- METHOD: #getRanks --- */
-  #getRanks(graph, source, target) {
-    // source is ignored for now
-    const dists = GraphUtils.shortestPaths(graph, target)[1];
-    const items = [];
-    graph.V().forEach((u) => {
-      items.push({ vertex: u, dist: dists[u] });
-    });
-    items.sort((a, b) => b.dist - a.dist);
-    const ranks = {};
-    for (let i = 0; i < items.length; i++) {
-      ranks[items[i].vertex] = items[i].dist;
-    }
-    return ranks;
   }
 };
