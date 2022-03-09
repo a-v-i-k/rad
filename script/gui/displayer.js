@@ -109,7 +109,10 @@ const Displayer = class {
 
     this.#drawer = new Drawer(this.#HTML().canvas, DEFAULT_CANVAS_BG);
     this.#colors = {
-      rooms: { map: {}, gen: new Colors() },
+      plain: { map: {}, gen: new Colors() },
+      arched: { map: {}, gen: new Colors() },
+      round: { map: {}, gen: new Colors() },
+      twowindow: { map: {}, gen: new Colors() },
       randys: { map: {}, gen: new Colors() },
     };
 
@@ -419,11 +422,20 @@ const Displayer = class {
   }
 
   /* --- METHOD: #getRoomColor --- */
-  #getRoomColor(id) {
-    const colmap = this.#colors.rooms.map;
-    if (!(id in colmap)) {
+  #getRoomColor(id, slaveType) {
+    switch (slaveType) {
+      case "plain":
+      case "arched":
+      case "round":
+      case "twowindow":
+        break;
+      default:
+        console.assert(false); // sanity check
+    }
+    const colmap = this.#colors[slaveType].map;
+    if (!(id in this.#colors[slaveType].map)) {
       // colmap[id] = Random.getRandomColor();
-      colmap[id] = this.#colors.rooms.gen.getNextColor();
+      colmap[id] = this.#colors[slaveType].gen.getNextColor();
     }
     return colmap[id];
   }
@@ -537,16 +549,17 @@ const Displayer = class {
         );
       } else {
         const outline = DOOR_OUTLINE;
-        // door assumes its owner's color (front fill)
-        const frontFill = this.#getRoomColor(door.ownerId);
         const windowFill = DOOR_WINDOW_FILL;
         const handleFill = DOOR_HANDLE_FILL;
 
         const numRooms = this.#game.getNumRooms();
         const rank = this.#game.getRoomRank(door.ownerId);
         if (!DOOR_SHAPES || rank < Math.ceil((numRooms - 1) / 4)) {
+          // door assumes its owner's color (front fill)
+          const frontFill = this.#getRoomColor(door.ownerId, "plain");
           this.#drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
         } else if (rank < Math.ceil((numRooms - 1) * (1 / 2))) {
+          const frontFill = this.#getRoomColor(door.ownerId, "arched");
           this.#drawArchedDoor(
             bbox,
             outline,
@@ -555,8 +568,10 @@ const Displayer = class {
             handleFill
           );
         } else if (rank < Math.ceil((numRooms - 1) * (3 / 4))) {
+          const frontFill = this.#getRoomColor(door.ownerId, "round");
           this.#drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill);
         } else {
+          const frontFill = this.#getRoomColor(door.ownerId, "twowindow");
           this.#drawTwoWindowDoor(
             bbox,
             outline,
