@@ -95,7 +95,7 @@ const GUI = class {
     this.#game = new Game(); // game
     this.#stopwatch = null;
     this.#randy = null;
-    this.#numStones = Object.keys(Stone.Type).length;
+    this.#numStones = this.#game.getNumStones();
     this.#stoneCount = 0;
 
     // setting
@@ -628,6 +628,7 @@ const GUI = class {
     const state = this.#game.getState(0);
     const player = state.player;
     const stones = state.stones;
+
     // NOTE: Auto pilot will go for a stone if one present.
     if (this.#CFGN().stones && stones.length > 0) {
       const dist = function (loc1, loc2) {
@@ -645,20 +646,14 @@ const GUI = class {
       return;
     }
 
-    // NOTE: This is stones per level except final level.
-    const stonesPerLevel = Math.floor(
-      this.#numStones / this.#game.getNumLevels()
-    );
-
+    // gather door choices (stop if can exit)
     const doors = state.doors;
-    const currLevel = state.room.level;
-    const currLevelChoices = [];
-    const nextLevelChoices = [];
+    const choicesByLevel = {};
     for (const door of doors) {
       if (door.type === Door.Type.EXIT) {
         // NOTE: Auto pilot will go fo the exit door, but only after
         // collecting all them stones (if stones flag enabled).
-        if (!this.#CFGN().stones || this.#stoneCount === this.#numStones) {
+        if (!this.#CFGN().stones || !this.#game.stonesRequired()) {
           this.#playerGoTo(door.loc);
           return;
         } else {
@@ -666,24 +661,36 @@ const GUI = class {
         }
       }
 
-      // NOTE: Auto pilot will go to the next level only if it collected
-      // all the stones of the current level; moreover, it will not go
-      // back to a previous level if it has advanced to the next one.
-      if (door.level == currLevel) {
-        currLevelChoices.push(door);
-      } else if (door.level == currLevel + 1) {
-        nextLevelChoices.push(door);
-      } else {
-        // nothing - auto pilot should never go back a level
+      const doorLevel = door.level;
+      if (!(doorLevel in choicesByLevel)) {
+        choicesByLevel[doorLevel] = [];
       }
+      choicesByLevel[doorLevel].push(door);
     }
 
-    let choices = currLevelChoices;
-    const advance = // may advance if stones are not required
-      !this.#CFGN().stones || this.#stoneCount >= stonesPerLevel * currLevel;
-    if (advance && nextLevelChoices.length > 0) {
-      choices = nextLevelChoices;
+    // NOTE: Auto pilot will go to the highest level possible, unless the
+    // stones flag is on, in which case it will go to the lowest level that
+    // follows levels (self included) with missing stones.
+    const doorLevels = Object.keys(choicesByLevel).map((x) => parseInt(x));
+    doorLevels.sort();
+    let gotoLevel;
+    if (this.#CFGN().stones) {
+      const lowestMissingLevel = Math.min(
+        ...Object.keys(state.missingStones).map((x) => parseInt(x))
+      );
+      for (let i = 0; i < doorLevels.length; i++) {
+        if (
+          doorLevels[i] >= lowestMissingLevel ||
+          i == doorLevels.length - 1 // prefer highest level
+        ) {
+          gotoLevel = doorLevels[i];
+          break;
+        }
+      }
+    } else {
+      gotoLevel = doorLevels[doorLevels.length - 1];
     }
+    const choices = choicesByLevel[gotoLevel];
 
     // NOTE: Auto pilot will not go to the room it just came from, if possible.
     if (choices.length > 1) {

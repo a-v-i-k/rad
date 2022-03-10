@@ -50,7 +50,7 @@ const Game = class {
   #numRooms;
   #roomsInfo;
   #numStones;
-  #stones;
+  #missingStones;
 
   /* --- INNER: Status --- */
   static Status = GameStatus;
@@ -93,6 +93,7 @@ const Game = class {
 
       // stones
       this.stonesRequired = game.stonesRequired();
+      this.missingStones = game.getMissingStones();
       this.stones = [];
       for (const loc of room.getStoneLocations()) {
         const stone = room.getCell(loc).getElement();
@@ -123,7 +124,7 @@ const Game = class {
     this.#players = [];
     this.#roomsInfo = null;
     this.#numStones = Object.keys(Stone.Type).length;
-    this.#stones = [];
+    this.#missingStones = {};
   }
 
   /* --- METHOD: #validator --- */
@@ -204,9 +205,23 @@ const Game = class {
     return this.#roomsInfo.levels[roomId];
   }
 
+  /* --- METHOD: getNumStones --- */
+  getNumStones() {
+    return this.#numStones;
+  }
+
   /* --- METHOD: stonesRequired --- */
   stonesRequired() {
-    return STONES_REQUIRED && this.#stones.length < this.#numStones;
+    return STONES_REQUIRED && Object.keys(this.#missingStones).length > 0;
+  }
+
+  /* --- METHOD: getMissingStones --- */
+  getMissingStones() {
+    const missingStones = {};
+    for (const level in this.#missingStones) {
+      missingStones[level] = this.#missingStones[level].map((x) => x);
+    }
+    return missingStones;
   }
 
   /// PLAYING
@@ -259,7 +274,7 @@ const Game = class {
       this.#players[i].exit(); // let player out
       this.#players[i].stop();
     }
-    this.#stones = [];
+    this.#missingStones = {};
     this.#destroyNetwork();
     this.#players = [];
     this.#setStatus(Game.Status.IDLE);
@@ -300,7 +315,7 @@ const Game = class {
             if (index > 0) {
               winStatus = true;
             } else {
-              if (STONES_REQUIRED && this.#stones.length < this.#numStones) {
+              if (this.stonesRequired()) {
                 console.log(`Where are them stones?`);
               } else {
                 winStatus = true;
@@ -315,9 +330,15 @@ const Game = class {
           }
           elementType = doorType;
         } else if (element instanceof Stone) {
-          this.#stones.push(element);
-          player.getRoom().removeStone(player.getLocation());
+          const room = player.getRoom();
+          const level = this.getRoomLevel(room.getId());
+          const missing = this.#missingStones[level];
           elementType = element.getType();
+          missing.splice(missing.indexOf(elementType), 1);
+          if (missing.length == 0) {
+            delete this.#missingStones[level];
+          }
+          room.removeStone(player.getLocation());
         }
         break;
 
@@ -458,8 +479,8 @@ const Game = class {
     const stoneTypes = Object.keys(Stone.Type);
     Random.shuffleArray(stoneTypes);
     let level = 1;
-    for (const type of stoneTypes) {
-      const stone = new Stone(type);
+    for (const stoneType of stoneTypes) {
+      const stone = new Stone(stoneType);
 
       const bucket = buckets[level];
       const nu = Random.getRandomChoice(bucket);
@@ -468,6 +489,10 @@ const Game = class {
       }
 
       rooms[nu].addStone(stone);
+      if (!(level in this.#missingStones)) {
+        this.#missingStones[level] = [];
+      }
+      this.#missingStones[level].push(stoneType);
       level = (level % numLevels) + 1;
     }
 
