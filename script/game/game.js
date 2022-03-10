@@ -476,8 +476,31 @@ const Game = class {
         buckets[level].push(nu);
       }
     });
-    const stoneTypes = Object.keys(Stone.Type);
-    Random.shuffleArray(stoneTypes);
+
+    // NOTE: The stones are arranged such that stones from the same plate row
+    // appear in the same level, stones from different plate rows appear in
+    // different levels, and upper rows appear in lower levels. This is all
+    // assuming exactly 4 types of doors.
+    const stoneTypes = [
+      // column 1
+      Stone.Type.RUBY,
+      Stone.Type.GARNET,
+      Stone.Type.OPAL,
+      Stone.Type.AQUAMARINE,
+      // column 2
+      Stone.Type.EMERALD,
+      Stone.Type.SAPPHIRE,
+      Stone.Type.AGATE,
+      Stone.Type.ONYX,
+      // column 3
+      Stone.Type.TOPAZ,
+      Stone.Type.DIAMOND,
+      Stone.Type.AMETHYST,
+      Stone.Type.JASPER,
+    ];
+    // const stoneTypes = Object.keys(Stone.Type);
+    // Random.shuffleArray(stoneTypes);
+
     let level = 1;
     for (const stoneType of stoneTypes) {
       const stone = new Stone(stoneType);
