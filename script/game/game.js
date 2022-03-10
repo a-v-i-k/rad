@@ -463,7 +463,9 @@ const Game = class {
 
       const bucket = buckets[level];
       const nu = Random.getRandomChoice(bucket);
-      bucket.splice(bucket.indexOf(nu), 1); // without replacement
+      if (DEFAULT_ROOMS_PER_LEVEL > 3) {
+        bucket.splice(bucket.indexOf(nu), 1); // without replacement
+      }
 
       rooms[nu].addStone(stone);
       level = (level % numLevels) + 1;
