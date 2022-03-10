@@ -94,7 +94,9 @@
 //     ├── stone-collect.mp3
 //     ├── triumph.mp3
 //     ├── triumph-2.mp3
-//     └── welcome.mp3
+//     ├── welcome.mp3
+//     ├── wow-who-are-you.mp3
+//     └── where-are-them-stones.mp3
 // ============================================================================
 
 import GUI from "./gui/gui.js";

@@ -4,7 +4,7 @@ import Location from "../game/location.js";
 import Direction from "../game/direction.js";
 import Door from "../game/door.js";
 import Stone from "../game/stone.js";
-import Game from "../game/game.js";
+import Game, { BACKTRACK, STONES_REQUIRED } from "../game/game.js";
 import Displayer from "./displayer.js";
 import Stopwatch from "./stopwatch.js";
 import RandyManager from "./randy-manager.js";
@@ -85,10 +85,10 @@ const GUI = class {
 
     // configuration
     this.#cfgn = {
-      undo: undo,
+      undo: undo && BACKTRACK,
       clock: clock,
       randy: randy,
-      stones: stones,
+      stones: stones || STONES_REQUIRED,
       sound: sound,
     };
 
@@ -243,6 +243,7 @@ const GUI = class {
         enter: document.querySelector("#enter"),
         stonecollect: document.querySelector("#stone-collect"),
         complete: document.querySelector("#complete"),
+        nostones: document.querySelector("#no-stones"),
         pause: document.querySelector("#pause-sound"),
         randydone: document.querySelector("#randy-done"),
         triumph: document.querySelector("#triumph"),
@@ -527,7 +528,10 @@ const GUI = class {
           break;
 
         case "c":
-          if (!this.#activeRandomPath()) {
+          if (
+            this.getStatus() === GUI.Status.PLAYING &&
+            !this.#activeRandomPath()
+          ) {
             this.#simulatePseudoRandomPlayerMove();
           }
           break;
@@ -653,8 +657,8 @@ const GUI = class {
     for (const door of doors) {
       if (door.type === Door.Type.EXIT) {
         // NOTE: Auto pilot will go fo the exit door, but only after
-        // collecting all them stones.
-        if (this.#stoneCount === this.#numStones) {
+        // collecting all them stones (if stones flag enabled).
+        if (!this.#CFGN().stones || this.#stoneCount === this.#numStones) {
           this.#playerGoTo(door.loc);
           return;
         } else {
@@ -675,7 +679,8 @@ const GUI = class {
     }
 
     let choices = currLevelChoices;
-    const advance = this.#stoneCount >= stonesPerLevel * currLevel;
+    const advance = // may advance if stones are not required
+      !this.#CFGN().stones || this.#stoneCount >= stonesPerLevel * currLevel;
     if (advance && nextLevelChoices.length > 0) {
       choices = nextLevelChoices;
     }
@@ -913,19 +918,28 @@ const GUI = class {
 
     const state = this.#game.getState(0);
     this.#lastRoomId = state.room.id;
-    const result = this.#game.playerInspect(0);
-    if (result === Door.Type.EXIT) {
+    // FIXME: I am not happy with the current way of passing information after
+    // player inspection. [elementType, winStatus] - really? Can we come up
+    // with a better mechanism.
+    const [elementType, winStatus] = this.#game.playerInspect(0);
+    if (winStatus) {
       this.#setStatus(GUI.Status.REWARD);
       this.#unset();
       this.#playerWon();
+    } else if (elementType === Door.Type.EXIT) {
+      // NOTE: If the player inspected an exit door but hasn't won the game,
+      // then it must be the case that stones are required yet the player
+      // didn't collect them all.
+      // alert("Where are them stones?");
+      this.#playSound(this.#HTML().sound.nostones);
     } else {
       const newState = this.#game.getState(0);
       if (newState.room.id !== this.#lastRoomId) {
         // player entered a new room
         this.#playSound(this.#HTML().sound.enter);
-      } else if (this.#CFGN().stones && result in Stone.Type) {
+      } else if (this.#CFGN().stones && elementType in Stone.Type) {
         // player collected a stone
-        const stoneName = result.toLowerCase();
+        const stoneName = elementType.toLowerCase();
         const placeholder = document.querySelector("#plate-" + stoneName);
         placeholder.setAttribute("id", stoneName);
         placeholder.style.borderStyle = "outset";

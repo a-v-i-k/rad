@@ -540,13 +540,17 @@ const Displayer = class {
       // display door
       if (door.type === Door.Type.EXIT) {
         // exit door
-        this.#drawExitDoor(
-          bbox,
-          DOOR_OUTLINE,
-          EXIT_DOOR_FRONT_FILL,
-          EXIT_DOOR_WINDOW_FILL,
-          EXIT_DOOR_HANDLE_FILL
-        );
+        if (state.stonesRequired) {
+          this.#drawExitDoor(bbox, DOOR_OUTLINE, "black", "black", "black");
+        } else {
+          this.#drawExitDoor(
+            bbox,
+            DOOR_OUTLINE,
+            EXIT_DOOR_FRONT_FILL,
+            EXIT_DOOR_WINDOW_FILL,
+            EXIT_DOOR_HANDLE_FILL
+          );
+        }
       } else {
         const outline = DOOR_OUTLINE;
         const windowFill = DOOR_WINDOW_FILL;

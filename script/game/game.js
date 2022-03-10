@@ -17,6 +17,7 @@ import {
 
 /* --- EXPORTS --- */
 export { Game as default };
+export { BACKTRACK, STONES_REQUIRED };
 
 /* --- ENUM: GameStatus --- */
 const GameStatus = {
@@ -31,7 +32,10 @@ const DEFAULT_NUM_COLUMNS = 4;
 const DEFAULT_NUM_LEVELS = 4;
 const DEFAULT_ROOMS_PER_LEVEL = 30;
 const DEFAULT_NUM_PLAYERS = 1;
-const DEFAULT_BACKTRACK = true;
+
+/* --- CONSTANTS --- */
+const BACKTRACK = true;
+const STONES_REQUIRED = true;
 
 /*
  * CLASS: Game [UML]
@@ -44,8 +48,9 @@ const Game = class {
   #numLevels;
   #roomsPerLevel;
   #numRooms;
-  #backtrack;
   #roomsInfo;
+  #numStones;
+  #stones;
 
   /* --- INNER: Status --- */
   static Status = GameStatus;
@@ -87,6 +92,7 @@ const Game = class {
       }
 
       // stones
+      this.stonesRequired = game.stonesRequired();
       this.stones = [];
       for (const loc of room.getStoneLocations()) {
         const stone = room.getCell(loc).getElement();
@@ -105,23 +111,23 @@ const Game = class {
     rows = DEFAULT_NUM_ROWS,
     columns = DEFAULT_NUM_COLUMNS,
     numLevels = DEFAULT_NUM_LEVELS,
-    roomsPerLevel = DEFAULT_ROOMS_PER_LEVEL,
-    backtrack = DEFAULT_BACKTRACK
+    roomsPerLevel = DEFAULT_ROOMS_PER_LEVEL
   ) {
-    Game.#validator(rows, columns, numLevels, roomsPerLevel, backtrack);
+    Game.#validator(rows, columns, numLevels, roomsPerLevel);
     this.#rows = rows;
     this.#columns = columns;
     this.#numLevels = numLevels;
     this.#roomsPerLevel = roomsPerLevel;
-    this.#backtrack = backtrack;
 
     this.#setStatus(Game.Status.IDLE);
-    this.#roomsInfo = null;
     this.#players = [];
+    this.#roomsInfo = null;
+    this.#numStones = Object.keys(Stone.Type).length;
+    this.#stones = [];
   }
 
   /* --- METHOD: #validator --- */
-  static #validator(rows, columns, numLevels, roomsPerLevel, backtrack) {
+  static #validator(rows, columns, numLevels, roomsPerLevel) {
     if (!Number.isInteger(rows)) {
       throw new ETypeError(`input is not an integer`, rows);
     }
@@ -149,10 +155,6 @@ const Game = class {
         `rooms per level must be at least 2`,
         roomsPerLevel
       );
-    }
-
-    if (typeof backtrack !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, backtrack);
     }
   }
 
@@ -202,6 +204,13 @@ const Game = class {
     return this.#roomsInfo.levels[roomId];
   }
 
+  /* --- METHOD: stonesRequired --- */
+  stonesRequired() {
+    return STONES_REQUIRED && this.#stones.length < this.#numStones;
+  }
+
+  /// PLAYING
+
   /* --- METHOD: play --- */
   play(numPlayers = DEFAULT_NUM_PLAYERS) {
     if (this.getStatus() === Game.Status.PLAYING) {
@@ -250,8 +259,9 @@ const Game = class {
       this.#players[i].exit(); // let player out
       this.#players[i].stop();
     }
-    this.#players = [];
+    this.#stones = [];
     this.#destroyNetwork();
+    this.#players = [];
     this.#setStatus(Game.Status.IDLE);
     return true;
   }
@@ -274,6 +284,7 @@ const Game = class {
     const player = this.#players[index];
     const cell = player.inspect();
 
+    let [elementType, winStatus] = [null, false];
     switch (cell.getType()) {
       case Cell.Type.PLAIN: // plain cell
         const element = cell.getElement();
@@ -284,20 +295,34 @@ const Game = class {
           if (doorType === Door.Type.PLAIN) {
             player.enter(element.open());
           } else if (doorType === Door.Type.EXIT) {
-            console.log(`Player ${index} has won the game!`);
-            this.stop();
+            // NOTE: If stones are required, they are only required for the
+            // primary player.
+            if (index > 0) {
+              winStatus = true;
+            } else {
+              if (STONES_REQUIRED && this.#stones.length < this.#numStones) {
+                console.log(`Where are them stones?`);
+              } else {
+                winStatus = true;
+              }
+            }
+            if (winStatus) {
+              console.log(`Player ${index} has won the game!`);
+              this.stop();
+            }
           } else {
             console.assert(false); // sanity check
           }
-          return doorType;
+          elementType = doorType;
         } else if (element instanceof Stone) {
+          this.#stones.push(element);
           player.getRoom().removeStone(player.getLocation());
-          return element.getType();
+          elementType = element.getType();
         }
         break;
 
       case Cell.Type.WELCOME: // welcome cell
-        if (this.#backtrack) {
+        if (BACKTRACK) {
           this.playerBacktrack(index); // go back to previous room
         }
         break;
@@ -305,14 +330,14 @@ const Game = class {
       default:
         console.assert(false); // sanity check
     }
-    return null;
+    return [elementType, winStatus];
   }
 
   /* --- METHOD: playerBacktrack --- */
   playerBacktrack(index) {
     this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
-    if (this.#backtrack) {
+    if (BACKTRACK) {
       this.#players[index].backtrack();
     } else {
       console.log("Player backtrack is off.");
