@@ -90,6 +90,7 @@
 //     ├── enter.mp3
 //     ├── enter-at-your-own-risk.mp3
 //     ├── pause-sound.mp3
+//     ├── pause-sound-old.mp3
 //     ├── randy-done.mp3
 //     ├── stone-collect.mp3
 //     ├── triumph.mp3
