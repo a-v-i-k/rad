@@ -44,7 +44,7 @@ const PLATE_COMPLETE_COLOR = "gold";
 
 const MAX_NUM_RANDYS = 10;
 
-const PLAYER_DELAY = 200; // in milliseconds
+const AUTO_PILOT_DELAY = 300; // in milliseconds
 
 /*
  * CLASS: GUI [UML]
@@ -508,7 +508,7 @@ const GUI = class {
         case "a":
           if (this.#auto === null) {
             this.#auto = new TIterator(
-              PLAYER_DELAY,
+              AUTO_PILOT_DELAY,
               () => {
                 window.dispatchEvent(
                   new KeyboardEvent("keydown", { key: "c" })
@@ -991,7 +991,7 @@ const GUI = class {
     console.assert(dst instanceof Location); // sanity check
     const src = this.#game.getState(0).player.loc;
     this.#rpath = new RandomPath(
-      PLAYER_DELAY,
+      AUTO_PILOT_DELAY,
       src,
       dst,
       (direction) => {
