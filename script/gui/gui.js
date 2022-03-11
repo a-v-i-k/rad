@@ -695,7 +695,7 @@ const GUI = class {
     // NOTE: Auto pilot will not go to the room it just came from, if possible.
     if (choices.length > 1) {
       for (let i = 0; i < choices.length; i++) {
-        if (choices[i].ownerId === this.#lastRoomId) {
+        if (choices[i].ownerId == this.#lastRoomId) {
           choices.splice(i, 1);
           break;
         }
@@ -924,7 +924,7 @@ const GUI = class {
     if (this.getStatus() !== GUI.Status.PLAYING) return;
 
     const state = this.#game.getState(0);
-    this.#lastRoomId = state.room.id;
+    const lastRoomId = state.room.id;
     // FIXME: I am not happy with the current way of passing information after
     // player inspection. [elementType, winStatus] - really? Can we come up
     // with a better mechanism.
@@ -941,8 +941,9 @@ const GUI = class {
       this.#playSound(this.#HTML().sound.nostones);
     } else {
       const newState = this.#game.getState(0);
-      if (newState.room.id !== this.#lastRoomId) {
+      if (newState.room.id !== lastRoomId) {
         // player entered a new room
+        this.#lastRoomId = lastRoomId; // save it
         this.#playSound(this.#HTML().sound.enter);
       } else if (this.#CFGN().stones && elementType in Stone.Type) {
         // player collected a stone
