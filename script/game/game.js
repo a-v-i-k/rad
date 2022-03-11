@@ -151,9 +151,9 @@ const Game = class {
     if (!Number.isInteger(roomsPerLevel)) {
       throw new ETypeError(`input is not an integer`, roomsPerLevel);
     }
-    if (roomsPerLevel < 2) {
+    if (roomsPerLevel < 3) {
       throw new ERangeError(
-        `rooms per level must be at least 2`,
+        `rooms per level must be at least 3`,
         roomsPerLevel
       );
     }
@@ -484,9 +484,6 @@ const Game = class {
 
       const bucket = buckets[level];
       const nu = Random.getRandomChoice(bucket);
-      if (DEFAULT_ROOMS_PER_LEVEL > 3) {
-        bucket.splice(bucket.indexOf(nu), 1); // without replacement
-      }
 
       rooms[nu].addStone(stone);
       if (!(level in this.#missingStones)) {
@@ -511,6 +508,46 @@ const Game = class {
     // corrsponds with the order they appear in the plate.
     let stoneTypes;
     switch (this.getNumLevels()) {
+      case 1:
+        // doesn't really matter how we return the stone types
+        stoneTypes = Object.keys(Stone.Type);
+        break;
+
+      case 2:
+        stoneTypes = [
+          Stone.Type.RUBY,
+          Stone.Type.OPAL,
+          Stone.Type.EMERALD,
+          Stone.Type.AGATE,
+          Stone.Type.TOPAZ,
+          Stone.Type.AMETHYST,
+          Stone.Type.GARNET,
+          Stone.Type.AQUAMARINE,
+          Stone.Type.SAPPHIRE,
+          Stone.Type.ONYX,
+          Stone.Type.DIAMOND,
+          Stone.Type.JASPER,
+        ];
+        break;
+
+      case 3:
+        // same as case 12
+        stoneTypes = [
+          Stone.Type.RUBY,
+          Stone.Type.EMERALD,
+          Stone.Type.TOPAZ,
+          Stone.Type.GARNET,
+          Stone.Type.SAPPHIRE,
+          Stone.Type.DIAMOND,
+          Stone.Type.OPAL,
+          Stone.Type.AGATE,
+          Stone.Type.AMETHYST,
+          Stone.Type.AQUAMARINE,
+          Stone.Type.ONYX,
+          Stone.Type.JASPER,
+        ];
+        break;
+
       case 4:
         stoneTypes = [
           // column 1
@@ -559,6 +596,23 @@ const Game = class {
           Stone.Type.GARNET,
           Stone.Type.SAPPHIRE,
           Stone.Type.DIAMOND,
+          Stone.Type.AQUAMARINE,
+          Stone.Type.ONYX,
+          Stone.Type.JASPER,
+        ];
+        break;
+
+      case 12:
+        stoneTypes = [
+          Stone.Type.RUBY,
+          Stone.Type.EMERALD,
+          Stone.Type.TOPAZ,
+          Stone.Type.GARNET,
+          Stone.Type.SAPPHIRE,
+          Stone.Type.DIAMOND,
+          Stone.Type.OPAL,
+          Stone.Type.AGATE,
+          Stone.Type.AMETHYST,
           Stone.Type.AQUAMARINE,
           Stone.Type.ONYX,
           Stone.Type.JASPER,
