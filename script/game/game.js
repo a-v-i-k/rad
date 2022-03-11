@@ -398,6 +398,7 @@ const Game = class {
 
   /* --- METHOD: #createNetwork --- */
   #createNetwork() {
+    // TODO: This method is too big, split it.
     console.assert(this.getStatus() === Game.Status.IDLE); // sanity check
 
     // set number of rooms
@@ -467,15 +468,20 @@ const Game = class {
     // NOTE: Stones are scattered evenly (as much as possible) between levels.
     const buckets = {};
     network.V().forEach((nu) => {
-      // NOTE: No stones in source and target room.
-      if (nu !== source && nu !== target) {
-        const level = levels[nu];
-        if (!(level in buckets)) {
-          buckets[level] = [];
-        }
-        buckets[level].push(nu);
+      const level = levels[nu];
+      if (!(level in buckets)) {
+        buckets[level] = [];
       }
+      buckets[level].push(nu);
     });
+    // NOTE: No stones in endpoints.
+    for (let i = 0; i < endpoints.length; i++) {
+      for (let j = 0; j < 2; j++) {
+        const nu = i * roomsPerLevel + endpoints[i][j];
+        const level = levels[nu];
+        buckets[level].splice(buckets[level].indexOf(nu), 1);
+      }
+    }
 
     const stoneTypes = this.#getStoneTypes();
     let level = 1;
