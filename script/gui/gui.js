@@ -517,7 +517,7 @@ const GUI = class {
               },
               () => {}
             );
-          } else {
+          } else if (this.#auto !== null) {
             this.#auto.cancel();
             this.#auto = null;
             if (this.#activeRandomPath()) {
