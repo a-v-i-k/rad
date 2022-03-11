@@ -113,8 +113,9 @@ const Displayer = class {
       plain: { map: {}, gen: new Colors() },
       arched: { map: {}, gen: new Colors() },
       round: { map: {}, gen: new Colors() },
-      twowindow: { map: {}, gen: new Colors() },
       trapezoid: { map: {}, gen: new Colors() },
+      twowindow: { map: {}, gen: new Colors() },
+      bars: { map: {}, gen: new Colors() },
       randys: { map: {}, gen: new Colors() },
     };
 
@@ -431,6 +432,7 @@ const Displayer = class {
       case "round":
       case "trapezoid":
       case "twowindow":
+      case "bars":
         break;
       default:
         console.assert(false); // sanity check
@@ -585,8 +587,7 @@ const Displayer = class {
             BARS_OUTLINE,
             handleFill
           );
-        } else {
-          // door.level > 4
+        } else if (door.level == 5) {
           const frontFill = this.#getRoomColor(door.ownerId, "twowindow");
           this.#drawTwoWindowDoor(
             bbox,
@@ -594,6 +595,16 @@ const Displayer = class {
             frontFill,
             windowFill,
             handleFill
+          );
+        } else {
+          // door.level > 5
+          const frontFill = this.#getRoomColor(door.ownerId, "bars");
+          this.#drawBarsDoor(
+            bbox,
+            outline,
+            frontFill,
+            DOOR_HANDLE_FILL,
+            BARS_OUTLINE
           );
         }
       }
@@ -830,6 +841,94 @@ const Displayer = class {
     x0 += Math.round(bbox.width * (3 / 8)) + 2;
     handleBBox = new BoundingBox(x0, y0, width, height);
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawBarsDoor --- */
+  #drawBarsDoor(bbox, outline, frontFill, handleFill, barsOutline) {
+    // display front
+    const frontPolyline = new Polyline();
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width / 8),
+      bbox.y0 + Math.round(bbox.height / 16)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (7 / 8)),
+      bbox.y0 + Math.round(bbox.height / 16)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (7 / 8)),
+      bbox.y0 + Math.round(bbox.height * (15 / 16))
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (1 / 8)),
+      bbox.y0 + Math.round(bbox.height * (15 / 16))
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width / 8),
+      bbox.y0 + Math.round(bbox.height / 16)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (3 / 16)),
+      bbox.y0 + Math.round(bbox.height / 8)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (3 / 16)),
+      bbox.y0 + Math.round(bbox.height * (7 / 8))
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (13 / 16)),
+      bbox.y0 + Math.round(bbox.height * (7 / 8))
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (13 / 16)),
+      bbox.y0 + Math.round(bbox.height / 8)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (3 / 16)),
+      bbox.y0 + Math.round(bbox.height / 8)
+    );
+    this.#drawer.drawPolygon(frontPolyline, frontFill, frontFill, 2);
+
+    // front outer outline
+    const frontOuterOutlineBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width / 8) - 1,
+      bbox.y0 + Math.round(bbox.height / 16) - 1,
+      Math.round(bbox.width * (3 / 4)) + 2,
+      Math.round(bbox.height * (14 / 16)) + 2
+    );
+    this.#drawer.drawRectangle(frontOuterOutlineBBox, outline, null, 2);
+
+    // front inner outline
+    const frontInnerOutlineBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width * (3 / 16)) + 1,
+      bbox.y0 + Math.round(bbox.height / 8) + 1,
+      Math.round(bbox.width * (10 / 16)) - 2,
+      Math.round(bbox.height * (6 / 8)) - 2
+    );
+    this.#drawer.drawRectangle(frontInnerOutlineBBox, outline, null, 2);
+
+    // draw bars
+    for (let i = 5; i <= 11; i += 2) {
+      // vertical bars
+      const point1 = [
+        bbox.x0 + Math.round(bbox.width * (i / 16)),
+        bbox.y0 + Math.round(bbox.height / 8) + 1,
+      ];
+      const point2 = [
+        bbox.x0 + Math.round(bbox.width * (i / 16)),
+        bbox.y0 + Math.round(bbox.height * (7 / 8)) - 2,
+      ];
+      this.#drawer.drawLine(point1, point2, barsOutline, 2);
+    }
+
+    // draw handle
+    const handleBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width / 8) + 3,
+      bbox.y0 + Math.round(bbox.height / 2) - 1,
+      Math.round(bbox.width / 8) - 3,
+      3
+    );
+    this.#drawer.drawRectangle(handleBBox, outline, handleFill, 2);
   }
 
   /* --- METHOD: #drawFancyDoor --- */

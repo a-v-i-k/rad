@@ -29,7 +29,7 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 4;
 const DEFAULT_NUM_COLUMNS = 4;
-const DEFAULT_NUM_LEVELS = 5;
+const DEFAULT_NUM_LEVELS = 6;
 const DEFAULT_ROOMS_PER_LEVEL = 30;
 const DEFAULT_NUM_PLAYERS = 1;
 
@@ -477,26 +477,7 @@ const Game = class {
       }
     });
 
-    // NOTE: The stones are arranged so that the order they appear in levels
-    // corrsponds with the order they appear in the plate. This is all assuming
-    // exactly 5 levels.
-    const stoneTypes = [
-      Stone.Type.RUBY,
-      Stone.Type.GARNET,
-      Stone.Type.OPAL,
-      Stone.Type.AGATE,
-      Stone.Type.AMETHYST,
-      Stone.Type.EMERALD,
-      Stone.Type.SAPPHIRE,
-      Stone.Type.AQUAMARINE,
-      Stone.Type.ONYX,
-      Stone.Type.JASPER,
-      Stone.Type.TOPAZ,
-      Stone.Type.DIAMOND,
-    ];
-    // const stoneTypes = Object.keys(Stone.Type);
-    // Random.shuffleArray(stoneTypes);
-
+    const stoneTypes = this.#getStoneTypes();
     let level = 1;
     for (const stoneType of stoneTypes) {
       const stone = new Stone(stoneType);
@@ -522,6 +503,75 @@ const Game = class {
       this.#roomsInfo.rooms[roomId] = rooms[nu];
       this.#roomsInfo.levels[roomId] = levels[nu];
     });
+  }
+
+  /* --- #getStoneTypes --- */
+  #getStoneTypes() {
+    // NOTE: The stones are arranged so that the order they appear in levels
+    // corrsponds with the order they appear in the plate.
+    let stoneTypes;
+    switch (this.getNumLevels()) {
+      case 4:
+        stoneTypes = [
+          // column 1
+          Stone.Type.RUBY,
+          Stone.Type.GARNET,
+          Stone.Type.OPAL,
+          Stone.Type.AQUAMARINE,
+          // column 2
+          Stone.Type.EMERALD,
+          Stone.Type.SAPPHIRE,
+          Stone.Type.AGATE,
+          Stone.Type.ONYX,
+          // column 3
+          Stone.Type.TOPAZ,
+          Stone.Type.DIAMOND,
+          Stone.Type.AMETHYST,
+          Stone.Type.JASPER,
+        ];
+        break;
+
+      case 5:
+        stoneTypes = [
+          Stone.Type.RUBY,
+          Stone.Type.GARNET,
+          Stone.Type.OPAL,
+          Stone.Type.AGATE,
+          Stone.Type.AMETHYST,
+          Stone.Type.EMERALD,
+          Stone.Type.SAPPHIRE,
+          Stone.Type.AQUAMARINE,
+          Stone.Type.ONYX,
+          Stone.Type.JASPER,
+          Stone.Type.TOPAZ,
+          Stone.Type.DIAMOND,
+        ];
+        break;
+
+      case 6:
+        stoneTypes = [
+          Stone.Type.RUBY,
+          Stone.Type.EMERALD,
+          Stone.Type.TOPAZ,
+          Stone.Type.OPAL,
+          Stone.Type.AGATE,
+          Stone.Type.AMETHYST,
+          Stone.Type.GARNET,
+          Stone.Type.SAPPHIRE,
+          Stone.Type.DIAMOND,
+          Stone.Type.AQUAMARINE,
+          Stone.Type.ONYX,
+          Stone.Type.JASPER,
+        ];
+        break;
+
+      default:
+        // random order
+        stoneTypes = Object.keys(Stone.Type);
+        Random.shuffleArray(stoneTypes);
+    }
+
+    return stoneTypes;
   }
 
   /* --- METHOD: #destroyNetwork --- */
