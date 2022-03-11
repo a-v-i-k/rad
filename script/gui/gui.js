@@ -506,7 +506,7 @@ const GUI = class {
           break;
 
         case "a":
-          if (this.#auto === null) {
+          if (this.getStatus() === GUI.Status.PLAYING && this.#auto === null) {
             this.#auto = new TIterator(
               AUTO_PILOT_DELAY,
               () => {
