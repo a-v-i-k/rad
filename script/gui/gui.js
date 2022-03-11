@@ -672,11 +672,13 @@ const GUI = class {
     // stones flag is on, in which case it will go to the lowest level that
     // follows levels (self included) with missing stones.
     const doorLevels = Object.keys(choicesByLevel).map((x) => parseInt(x));
-    doorLevels.sort();
-    let gotoLevel;
-    if (this.#CFGN().stones) {
+    // NOTE: Javascript sorts alphabetically (including integers).
+    doorLevels.sort((a, b) => a - b);
+    let gotoLevel = doorLevels[doorLevels.length - 1]; // prefer highest level
+    const missingStones = Object.keys(state.missingStones);
+    if (this.#CFGN().stones && missingStones.length > 0) {
       const lowestMissingLevel = Math.min(
-        ...Object.keys(state.missingStones).map((x) => parseInt(x))
+        ...missingStones.map((x) => parseInt(x))
       );
       for (let i = 0; i < doorLevels.length; i++) {
         if (
@@ -687,8 +689,6 @@ const GUI = class {
           break;
         }
       }
-    } else {
-      gotoLevel = doorLevels[doorLevels.length - 1];
     }
     const choices = choicesByLevel[gotoLevel];
 
