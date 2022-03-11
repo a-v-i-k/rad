@@ -53,6 +53,7 @@ const DOOR_HANDLE_FILL = "silver";
 const EXIT_DOOR_FRONT_FILL = "goldenrod";
 const EXIT_DOOR_WINDOW_FILL = "gold";
 const EXIT_DOOR_HANDLE_FILL = "gold";
+const BARS_OUTLINE = "darkslategray";
 
 const PLAYER_SCALE = 0.5;
 const PLAYER_OUTLINE = "black";
@@ -113,6 +114,7 @@ const Displayer = class {
       arched: { map: {}, gen: new Colors() },
       round: { map: {}, gen: new Colors() },
       twowindow: { map: {}, gen: new Colors() },
+      trapezoid: { map: {}, gen: new Colors() },
       randys: { map: {}, gen: new Colors() },
     };
 
@@ -427,6 +429,7 @@ const Displayer = class {
       case "plain":
       case "arched":
       case "round":
+      case "trapezoid":
       case "twowindow":
         break;
       default:
@@ -572,8 +575,18 @@ const Displayer = class {
         } else if (door.level == 3) {
           const frontFill = this.#getRoomColor(door.ownerId, "round");
           this.#drawRoundDoor(bbox, outline, frontFill, windowFill, handleFill);
+        } else if (door.level == 4) {
+          const frontFill = this.#getRoomColor(door.ownerId, "trapezoid");
+          this.#drawTrapezoidDoor(
+            bbox,
+            outline,
+            frontFill,
+            windowFill,
+            BARS_OUTLINE,
+            handleFill
+          );
         } else {
-          // door.level > 3
+          // door.level > 4
           const frontFill = this.#getRoomColor(door.ownerId, "twowindow");
           this.#drawTwoWindowDoor(
             bbox,
@@ -685,6 +698,91 @@ const Displayer = class {
     y0 = bbox.y0 + Math.round(bbox.width * (4 / 7));
     height = Math.round(bbox.height / 7);
     const handleBBox = new BoundingBox(x0, y0, width, height);
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
+  }
+
+  /* --- METHOD: #drawTrapezoidDoor --- */
+  #drawTrapezoidDoor(
+    bbox,
+    outline,
+    frontFill,
+    windowFill,
+    barsOutline,
+    handleFill
+  ) {
+    // display front
+    const frontPolyline = new Polyline();
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (3 / 16)),
+      bbox.y0 + Math.round(bbox.height / 16)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + bbox.width - 1 - Math.round(bbox.width * (3 / 16)),
+      bbox.y0 + Math.round(bbox.height / 16)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (11 / 16)),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height / 16)
+    );
+    frontPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (5 / 16)),
+      bbox.y0 + bbox.height - 1 - Math.round(bbox.height / 16)
+    );
+    this.#drawer.drawPolygon(frontPolyline, outline, frontFill, 4);
+
+    // display window
+    const windowPolyline = new Polyline();
+    windowPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width / 4),
+      bbox.y0 + Math.round(bbox.height / 8)
+    );
+    windowPolyline.addPoint(
+      bbox.x0 + bbox.width - 1 - Math.round(bbox.width / 4),
+      bbox.y0 + Math.round(bbox.height / 8)
+    );
+    windowPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (11 / 16)),
+      bbox.y0 + Math.round(bbox.height / 2)
+    );
+    windowPolyline.addPoint(
+      bbox.x0 + Math.round(bbox.width * (5 / 16)),
+      bbox.y0 + Math.round(bbox.height / 2)
+    );
+    this.#drawer.drawPolygon(windowPolyline, outline, windowFill, 4);
+
+    // draw bars
+    for (let i = 6; i <= 10; i += 2) {
+      // vertical bars
+      const point1 = [
+        bbox.x0 + Math.round(bbox.width * (i / 16)),
+        bbox.y0 + Math.round(bbox.height / 8),
+      ];
+      const point2 = [
+        bbox.x0 + Math.round(bbox.width * (i / 16)),
+        bbox.y0 + Math.round(bbox.height / 2),
+      ];
+      this.#drawer.drawLine(point1, point2, barsOutline, 2);
+    }
+    for (let i = 3; i <= 7; i += 2) {
+      // horizontal bars
+      const point1 = [
+        bbox.x0 + Math.round(bbox.width * (5 / 16) - (8 - i) / 2),
+        bbox.y0 + Math.round(bbox.height * (i / 16)),
+      ];
+      const point2 = [
+        bbox.x0 + Math.round(bbox.width * (11 / 16) + (8 - i) / 2),
+        bbox.y0 + Math.round(bbox.height * (i / 16)),
+      ];
+      this.#drawer.drawLine(point1, point2, barsOutline, 2);
+    }
+
+    // display handle
+    const handleBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width * (5 / 16)),
+      bbox.y0 + Math.round(bbox.width * (9 / 16)),
+      Math.round(bbox.width / 8),
+      Math.round(bbox.height / 8)
+    );
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 

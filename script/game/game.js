@@ -29,7 +29,7 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 4;
 const DEFAULT_NUM_COLUMNS = 4;
-const DEFAULT_NUM_LEVELS = 4;
+const DEFAULT_NUM_LEVELS = 5;
 const DEFAULT_ROOMS_PER_LEVEL = 30;
 const DEFAULT_NUM_PLAYERS = 1;
 
@@ -477,26 +477,22 @@ const Game = class {
       }
     });
 
-    // NOTE: The stones are arranged such that stones from the same plate row
-    // appear in the same level, stones from different plate rows appear in
-    // different levels, and upper rows appear in lower levels. This is all
-    // assuming exactly 4 types of doors.
+    // NOTE: The stones are arranged so that the order they appear in levels
+    // corrsponds with the order they appear in the plate. This is all assuming
+    // exactly 5 levels.
     const stoneTypes = [
-      // column 1
       Stone.Type.RUBY,
       Stone.Type.GARNET,
       Stone.Type.OPAL,
-      Stone.Type.AQUAMARINE,
-      // column 2
+      Stone.Type.AGATE,
+      Stone.Type.AMETHYST,
       Stone.Type.EMERALD,
       Stone.Type.SAPPHIRE,
-      Stone.Type.AGATE,
+      Stone.Type.AQUAMARINE,
       Stone.Type.ONYX,
-      // column 3
+      Stone.Type.JASPER,
       Stone.Type.TOPAZ,
       Stone.Type.DIAMOND,
-      Stone.Type.AMETHYST,
-      Stone.Type.JASPER,
     ];
     // const stoneTypes = Object.keys(Stone.Type);
     // Random.shuffleArray(stoneTypes);
