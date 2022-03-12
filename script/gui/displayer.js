@@ -59,7 +59,9 @@ const TERMINAL_DOOR_HANDLE_FILL = DOOR_HANDLE_FILL;
 const EXIT_DOOR_FRONT_FILL = "goldenrod";
 const EXIT_DOOR_WINDOW_FILL = "gold";
 const EXIT_DOOR_HANDLE_FILL = "gold";
+
 const BARS_OUTLINE = "darkslategray";
+const INSIDE_FILL = "black";
 
 const PLAYER_SCALE = 0.5;
 const PLAYER_OUTLINE = "black";
@@ -124,8 +126,10 @@ const Displayer = class {
       twowindow: { map: {}, gen: new Colors() },
       archedwindows: { map: {}, gen: new Colors() },
       stylish: { map: {}, gen: new Colors() },
+      arched: { map: {}, gen: new Colors() },
       grid: { map: {}, gen: new Colors() },
       bars: { map: {}, gen: new Colors() },
+      frame: { map: {}, gen: new Colors() },
 
       randys: { map: {}, gen: new Colors() },
     };
@@ -439,8 +443,10 @@ const Displayer = class {
       case "twowindow":
       case "archedwindows":
       case "stylish":
+      case "arched":
       case "grid":
       case "bars":
+      case "frame":
         break;
       default:
         console.assert(false); // sanity check
@@ -667,6 +673,17 @@ const Displayer = class {
         break;
 
       case 8: // LEVEL 8
+        frontFill = this.#getRoomColor(ownerId, "arched");
+        this.#doors.drawArchedDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          DOOR_HANDLE_FILL
+        );
+        break;
+
+      case 9: // LEVEL 9
         frontFill = this.#getRoomColor(ownerId, "grid");
         this.#doors.drawGridDoor(
           bbox,
@@ -678,7 +695,7 @@ const Displayer = class {
         );
         break;
 
-      case 9: // LEVEL 9
+      case 10: // LEVEL 10
         frontFill = this.#getRoomColor(ownerId, "bars");
         this.#doors.drawBarsDoor(
           bbox,
@@ -689,7 +706,12 @@ const Displayer = class {
         );
         break;
 
-      case 10: // LEVEL 10
+      case 11: // LEVEL 11
+        frontFill = this.#getRoomColor(ownerId, "frame");
+        this.#doors.drawFrameDoor(bbox, outline, frontFill, INSIDE_FILL);
+        break;
+
+      case 12: // LEVEL 12
         this.#doors.drawTerminalDoor(
           bbox,
           TERMINAL_DOOR_OUTLINE,
