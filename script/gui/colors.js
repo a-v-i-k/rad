@@ -53,7 +53,7 @@ const COLORS47 = [
   "dimgray",
   "skyblue",
   "lightseagreen",
-  "black",
+  "peachpuff",
 ];
 
 const COLORS = COLORS47;
