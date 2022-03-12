@@ -67,6 +67,7 @@
 // │   |   ├── bounding-box.js
 // │   |   ├── colors.js
 // │   |   ├── displayer.js
+// │   |   ├── doors.js
 // │   |   ├── drawer.js
 // │   |   ├── gui.js
 // │   |   ├── polyline.js
