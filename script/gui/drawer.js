@@ -73,6 +73,7 @@ const Drawer = class {
   }
 
   /* --- METHOD: drawLine --- */
+  // FIXME: lineWidth is not validated! Fix in all methods.
   drawLine(pt1, pt2, strokeStyle, lineWidth = 1) {
     this.#validatePoint(pt1);
     this.#validatePoint(pt2);
@@ -96,8 +97,8 @@ const Drawer = class {
     if (fillStyle !== null) {
       Drawer.validateColor(fillStyle);
     }
-    const context = this.#getContext();
 
+    const context = this.#getContext();
     context.beginPath();
     if (fillStyle !== null) {
       context.fillStyle = fillStyle;
@@ -124,17 +125,42 @@ const Drawer = class {
   /* --- METHOD: drawCircle --- */
   drawCircle(bbox, strokeStyle, fillStyle = null, lineWidth = 1) {
     this.#validateBoundingBox(bbox);
+
+    const r = Math.floor(Math.min(bbox.width, bbox.height) / 2) - 1;
+    const x = bbox.x0 + r + 1,
+      y = bbox.y0 + r + 1;
+    this.drawArc(x, y, r, 0, 2 * Math.PI, strokeStyle, fillStyle, lineWidth);
+  }
+
+  /* --- METHOD: drawArc --- */
+  drawArc(
+    x,
+    y,
+    r,
+    sAngle,
+    eAngle,
+    strokeStyle,
+    fillStyle = null,
+    lineWidth = 1
+  ) {
+    // TODO Improve validation process.
+    this.#validatePoint([x, y]);
+    if (!Number.isInteger(r)) {
+      throw new ETypeError(`radius is not an integer`, r);
+    }
+    if (r < 0) {
+      throw new ERangeError(`radius is negative`, r);
+    }
+    this.#validateAngle(sAngle);
+    this.#validateAngle(eAngle);
     Drawer.validateColor(strokeStyle);
     if (fillStyle !== null) {
       Drawer.validateColor(fillStyle);
     }
-    const context = this.#getContext();
 
+    const context = this.#getContext();
     context.beginPath();
-    const radius = Math.floor(Math.min(bbox.width, bbox.height) / 2) - 1;
-    const x = bbox.x0 + radius + 1,
-      y = bbox.y0 + radius + 1;
-    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.arc(x, y, r, sAngle, eAngle);
     if (fillStyle !== null) {
       context.fillStyle = fillStyle;
       context.fill();
@@ -152,8 +178,8 @@ const Drawer = class {
     if (fillStyle !== null) {
       Drawer.validateColor(fillStyle);
     }
-    const context = this.#getContext();
 
+    const context = this.#getContext();
     context.lineWidth = lineWidth;
     context.strokeStyle = strokeStyle;
 
@@ -253,6 +279,16 @@ const Drawer = class {
         point
       );
     }
+  }
+
+  /* --- METHOD: #validatePolyline --- */
+  #validateAngle(angle) {
+    if (typeof angle !== "number") {
+      throw new ETypeError(`angle is not a number`, angle);
+    }
+    // if (angle < 0 || angle > 2 * Math.PI) {
+    //   throw new ERangeError(`angle is not contained in [0, 2*PI]`, angle);
+    // }
   }
 
   /* --- METHOD: #validatePolyline --- */

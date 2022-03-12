@@ -29,7 +29,7 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 4;
 const DEFAULT_NUM_COLUMNS = 4;
-const DEFAULT_NUM_LEVELS = 8;
+const DEFAULT_NUM_LEVELS = 9;
 const DEFAULT_ROOMS_PER_LEVEL = 30;
 const DEFAULT_NUM_PLAYERS = 1;
 

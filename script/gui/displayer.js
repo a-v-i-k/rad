@@ -121,9 +121,11 @@ const Displayer = class {
       parabolic: { map: {}, gen: new Colors() },
       round: { map: {}, gen: new Colors() },
       trapezoid: { map: {}, gen: new Colors() },
-      grid: { map: {}, gen: new Colors() },
       twowindow: { map: {}, gen: new Colors() },
+      archedwindows: { map: {}, gen: new Colors() },
+      grid: { map: {}, gen: new Colors() },
       bars: { map: {}, gen: new Colors() },
+
       randys: { map: {}, gen: new Colors() },
     };
 
@@ -433,8 +435,9 @@ const Displayer = class {
       case "parabolic":
       case "round":
       case "trapezoid":
-      case "grid":
       case "twowindow":
+      case "archedwindows":
+      case "grid":
       case "bars":
         break;
       default:
@@ -629,6 +632,28 @@ const Displayer = class {
         break;
 
       case 5: // LEVEL 5
+        frontFill = this.#getRoomColor(ownerId, "twowindow");
+        this.#doors.drawTwoWindowDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 6: // LEVEL 6
+        frontFill = this.#getRoomColor(ownerId, "archedwindows");
+        this.#doors.drawArchedWindowsDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          DOOR_HANDLE_FILL
+        );
+        break;
+
+      case 7: // LEVEL 7
         frontFill = this.#getRoomColor(ownerId, "grid");
         this.#doors.drawGridDoor(
           bbox,
@@ -640,18 +665,7 @@ const Displayer = class {
         );
         break;
 
-      case 6: // LEVEL 6
-        frontFill = this.#getRoomColor(ownerId, "twowindow");
-        this.#doors.drawTwoWindowDoor(
-          bbox,
-          outline,
-          frontFill,
-          windowFill,
-          handleFill
-        );
-        break;
-
-      case 7: // LEVEL 7
+      case 8: // LEVEL 8
         frontFill = this.#getRoomColor(ownerId, "bars");
         this.#doors.drawBarsDoor(
           bbox,
@@ -662,7 +676,7 @@ const Displayer = class {
         );
         break;
 
-      case 8: // LEVEL 8
+      case 9: // LEVEL 9
         this.#doors.drawPlainDoor(
           bbox,
           TERMINAL_DOOR_OUTLINE,
