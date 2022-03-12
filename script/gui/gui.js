@@ -44,7 +44,7 @@ const PLATE_COMPLETE_COLOR = "gold";
 
 const MAX_NUM_RANDYS = 10;
 
-const AUTO_PILOT_DELAY = 300; // in milliseconds
+const AUTO_PILOT_DELAY = 200; // in milliseconds
 
 /*
  * CLASS: GUI [UML]
