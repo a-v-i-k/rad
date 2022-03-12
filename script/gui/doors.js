@@ -54,8 +54,8 @@ const Doors = class {
     this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 
-  /* --- METHOD: #drawArchedDoor --- */
-  drawArchedDoor(bbox, outline, frontFill, windowFill, handleFill) {
+  /* --- METHOD: #drawParabolicDoor --- */
+  drawParabolicDoor(bbox, outline, frontFill, windowFill, handleFill) {
     // display front
     let x0 = bbox.x0 + Math.round(bbox.width / 5);
     let y0 = bbox.y0 + Math.round(bbox.height / 15);

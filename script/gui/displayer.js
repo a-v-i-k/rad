@@ -48,7 +48,14 @@ const WELCOME_CELL_CASCADE_SHAPE = "circle";
 
 const DOOR_OUTLINE = "black";
 const DOOR_WINDOW_FILL = "white";
-const DOOR_HANDLE_FILL = "silver";
+const DOOR_HANDLE_FILL = "gray";
+
+// TODO: TERMINAL? Maybe a better prefix?
+const TERMINAL_DOOR_OUTLINE = "saddlebrown";
+const TERMINAL_DOOR_FRONT_FILL = "burlywood";
+const TERMINAL_DOOR_WINDOW_FILL = "silver";
+const TERMINAL_DOOR_HANDLE_FILL = DOOR_HANDLE_FILL;
+
 const EXIT_DOOR_FRONT_FILL = "goldenrod";
 const EXIT_DOOR_WINDOW_FILL = "gold";
 const EXIT_DOOR_HANDLE_FILL = "gold";
@@ -574,72 +581,100 @@ const Displayer = class {
     const windowFill = DOOR_WINDOW_FILL;
     const handleFill = DOOR_HANDLE_FILL;
 
-    if (level == 1) {
-      // door assumes its owner's color (front fill)
-      const frontFill = this.#getRoomColor(ownerId, "plain");
-      this.#doors.drawPlainDoor(
-        bbox,
-        outline,
-        frontFill,
-        windowFill,
-        handleFill
-      );
-    } else if (level == 2) {
-      const frontFill = this.#getRoomColor(ownerId, "arched");
-      this.#doors.drawArchedDoor(
-        bbox,
-        outline,
-        frontFill,
-        windowFill,
-        handleFill
-      );
-    } else if (level == 3) {
-      const frontFill = this.#getRoomColor(ownerId, "round");
-      this.#doors.drawRoundDoor(
-        bbox,
-        outline,
-        frontFill,
-        windowFill,
-        handleFill
-      );
-    } else if (level == 4) {
-      const frontFill = this.#getRoomColor(ownerId, "trapezoid");
-      this.#doors.drawTrapezoidDoor(
-        bbox,
-        outline,
-        frontFill,
-        windowFill,
-        handleFill
-      );
-    } else if (level == 5) {
-      const frontFill = this.#getRoomColor(ownerId, "grid");
-      this.#doors.drawGridDoor(
-        bbox,
-        outline,
-        BARS_OUTLINE,
-        frontFill,
-        windowFill,
-        handleFill
-      );
-    } else if (level == 6) {
-      const frontFill = this.#getRoomColor(ownerId, "twowindow");
-      this.#doors.drawTwoWindowDoor(
-        bbox,
-        outline,
-        frontFill,
-        windowFill,
-        handleFill
-      );
-    } else {
-      // level > 6
-      const frontFill = this.#getRoomColor(ownerId, "bars");
-      this.#doors.drawBarsDoor(
-        bbox,
-        outline,
-        BARS_OUTLINE,
-        frontFill,
-        DOOR_HANDLE_FILL
-      );
+    let frontFill;
+    switch (level) {
+      case 1: // LEVEL 1
+        // door assumes its owner's color (front fill)
+        frontFill = this.#getRoomColor(ownerId, "plain");
+        this.#doors.drawPlainDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 2: // LEVEL 2
+        frontFill = this.#getRoomColor(ownerId, "arched");
+        this.#doors.drawParabolicDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 3: // LEVEL 3
+        frontFill = this.#getRoomColor(ownerId, "round");
+        this.#doors.drawRoundDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 4: // LEVEL 4
+        frontFill = this.#getRoomColor(ownerId, "trapezoid");
+        this.#doors.drawTrapezoidDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 5: // LEVEL 5
+        frontFill = this.#getRoomColor(ownerId, "grid");
+        this.#doors.drawGridDoor(
+          bbox,
+          outline,
+          BARS_OUTLINE,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 6: // LEVEL 6
+        frontFill = this.#getRoomColor(ownerId, "twowindow");
+        this.#doors.drawTwoWindowDoor(
+          bbox,
+          outline,
+          frontFill,
+          windowFill,
+          handleFill
+        );
+        break;
+
+      case 7: // LEVEL 7
+        frontFill = this.#getRoomColor(ownerId, "bars");
+        this.#doors.drawBarsDoor(
+          bbox,
+          outline,
+          BARS_OUTLINE,
+          frontFill,
+          DOOR_HANDLE_FILL
+        );
+        break;
+
+      case 8: // LEVEL 8
+        this.#doors.drawPlainDoor(
+          bbox,
+          TERMINAL_DOOR_OUTLINE,
+          TERMINAL_DOOR_FRONT_FILL,
+          TERMINAL_DOOR_WINDOW_FILL,
+          TERMINAL_DOOR_HANDLE_FILL
+        );
+        break;
+
+      default:
+        // TODO: Do something else?
+        console.assert(false); // sanity check
     }
   }
 

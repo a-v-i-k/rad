@@ -29,7 +29,7 @@ Object.freeze(GameStatus);
 /* --- DEFAULTS --- */
 const DEFAULT_NUM_ROWS = 4;
 const DEFAULT_NUM_COLUMNS = 4;
-const DEFAULT_NUM_LEVELS = 7;
+const DEFAULT_NUM_LEVELS = 8;
 const DEFAULT_ROOMS_PER_LEVEL = 30;
 const DEFAULT_NUM_PLAYERS = 1;
 
@@ -574,22 +574,23 @@ const Game = class {
         ];
         break;
 
-      case 5:
-        stoneTypes = [
-          Stone.Type.RUBY,
-          Stone.Type.GARNET,
-          Stone.Type.OPAL,
-          Stone.Type.AGATE,
-          Stone.Type.AMETHYST,
-          Stone.Type.EMERALD,
-          Stone.Type.SAPPHIRE,
-          Stone.Type.AQUAMARINE,
-          Stone.Type.ONYX,
-          Stone.Type.JASPER,
-          Stone.Type.TOPAZ,
-          Stone.Type.DIAMOND,
-        ];
-        break;
+      // NOTE: Don't bother if number of levels doesn't divide 12.
+      // case 5:
+      //   stoneTypes = [
+      //     Stone.Type.RUBY,
+      //     Stone.Type.GARNET,
+      //     Stone.Type.OPAL,
+      //     Stone.Type.AGATE,
+      //     Stone.Type.AMETHYST,
+      //     Stone.Type.EMERALD,
+      //     Stone.Type.SAPPHIRE,
+      //     Stone.Type.AQUAMARINE,
+      //     Stone.Type.ONYX,
+      //     Stone.Type.JASPER,
+      //     Stone.Type.TOPAZ,
+      //     Stone.Type.DIAMOND,
+      //   ];
+      //   break;
 
       case 6:
         stoneTypes = [
