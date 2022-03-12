@@ -9,7 +9,7 @@ import { ETypeError, ERangeError, RuntimeError } from "../library/errors.js";
 export { RandyManager as default };
 
 /* --- CONSTANTS --- */
-const RANDY_DELAY = 400; // in milliseconds
+const RANDY_DELAY = 200; // in milliseconds
 
 /*
  * CLASS: RandyManager
