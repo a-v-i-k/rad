@@ -371,8 +371,87 @@ const Doors = class {
 
   /* --- METHOD: drawArchedDoor --- */
   drawArchedDoor(bbox, outline, frontFill, windowFill, handleFill) {
-    // TODO
-    this.drawFancyDoor(bbox, outline, frontFill, windowFill, handleFill);
+    // this.drawFancyDoor(bbox, outline, frontFill, windowFill, handleFill);
+
+    // draw top arc
+    this.#drawer.drawArc(
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+      Math.round(Math.min(bbox.width, bbox.height) * (5 / 16)),
+      Math.PI,
+      0,
+      outline,
+      frontFill,
+      2
+    );
+
+    // draw rest of front
+    const frontBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width * (3 / 16)),
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+      Math.round(bbox.width * (10 / 16)),
+      Math.round(bbox.width * (9 / 16))
+    );
+    this.#drawer.fillRectangle(frontBBox, frontFill);
+    let point1 = [
+      bbox.x0 + Math.round(bbox.width * (3 / 16)) + 1,
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+    ];
+    let point2 = [
+      bbox.x0 + Math.round(bbox.width * (3 / 16)) + 1,
+      bbox.y0 + Math.round(bbox.height * (15 / 16)),
+    ];
+    let point3 = [
+      bbox.x0 + Math.round(bbox.width * (13 / 16)),
+      bbox.y0 + Math.round(bbox.height * (15 / 16)),
+    ];
+    let point4 = [
+      bbox.x0 + Math.round(bbox.width * (13 / 16)),
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+    ];
+    // TODO: Use polyline instead?
+    this.#drawer.drawLine(point1, point2, outline, 2);
+    this.#drawer.drawLine(point2, point3, outline, 2);
+    this.#drawer.drawLine(point3, point4, outline, 2);
+
+    // draw arched window
+    this.#drawer.drawArc(
+      bbox.x0 + Math.round(bbox.width / 2),
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+      Math.round(Math.min(bbox.width, bbox.height) * (3 / 16)),
+      Math.PI,
+      0,
+      outline,
+      windowFill,
+      2
+    );
+    point1 = [
+      bbox.x0 + Math.round(bbox.width * (5 / 16)),
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+    ];
+    point2 = [
+      bbox.x0 + Math.round(bbox.width * (11 / 16)),
+      bbox.y0 + Math.round(bbox.height * (6 / 16)),
+    ];
+    this.#drawer.drawLine(point1, point2, outline, 2);
+
+    // draw rest of windows
+    let windowBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width * (5 / 16)) + 1,
+      bbox.y0 + Math.round(bbox.height * (7 / 16)),
+      Math.round(bbox.width * (6 / 16)),
+      Math.round(bbox.height * (3 / 16))
+    );
+    this.#drawer.drawRectangle(windowBBox, outline, windowFill, 2);
+
+    // draw handle
+    const handleBBox = new BoundingBox(
+      bbox.x0 + Math.round(bbox.width * (5 / 16)),
+      bbox.y0 + Math.round(bbox.height * (11 / 16)),
+      Math.round(bbox.width / 8),
+      Math.round(bbox.height / 8)
+    );
+    this.#drawer.drawCircle(handleBBox, outline, handleFill, 2);
   }
 
   /// GRID DOOR
