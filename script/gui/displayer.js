@@ -118,7 +118,7 @@ const Displayer = class {
     this.#doors = new Doors(this.#drawer);
     this.#colors = {
       plain: { map: {}, gen: new Colors() },
-      arched: { map: {}, gen: new Colors() },
+      parabolic: { map: {}, gen: new Colors() },
       round: { map: {}, gen: new Colors() },
       trapezoid: { map: {}, gen: new Colors() },
       grid: { map: {}, gen: new Colors() },
@@ -430,7 +430,7 @@ const Displayer = class {
   #getRoomColor(id, slaveType) {
     switch (slaveType) {
       case "plain":
-      case "arched":
+      case "parabolic":
       case "round":
       case "trapezoid":
       case "grid":
@@ -596,7 +596,7 @@ const Displayer = class {
         break;
 
       case 2: // LEVEL 2
-        frontFill = this.#getRoomColor(ownerId, "arched");
+        frontFill = this.#getRoomColor(ownerId, "parabolic");
         this.#doors.drawParabolicDoor(
           bbox,
           outline,
