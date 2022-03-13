@@ -9,7 +9,7 @@ import { ETypeError, ERangeError, RuntimeError } from "../library/errors.js";
 export { RandyManager as default };
 
 /* --- CONSTANTS --- */
-const RANDY_DELAY = 200; // in milliseconds
+const RANDY_DELAY = 400; // in milliseconds
 
 /*
  * CLASS: RandyManager
@@ -73,7 +73,7 @@ const RandyManager = class {
         delay = RANDY_DELAY;
       } else {
         // index > 1
-        delay = Random.getRandomInteger(RANDY_DELAY, 2 * RANDY_DELAY);
+        delay = Random.getRandomInteger(RANDY_DELAY - 200, RANDY_DELAY + 201);
       }
 
       const jobId = Scheduler.after(delay, () => {
