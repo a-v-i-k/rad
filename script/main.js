@@ -1,8 +1,11 @@
 /*
+ * VERSION: v1.0
+ */
+
+/*
  ******************************************************************************
  * TODO:
  * - Testing. Unit Testing, Test Automation, Logging.
- * - Add version number. What about a package?
  * - Stats; e.g., count steps.
  * - GitHub
  * - README.md
