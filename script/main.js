@@ -57,7 +57,7 @@
 // │   |   ├── cell.js
 // │   |   ├── direction.js [v1.0-p]
 // │   |   ├── door.js
-// │   |   ├── element.js
+// │   |   ├── element.js [v1.0-p]
 // │   |   ├── game.js
 // │   |   ├── location.js
 // │   |   ├── player.js
