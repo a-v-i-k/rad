@@ -55,7 +55,7 @@
 // │   ├── main.js
 // │   ├── game
 // │   |   ├── cell.js
-// │   |   ├── direction.js
+// │   |   ├── direction.js [v1.0-p]
 // │   |   ├── door.js
 // │   |   ├── element.js
 // │   |   ├── game.js
