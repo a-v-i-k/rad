@@ -1,7 +1,7 @@
 
 rem VERSION
 SET version-major=1
-SET version-minor=0
+SET version-minor=0-p
 
 rem OUTPUT FILE
 SET ZIPFILE=rad-v%version-major%.%version-minor%.zip
