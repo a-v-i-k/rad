@@ -5,7 +5,7 @@ import { ETypeError, ERangeError } from "../library/errors.js";
 export { BoundingBox as default };
 
 /*
- * CLASS: BoundingBox [UML]
+ * CLASS: BoundingBox
  *****************************************************************************/
 const BoundingBox = class {
   /* --- C'TOR: constructor --- */

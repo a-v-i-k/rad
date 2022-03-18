@@ -47,7 +47,7 @@ const MAX_NUM_RANDYS = 10;
 const AUTO_PILOT_DELAY = 200; // in milliseconds
 
 /*
- * CLASS: GUI [UML]
+ * CLASS: GUI
  *****************************************************************************/
 // TODO: Split into smaller classes.
 const GUI = class {

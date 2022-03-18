@@ -11,7 +11,7 @@ import { ETypeError, ERangeError } from "../library/errors.js";
 export { Room as default };
 
 /*
- * CLASS: Room [UML]
+ * CLASS: Room
  *****************************************************************************/
 const Room = class extends Element {
   #rows;

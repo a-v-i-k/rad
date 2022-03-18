@@ -38,7 +38,7 @@ const BACKTRACK = true;
 const STONES_REQUIRED = true;
 
 /*
- * CLASS: Game [UML]
+ * CLASS: Game
  *****************************************************************************/
 const Game = class {
   #status;

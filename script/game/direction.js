@@ -2,7 +2,7 @@
 export { Direction as default };
 
 /*
- * ENUM: Direction [UML]
+ * ENUM: Direction
  *****************************************************************************/
 const Direction = {
   LEFT: "LEFT",

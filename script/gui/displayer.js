@@ -84,7 +84,7 @@ const STONE_ONYX_COLOR = `hsla(195, 4%, 22%, ${STONE_ALPHA})`;
 const STONE_JASPER_COLOR = `hsla(359, 66%, 54%, ${STONE_ALPHA})`;
 
 /*
- * CLASS: Displayer [UML]
+ * CLASS: Displayer
  *****************************************************************************/
 const Displayer = class {
   #status;

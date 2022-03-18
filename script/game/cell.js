@@ -15,7 +15,7 @@ const CellType = {
 Object.freeze(CellType);
 
 /*
- * CLASS: Cell [UML]
+ * CLASS: Cell
  *****************************************************************************/
 const Cell = class extends Element {
   #type;

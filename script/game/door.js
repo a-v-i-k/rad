@@ -14,7 +14,7 @@ const DoorType = {
 Object.freeze(DoorType);
 
 /*
- * CLASS: Door [UML]
+ * CLASS: Door
  *****************************************************************************/
 const Door = class extends Element {
   #type;

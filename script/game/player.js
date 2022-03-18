@@ -16,7 +16,7 @@ const PlayerStatus = {
 Object.freeze(PlayerStatus);
 
 /*
- * CLASS: Player [UML]
+ * CLASS: Player
  *****************************************************************************/
 const Player = class extends Element {
   #status;

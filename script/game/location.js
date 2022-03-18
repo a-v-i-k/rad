@@ -5,7 +5,7 @@ import { ETypeError, ERangeError } from "../library/errors.js";
 export { Location as default };
 
 /*
- * CLASS: Location [UML]
+ * CLASS: Location
  *****************************************************************************/
 const Location = class {
   /* --- C'TOR: constructor --- */
