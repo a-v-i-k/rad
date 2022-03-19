@@ -25,6 +25,13 @@ const Validator = class {
     }
   }
 
+  /* --- subclassOf --- */
+  static subclassOf(type1, type2) {
+    if (!(type1 === type2 || type1.prototype instanceof type2)) {
+      throw new ETypeError(`${type1.name} is not a subclass of ${type2.name}`);
+    }
+  }
+
   /// INTEGER
 
   /* --- integer --- */
