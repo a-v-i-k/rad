@@ -1,8 +1,9 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
+import { ETypeError, RuntimeError } from "../library/errors.js";
 import Element from "./element.js";
 import Door from "./door.js";
 import Stone from "./stone.js";
-import { ETypeError, RuntimeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Cell as default };
@@ -27,16 +28,9 @@ const Cell = class extends Element {
   /* --- C'TOR: constructor --- */
   constructor(type = Cell.Type.PLAIN) {
     super();
-    Cell.#validator(type);
+    Validator.enumMember(type, Cell.Type);
     this.#type = type;
     this.#element = null;
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(type) {
-    if (!(type in Cell.Type)) {
-      throw new ETypeError(`input is not of type Cell.Type`, type);
-    }
   }
 
   /* --- METHOD: attach --- */

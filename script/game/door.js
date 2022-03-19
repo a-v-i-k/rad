@@ -1,7 +1,7 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
 import Element from "./element.js";
 import Room from "./room.js";
-import { ETypeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Door as default };
@@ -26,19 +26,10 @@ const Door = class extends Element {
   /* --- C'TOR: constructor --- */
   constructor(type, room) {
     super();
-    Door.#validator(type, room);
+    Validator.enumMember(type, Door.Type);
+    Validator.instanceOf(room, Room);
     this.#type = type;
     this.#owner = room;
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(type, room) {
-    if (!(type in Door.Type)) {
-      throw new ETypeError(`input is not of type Door.Type`, type);
-    }
-    if (!(room instanceof Room)) {
-      throw new ETypeError(`input is not of type Room`, room);
-    }
   }
 
   /* --- METHOD: getType --- */

@@ -54,15 +54,15 @@
 // ├── script
 // │   ├── main.js
 // │   ├── game
-// │   |   ├── cell.js
+// │   |   ├── cell.js      [v1.0-p]
 // │   |   ├── direction.js [v1.0-p]
-// │   |   ├── door.js
-// │   |   ├── element.js [v1.0-p]
+// │   |   ├── door.js      [v1.0-p]
+// │   |   ├── element.js   [v1.0-p]
 // │   |   ├── game.js
-// │   |   ├── location.js
+// │   |   ├── location.js  [v1.0-p]
 // │   |   ├── player.js
 // │   |   ├── room.js
-// │   |   ├── stone.js
+// │   |   ├── stone.js     [v1.0-p]
 // │   |   └── test
 // │   |       ├── game-tester.js
 // │   |       └── random-walker.js

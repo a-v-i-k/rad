@@ -1,6 +1,6 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
 import Element from "./element.js";
-import { ETypeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Stone as default };
@@ -34,15 +34,8 @@ const Stone = class extends Element {
   /* --- C'TOR: constructor --- */
   constructor(type) {
     super();
-    Stone.#validator(type);
+    Validator.enumMember(type, Stone.Type);
     this.#type = type;
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(type) {
-    if (!(type in Stone.Type)) {
-      throw new ETypeError(`input is not of type Stone.Type`, type);
-    }
   }
 
   /* --- METHOD: getType --- */
