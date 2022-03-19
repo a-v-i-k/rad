@@ -78,8 +78,9 @@ const Game = class {
 
       // doors
       this.doors = [];
-      for (const loc of room.getDoorLocations()) {
-        const door = room.getCell(loc).getElement();
+      for (const loc of room.getElementLocations(Door)) {
+        const door = room.getElement(loc);
+        console.assert(door instanceof Door); // sanity check
         const ownerId = door.open().getId();
         console.assert(door !== null); // sanity check
         this.doors.push({
@@ -95,8 +96,9 @@ const Game = class {
       this.stonesRequired = game.stonesRequired();
       this.missingStones = game.getMissingStones();
       this.stones = [];
-      for (const loc of room.getStoneLocations()) {
-        const stone = room.getCell(loc).getElement();
+      for (const loc of room.getElementLocations(Stone)) {
+        const stone = room.getElement(loc);
+        console.assert(stone instanceof Stone); // sanity check
         console.assert(stone !== null); // sanity check
         this.stones.push({
           id: stone.getId(),
@@ -338,7 +340,7 @@ const Game = class {
           if (missing.length == 0) {
             delete this.#missingStones[level];
           }
-          room.removeStone(player.getLocation());
+          room.removeElement(player.getLocation());
         }
         break;
 
@@ -459,7 +461,7 @@ const Game = class {
         network.neighbors(nu).forEach((nv) => {
           const type = nv === target ? Door.Type.EXIT : Door.Type.PLAIN;
           const door = new Door(type, rooms[nv]);
-          rooms[nu].addDoor(door);
+          rooms[nu].addElement(door);
         });
       }
     });
@@ -491,7 +493,7 @@ const Game = class {
       const bucket = buckets[level];
       const nu = Random.getRandomChoice(bucket);
 
-      rooms[nu].addStone(stone);
+      rooms[nu].addElement(stone);
       if (!(level in this.#missingStones)) {
         this.#missingStones[level] = [];
       }

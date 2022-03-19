@@ -1,9 +1,7 @@
 /* --- IMPORTS --- */
-import { ETypeError, RuntimeError } from "../library/errors.js";
+import { RuntimeError } from "../library/errors.js";
 import Validator from "../library/validation.js";
 import Element from "./element.js";
-import Door from "./door.js";
-import Stone from "./stone.js";
 
 /* --- EXPORTS --- */
 export { Cell as default };
@@ -35,11 +33,9 @@ const Cell = class extends Element {
 
   /* --- METHOD: attach --- */
   attach(element) {
+    Validator.instanceOf(element, Element);
     if (this.getElement() !== null) {
       throw new RuntimeError(`cannot attach elements to an occupied cell`);
-    }
-    if (!(element instanceof Door || element instanceof Stone)) {
-      throw new ETypeError(`element is not of type Door or Stone`, element);
     }
     this.#element = element;
   }
@@ -54,8 +50,8 @@ const Cell = class extends Element {
     return this.#element;
   }
 
-  // NOTE: this method will be useful in breaking circular references
   /* --- METHOD: detach --- */
+  // NOTE: This method will be useful in breaking circular references.
   detach() {
     if (this.getElement() === null) {
       throw new RuntimeError(`trying to detach an element from an empty cell`);
