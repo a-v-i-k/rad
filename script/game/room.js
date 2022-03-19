@@ -1,11 +1,12 @@
 /* --- IMPORTS --- */
+import { ETypeError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 import Random from "../library/random.js";
-import Element from "./element.js";
 import Location from "./location.js";
-import Cell from "./cell.js";
+import Element from "./element.js";
 import Door from "./door.js";
 import Stone from "./stone.js";
-import { ETypeError, ERangeError } from "../library/errors.js";
+import Cell from "./cell.js";
 
 /* --- EXPORTS --- */
 export { Room as default };
@@ -25,7 +26,8 @@ const Room = class extends Element {
   /* --- C'TOR: constructor --- */
   constructor(rows, columns) {
     super();
-    Room.#validator(rows, columns);
+    Validator.positiveInteger(rows);
+    Validator.positiveInteger(columns);
     [this.#rows, this.#columns] = [rows, columns];
 
     // create grid
@@ -40,36 +42,11 @@ const Room = class extends Element {
     this.#createCells();
   }
 
-  /* --- METHOD: #validator --- */
-  static #validator(rows, columns) {
-    if (!Number.isInteger(rows)) {
-      throw new ETypeError(`input is not an integer`, rows);
-    }
-    if (rows < 0) {
-      throw new ERangeError(`input is negative`, rows);
-    }
-
-    if (!Number.isInteger(columns)) {
-      throw new ETypeError(`input is not an integer`, columns);
-    }
-    if (columns < 0) {
-      throw new ERangeError(`input is negative`, columns);
-    }
-  }
-
   /* --- METHOD: validateLocation --- */
   validateLocation(loc) {
-    if (!(loc instanceof Location)) {
-      throw new ETypeError(`input is not of type Location`, loc);
-    }
-    const rows = this.rows,
-      columns = this.columns;
-    if (loc.x < 0 || loc >= columns || loc.y < 0 || loc.y >= rows) {
-      throw new ERangeError(
-        `location is not in the range [${0}, ${rows}] x [${0}, ${columns}]`,
-        loc
-      );
-    }
+    Validator.instanceOf(loc, Location);
+    Validator.range(loc.x, 0, this.#columns - 1);
+    Validator.range(loc.y, 0, this.#rows - 1);
   }
 
   /* --- METHOD: getDimensions --- */
