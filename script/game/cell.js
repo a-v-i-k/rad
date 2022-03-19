@@ -1,6 +1,6 @@
 /* --- IMPORTS --- */
-import Validator from "../library/validation.js";
 import { ETypeError, RuntimeError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 import Element from "./element.js";
 import Door from "./door.js";
 import Stone from "./stone.js";
