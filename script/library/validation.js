@@ -49,4 +49,20 @@ const Validator = class {
       throw new ERangeError(`input is negative`, input);
     }
   }
+
+  /* --- range --- */
+  static range(input, low, high) {
+    // NOTE: This method assumes all arguments passed to it are integers.
+    console.assert(Number.isInteger(input));
+    console.assert(Number.isInteger(low));
+    console.assert(Number.isInteger(high));
+    console.assert(low <= high);
+
+    if (input < low || input > high) {
+      throw new ERangeError(
+        `input is not in the range [${low}, ${high}]`,
+        input
+      );
+    }
+  }
 };
