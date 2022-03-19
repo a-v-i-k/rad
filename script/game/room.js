@@ -171,13 +171,9 @@ const Room = class extends Element {
 
   /* --- METHOD: clear --- */
   clear() {
-    const [rows, columns] = this.getDimensions();
-    for (let x = 0; x < columns; x++) {
-      for (let y = 0; y < rows; y++) {
-        const loc = new Location(x, y);
-        if (this.isOccupied(loc)) {
-          this.removeElement(loc);
-        }
+    for (let x in this.#occupiedLocs) {
+      for (let y in this.#occupiedLocs[x]) {
+        this.removeElement(this.#occupiedLocs[x][y]);
       }
     }
   }
