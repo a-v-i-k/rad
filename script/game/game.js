@@ -299,12 +299,13 @@ const Game = class {
     this.#validatePlayerIndex(index);
 
     const player = this.#players[index];
-    const cell = player.inspect();
+    const loc = player.getLocation();
+    const room = player.getRoom();
 
     let [elementType, winStatus] = [null, false];
-    switch (cell.getType()) {
+    switch (room.getCellType(loc)) {
       case Cell.Type.PLAIN: // plain cell
-        const element = cell.getElement();
+        const element = room.getElement(loc);
         if (element === null) {
           console.log("Nothing to inspect...");
         } else if (element instanceof Door) {
@@ -332,7 +333,6 @@ const Game = class {
           }
           elementType = doorType;
         } else if (element instanceof Stone) {
-          const room = player.getRoom();
           const level = this.getRoomLevel(room.getId());
           const missing = this.#missingStones[level];
           elementType = element.getType();

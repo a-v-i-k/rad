@@ -65,16 +65,15 @@ const Room = class extends Element {
     return this.#welcomeLoc.clone();
   }
 
+  /* --- METHOD: getCellType --- */
+  getCellType(loc) {
+    return this.#getCell(loc).getType();
+  }
+
   /* --- METHOD: getElement --- */
   getElement(loc) {
     this.validateLocation(loc);
     return this.#getCell(loc).getElement();
-  }
-
-  /* --- METHOD: getCell --- */
-  // TODO: This should be removed.
-  getCell(loc) {
-    return this.#grid[loc.x][loc.y];
   }
 
   /* --- METHOD: getElementLocations --- */

@@ -87,13 +87,6 @@ const Player = class extends Element {
     this.#loc = loc;
   }
 
-  /* --- METHOD: inspect --- */
-  inspect() {
-    this.#validateStatus(Player.Status.PLAYING);
-    const [room, loc] = [this.getRoom(), this.getLocation()];
-    return room.getCell(loc);
-  }
-
   /* --- METHOD: backtrack --- */
   backtrack() {
     this.#validateStatus(Player.Status.PLAYING);
