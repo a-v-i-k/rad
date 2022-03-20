@@ -49,7 +49,6 @@ const AUTO_PILOT_DELAY = 200; // in milliseconds
 /*
  * CLASS: GUI
  *****************************************************************************/
-// TODO: Split into smaller classes.
 const GUI = class {
   #status;
   #master;
@@ -100,7 +99,6 @@ const GUI = class {
 
     // setting
     this.#setStatus(GUI.Status.IDLE); // status
-    // TODO: HTMLManager class?
     this.#setHTML(); // HTML elements
     this.#setWidgets(); // GUI widgets
     this.#setDisplay(); // display
@@ -265,7 +263,6 @@ const GUI = class {
   /* --- METHOD: #unsetWidgets --- */
   #unsetWidgets() {
     // simply remove top frame's HTML element from DOM (can be restored!)
-    // TODO: Maybe display something when quitting?
     this.#master.removeChild(this.#slave);
     // this.#master.appendChild(this.#slave); // to restore
   }
@@ -277,7 +274,6 @@ const GUI = class {
 
   /* --- METHOD: #setTitle --- */
   #setTitle() {
-    // TODO: Separate titles.
     const pageTitle = this.#HTML().title.header.innerText;
     document.querySelector("title").innerText = pageTitle;
   }
@@ -448,7 +444,6 @@ const GUI = class {
   }
 
   /// EVENTS
-  // TODO: Move to EventManager class...
 
   /* --- METHOD: #activeRandomPath --- */
   #activeRandomPath() {
@@ -1059,7 +1054,6 @@ const GUI = class {
 
   /* --- METHOD: #randyIsDone --- */
   #randyIsDone(index) {
-    // TODO: do something with index?
     this.#playSound(this.#HTML().sound.randydone);
     this.#displayer.announce("Randy is done :()");
   }

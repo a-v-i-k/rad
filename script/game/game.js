@@ -54,8 +54,6 @@ const Game = class {
 
   /* --- INNER: State --- */
   static State = class {
-    // TODO: A lot of information here doesn't change, so maybe we can compute
-    // such information once and store it for later use.
     constructor(game, player) {
       console.assert(player instanceof Player); // sanity check
       console.assert(player instanceof Player); // sanity check
@@ -356,7 +354,6 @@ const Game = class {
 
   /* --- METHOD: #createNetwork --- */
   #createNetwork() {
-    // TODO: This method is too big, split it.
     console.assert(this.getStatus() === Game.Status.IDLE); // sanity check
 
     // set number of rooms

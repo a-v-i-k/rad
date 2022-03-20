@@ -15,7 +15,27 @@ WEB:
   * Doesn't load on IPhone
 
 SCRIPT:
-
+- GUI: Add launch() method?
+- GUI: Split GUI class into smaller classes.
+- GUI: HTMLManager class?
+- GUI: Maybe display something when quitting?
+- GUI: Separate page title and game title.
+- GUI: EventManager class?
+- GUI: randyIsDone - Do something with index?
+- GAME: A lot of the game state information doesn't change, so maybe we can
+  compute such information once and store it for later use.
+- GAME: #createNetwork method is too big, split it.
+- DISPLAYER: TERMINAL? Maybe a better prefix?
+- DISPLAYER: Use a proper HTML <blockquote> element for quotes?
+- DOORS: Should terminal door be plain door?
+- DRAWER: clearDisplay - Consider the following:
+    this.#getContext().clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+- DRAWER: Improve validation process.
+- DRAWER: Make some CSS properties confogurable (e.g., font-family)?
+- RANDY-MANAGER: Think about the delay formula...
+- GRAPH: Use private members.
+- GRAPH: Vertex class? Edge class?
+- GRAPHUTILS: getRandomTree - Stop earlier the MST search if already found tree.
 
 EASY:
 - Fix circular inclusion of Room and Door?

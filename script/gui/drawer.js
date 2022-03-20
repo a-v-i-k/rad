@@ -68,8 +68,6 @@ const Drawer = class {
       new BoundingBox(0, 0, this.#canvas.width, this.#canvas.height),
       this.#background
     );
-    // TODO: Consider the following.
-    // this.#getContext().clearRect(0, 0, this.#canvas.width, this.#canvas.height);
   }
 
   /* --- METHOD: drawLine --- */
@@ -143,7 +141,6 @@ const Drawer = class {
     fillStyle = null,
     lineWidth = 1
   ) {
-    // TODO Improve validation process.
     this.#validatePoint([x, y]);
     if (!Number.isInteger(r)) {
       throw new ETypeError(`radius is not an integer`, r);
@@ -232,8 +229,8 @@ const Drawer = class {
     const context = this.#getContext();
     context.beginPath();
     context.fillStyle = fillStyle;
-    context.font = `bold ${fontSize}px verdana`; // TODO: Make configurable?
-    context.textAlign = "center"; // TODO: Make configurable?
+    context.font = `bold ${fontSize}px verdana`;
+    context.textAlign = "center";
     context.fillText(text, x, y);
     context.closePath();
   }

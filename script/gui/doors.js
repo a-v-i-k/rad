@@ -409,7 +409,6 @@ const Doors = class {
       bbox.x0 + Math.round(bbox.width * (13 / 16)),
       bbox.y0 + Math.round(bbox.height * (6 / 16)),
     ];
-    // TODO: Use polyline instead?
     this.#drawer.drawLine(point1, point2, outline, 2);
     this.#drawer.drawLine(point2, point3, outline, 2);
     this.#drawer.drawLine(point3, point4, outline, 2);
@@ -656,7 +655,6 @@ const Doors = class {
 
   /* --- METHOS: drawFancyDoor --- */
   drawTerminalDoor(bbox, outline, frontFill, windowFill, handleFill) {
-    // TODO: Maybe not plain?
     this.drawPlainDoor(bbox, outline, frontFill, windowFill, handleFill);
   }
 

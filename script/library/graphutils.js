@@ -58,7 +58,6 @@ const GraphUtils = class {
     edges.forEach((e) => {
       const u = e[0],
         v = e[1];
-      // TODO: Stop earlier if already found tree.
       if (vertices.find(u) != vertices.find(v)) {
         mst.addEdge(u, v);
         vertices.union(u, v);

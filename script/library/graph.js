@@ -2,12 +2,6 @@
  * CLASS: Graph
  *****************************************************************************/
 const Graph = class {
-  // TODO: Use private members.
-  // #n;
-  // #adjlist;
-
-  // TODO: Vertex class? Edge class?
-
   /* --- Graph: constructor --- */
   constructor(n) {
     // if (!Number.isInteger(n) || n <= 0) {

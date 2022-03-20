@@ -50,7 +50,6 @@ const DOOR_OUTLINE = "black";
 const DOOR_WINDOW_FILL = "white";
 const DOOR_HANDLE_FILL = "gray";
 
-// TODO: TERMINAL? Maybe a better prefix?
 const TERMINAL_DOOR_OUTLINE = "saddlebrown";
 const TERMINAL_DOOR_FRONT_FILL = "burlywood";
 const TERMINAL_DOOR_WINDOW_FILL = "silver";
@@ -347,11 +346,9 @@ const Displayer = class {
   /// QUOTE
 
   /* --- METHOD: #getRandomQuote --- */
-  // TODO: Move to Random class?
   static #getRandomQuote = () => Random.getRandomChoice(QUOTES);
 
   /* --- METHOD: displayRandomQuote --- */
-  // TODO: Use a proper HTML <blockquote> element?
   displayRandomQuote() {
     const status = this.getStatus();
     console.assert(
@@ -722,7 +719,6 @@ const Displayer = class {
         break;
 
       default:
-        // TODO: Do something else?
         console.assert(false); // sanity check
     }
   }

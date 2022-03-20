@@ -67,7 +67,6 @@ const RandyManager = class {
       const walker = new Randy();
       walker.start();
 
-      // TODO: Think about the delay formula...
       let delay;
       if (index === 1) {
         delay = RANDY_DELAY;
