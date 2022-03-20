@@ -57,6 +57,14 @@ const Validator = class {
     }
   }
 
+  /* --- integerAtLeast --- */
+  static integerAtLeast(input, low) {
+    Validator.integer(input);
+    if (input < low) {
+      throw new ERangeError(`input must be at least ${low}`, input);
+    }
+  }
+
   /* --- range --- */
   static range(input, low, high) {
     // NOTE: This method assumes all arguments passed to it are integers.
