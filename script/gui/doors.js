@@ -1,8 +1,8 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
 import BoundingBox from "./bounding-box.js";
 import Polyline from "./polyline.js";
 import Drawer from "./drawer.js";
-import { ETypeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Doors as default };
@@ -15,15 +15,8 @@ const Doors = class {
 
   /* --- C'TOR: constructor --- */
   constructor(drawer) {
-    Doors.#validator(drawer);
+    Validator.instanceOf(drawer, Drawer);
     this.#drawer = drawer;
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(drawer) {
-    if (!(drawer instanceof Drawer)) {
-      throw new ETypeError(`input is not of type Drawer`, drawer);
-    }
   }
 
   /// PLAIN DOOR
