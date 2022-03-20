@@ -1,19 +1,16 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
+import { StatusError, ValueError } from "../library/errors.js";
 import Random from "../library/random.js";
 import Graph from "../library/graph.js";
 import GraphUtils from "../library/graphutils.js";
+import Direction from "./direction.js";
+// import Location from "./location";
 import Door from "./door.js";
 import Stone from "./stone.js";
 import Cell from "./cell.js";
 import Room from "./room.js";
 import Player from "./player.js";
-import Direction from "./direction.js";
-import {
-  ETypeError,
-  ERangeError,
-  StatusError,
-  ValueError,
-} from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Game as default };
@@ -116,7 +113,10 @@ const Game = class {
     numLevels = DEFAULT_NUM_LEVELS,
     roomsPerLevel = DEFAULT_ROOMS_PER_LEVEL
   ) {
-    Game.#validator(rows, columns, numLevels, roomsPerLevel);
+    Validator.positiveInteger(rows);
+    Validator.positiveInteger(columns);
+    Validator.integerAtLeast(numLevels, 1);
+    Validator.integerAtLeast(roomsPerLevel, 3);
     this.#rows = rows;
     this.#columns = columns;
     this.#numLevels = numLevels;
@@ -127,38 +127,6 @@ const Game = class {
     this.#roomsInfo = null;
     this.#numStones = Object.keys(Stone.Type).length;
     this.#missingStones = {};
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(rows, columns, numLevels, roomsPerLevel) {
-    if (!Number.isInteger(rows)) {
-      throw new ETypeError(`input is not an integer`, rows);
-    }
-    if (rows < 0) {
-      throw new ERangeError(`input is negative`, rows);
-    }
-    if (!Number.isInteger(columns)) {
-      throw new ETypeError(`input is not an integer`, columns);
-    }
-    if (columns < 0) {
-      throw new ERangeError(`input is negative`, columns);
-    }
-
-    if (!Number.isInteger(numLevels)) {
-      throw new ETypeError(`input is not an integer`, numLevels);
-    }
-    if (numLevels < 1) {
-      throw new ERangeError(`number of levels must be at least 1`, numLevels);
-    }
-    if (!Number.isInteger(roomsPerLevel)) {
-      throw new ETypeError(`input is not an integer`, roomsPerLevel);
-    }
-    if (roomsPerLevel < 3) {
-      throw new ERangeError(
-        `rooms per level must be at least 3`,
-        roomsPerLevel
-      );
-    }
   }
 
   /* --- METHOD: getStatus --- */
@@ -230,12 +198,10 @@ const Game = class {
 
   /* --- METHOD: play --- */
   play(numPlayers = DEFAULT_NUM_PLAYERS) {
+    Validator.positiveInteger(numPlayers);
     if (this.getStatus() === Game.Status.PLAYING) {
       console.log("You are already playing my dude.");
       return false;
-    }
-    if (numPlayers <= 0) {
-      throw new ERangeError(`number of players is not positive`, numPlayers);
     }
 
     // create network and players
@@ -287,9 +253,7 @@ const Game = class {
   playerMove(index, direction) {
     this.#validateStatus(Game.Status.PLAYING);
     this.#validatePlayerIndex(index);
-    if (!(direction in Direction)) {
-      throw new ETypeError(`input is not of type Direction`, direction);
-    }
+    Validator.enumMember(direction, Direction);
     this.#players[index].move(direction);
   }
 
@@ -384,16 +348,8 @@ const Game = class {
 
   /* --- #validatePlayerIndex --- */
   #validatePlayerIndex(index) {
-    if (!Number.isInteger(index)) {
-      throw new ETypeError(`input is not an integer`, index);
-    }
-    const numPlayers = this.getNumPlayers();
-    if (index < 0 || index >= numPlayers) {
-      throw new ERangeError(
-        `input is not in the range [${0}, ${numPlayers - 1}]`,
-        index
-      );
-    }
+    Validator.integer(index);
+    Validator.range(index, 0, this.getNumPlayers() - 1);
   }
 
   /// NETWORK
