@@ -1,4 +1,8 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
+import { ETypeError } from "../library/errors.js";
+import Random from "../library/random.js";
+import QUOTES from "../library/quotes.js";
 import Location from "../game/location.js";
 import Door from "../game/door.js";
 import Stone from "../game/stone.js";
@@ -7,10 +11,7 @@ import BoundingBox from "./bounding-box.js";
 import Polyline from "./polyline.js";
 import Drawer from "./drawer.js";
 import Doors from "./doors.js";
-import Random from "../library/random.js";
 import Colors from "./colors.js";
-import QUOTES from "../library/quotes.js";
-import { ETypeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Displayer as default };
@@ -144,23 +145,9 @@ const Displayer = class {
         dispFrame
       );
     }
-
-    if (!(game instanceof Game)) {
-      throw new ETypeError(`input is not of type Game`, game);
-    }
-
-    if (!Number.isInteger(cellwidth)) {
-      throw new ETypeError(`input is not an integer`, cellwidth);
-    }
-    if (cellwidth < 0) {
-      throw new ERangeError(`input is negative`, cellwidth);
-    }
-    if (!Number.isInteger(cellheight)) {
-      throw new ETypeError(`input is not an integer`, cellheight);
-    }
-    if (cellheight < 0) {
-      throw new ERangeError(`input is negative`, cellheight);
-    }
+    Validator.instanceOf(game, Game);
+    Validator.positiveInteger(cellwidth);
+    Validator.positiveInteger(cellheight);
   }
 
   /// GETTERS
