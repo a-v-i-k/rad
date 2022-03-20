@@ -12,12 +12,14 @@ WEB/COMPATIBILITY:
   * Responsive text. <h1 style="font-size:10vw">Hello World</h1>
   * Responsive images. <img src="img_girl.jpg" style="max-width:100%;height:auto;">
 - Cross-Browser Testing (BrowserStack: https://www.browserstack.com/)
+- W3C Validator: https://validator.w3.org/
 - Doesn't work on Mac (Safari)!
   * Replace '#' with '_'?
   * Doesn't load on IPhone
 - Check on Tablet.
 
 SCRIPT:
+- CELL/DOOR: WelcomeCell -> Door.Type.WELCOME
 - GUI: Add launch() method?
 - GUI: Split GUI class into smaller classes.
 - GUI: HTMLManager class?
@@ -25,6 +27,7 @@ SCRIPT:
 - GUI: Separate page title and game title.
 - GUI: EventManager class?
 - GUI: randyIsDone - Do something with index?
+- ROOM: Reconsider availableLocs/occupiedLocs data structures.
 - GAME: A lot of the game state information doesn't change, so maybe we can
   compute such information once and store it for later use.
 - GAME: #createNetwork method is too big, split it.
@@ -46,7 +49,6 @@ EASY:
   * Solution 2: Replace addDoor/addStone in Room with addElement.
 - Organize folders into subfolders of related modules.
 - Get rid of Location and use x,y instead?
-- Reconsider availableLocs/occupiedLocs data structures.
 - http://phrogz.net/tmp/24colors.html
 - Doors class: Have all measures multiples of 1/16. (perhaps 1/32 for better drawing resolution?)
   Also, there is a mess in Displayer, Drawer, and Doors with bbox, floor vs. round,
@@ -54,7 +56,6 @@ EASY:
   * Maybe insted of 75px, we can use a power of 2 (closest to it), e.g. 64 in our case.
 - Assemble TODOs. Maybe write a TODO list at the beginning of each module?
 - Should Randy's delay be reduced from 400 to 300 for now?
-- GitHub.
 - Should the 12 stones be divided randomly between 12 levels?
 - Point class?
 - Rethink (method) names of door shapes.
@@ -80,9 +81,7 @@ EASY:
 - this.#game in Displayer class should be replaced with this.#getGame().
 - "d" for auto DFS (this.#visited = {})? Maybe just have auto player give priority to unvisited rooms?
 - Improve status handling in GUI (and Game probably).
-- W3C Validator: https://validator.w3.org/
 - From #name (private) to _name (not supported in Mac apparently).
-- Improve exception messages.
 - Highlight in plate which stones are missing in the current level?
 - Use CamelCase for color names?
 
