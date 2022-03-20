@@ -123,9 +123,7 @@ const Room = class extends Element {
 
     // if no location specified, choose it randomly
     if (loc === null) {
-      const x = Random.getRandomChoice(Object.keys(this.#availableLocs));
-      const y = Random.getRandomChoice(Object.keys(this.#availableLocs[x]));
-      loc = this.#availableLocs[x][y];
+      loc = this.#getRandomLocation();
     } else if (!this.isAvailable(loc)) {
       console.log("Cannot add element because location is not available.");
       return;
@@ -175,6 +173,21 @@ const Room = class extends Element {
         this.removeElement(this.#occupiedLocs[x][y]);
       }
     }
+  }
+
+  /* --- METHOD: #getRandomLocation --- */
+  #getRandomLocation() {
+    // const x = Random.getRandomChoice(Object.keys(this.#availableLocs));
+    // const y = Random.getRandomChoice(Object.keys(this.#availableLocs[x]));
+    // return this.#availableLocs[x][y];
+
+    const choices = [];
+    for (let x in this.#availableLocs) {
+      for (let y in this.#availableLocs[x]) {
+        choices.push(this.#availableLocs[x][y]);
+      }
+    }
+    return Random.getRandomChoice(choices);
   }
 
   /* --- METHOD: #setWelcomeLocation --- */
