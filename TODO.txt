@@ -44,7 +44,6 @@ EASY:
 - Organize folders into subfolders of related modules.
 - Get rid of Location and use x,y instead?
 - Reconsider availableLocs/occupiedLocs data structures.
-- Pause sound is too strong.
 - http://phrogz.net/tmp/24colors.html
 - Doors class: Have all measures multiples of 1/16. (perhaps 1/32 for better drawing resolution?)
   Also, there is a mess in Displayer, Drawer, and Doors with bbox, floor vs. round,
