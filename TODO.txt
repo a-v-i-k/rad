@@ -1,0 +1,89 @@
+GENERAL:
+- Testing. Unit Testing, Test Automation, Logging.
+- Need documentation throughout the entire code.
+- Stats; e.g., count steps.
+- GitHub.
+- README.md
+
+WEB:
+- Smooth page loading.
+- Touch.
+- Responsive web design.
+- Cross-Browser Testing (BrowserStack: https://www.browserstack.com/)
+- Doesn't work on Mac! 
+  * Replace '#' with '_'?
+  * Doesn't load on IPhone
+
+SCRIPT:
+
+
+EASY:
+- Fix circular inclusion of Room and Door?
+  * Solution 1: Add Enterable class that Room inherits from.
+  * Solution 2: Replace addDoor/addStone in Room with addElement.
+- Organize folders into subfolders of related modules.
+- Get rid of Location and use x,y instead?
+- Reconsider availableLocs/occupiedLocs data structures.
+- Pause sound is too strong.
+- http://phrogz.net/tmp/24colors.html
+- Doors class: Have all measures multiples of 1/16. (perhaps 1/32 for better drawing resolution?)
+  Also, there is a mess in Displayer, Drawer, and Doors with bbox, floor vs. round,
+  integer vs float (what is required by HTML canvas?), Math.min(width, height), etc. Check this.
+  * Maybe insted of 75px, we can use a power of 2 (closest to it), e.g. 64 in our case.
+- Assemble TODOs. Maybe write a TODO list at the beginning of each module?
+- Should Randy's delay be reduced from 400 to 300 for now?
+- GitHub.
+- Should the 12 stones be divided randomly between 12 levels?
+- Point class?
+- Rethink (method) names of door shapes.
+- What should be the delay of auto pilot? 200 vs. 300.
+- Different room number for different levels? Should increase with the levels.
+- Add a "sound off" button.
+- Perhaps we should remove BoundingBox (and maybe Polygon as well) from Drawer's interface? (see drawArc)
+  Maybe have it correspond to HTML's interface for drawing on canvas?
+- Change name of the new Doors class?
+- Should we bother to scatter stones in levels according to the plate order when the
+  number of levels doesn't divide 12?
+- Reconsider which door shapes should be in which levels.
+- Control randomness with seed to recreate BUGs.
+- If the maximal degree of the graph randomly chosen is "large", then choose again. (Graph.getMaxDegree)
+- Add select dropdown to choose between game modes - memory vs fantasy:
+  * memory mode: no stones, all doors colored the same, 47 (or 25) rooms, one level
+  * fantasy mode: stones, different door colors, 30 (or 47) rooms, 6 levels
+- Add selection for number-of-levels and/or rooms-per-level?
+- 30 or 47 rooms???
+- Arrange comments and nots: TODOs, main.js, index.html, etc.
+- Implement a more sophisticated console.assert method that outputs objects.
+- Something is off with #randy-frame.
+- this.#game in Displayer class should be replaced with this.#getGame().
+- "d" for auto DFS (this.#visited = {})? Maybe just have auto player give priority to unvisited rooms?
+- Improve status handling in GUI (and Game probably).
+- W3C Validator: https://validator.w3.org/
+- From #name (private) to _name (not supported in Mac apparently).
+- Improve exception messages.
+- Highlight in plate which stones are missing in the current level?
+- Use CamelCase for color names?
+
+HARD:
+- Why users won't see my javascript updates?
+- Should test the Randy to determine its delay. Can compare it with the auto pilot.
+- Fix the way game element are displayed. It is not consistent - sometimes relative to cell width/height
+  and sometime absolute pixles.
+- Memory: Door shapes? Mark visited doors (show them open)?
+- Make Randy prioritize rooms shaped according to higher ranks?
+- Display distance from target?
+- App not working on Safari.
+- Responsive Web Design:
+  - Responsive text. <h1 style="font-size:10vw">Hello World</h1>
+  - Responsive images. <img src="img_girl.jpg" style="max-width:100%;height:auto;">
+- Check on Tablet.
+- Top window to include HTML management.
+- Add auto playing via click/touch? Maybe by voice?
+- Resume pause if arrow key pressed?
+- Currently, overlapping sounds are ignored.
+- Implement Python tests (Randy's expectation, diameter consistency, etc.)
+- Quality Assurance. Not only BUGs, but also new features and UI.
+- Do something else other than asking "Where are them stones?". Now there is only a sound.
+We can add an alert or something else. We can also trick the user and have it open anyway :)
+or maybe we can start a small game (e.g., snake) the user can lplay and leave to get back
+collecting stones.
