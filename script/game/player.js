@@ -1,9 +1,10 @@
 /* --- IMPORTS --- */
+import { StatusError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 import Element from "./element.js";
 import Room from "./room.js";
-// import Location from "./location.js";
 import Direction from "./direction.js";
-import { ETypeError, StatusError } from "../library/errors.js";
+// import Location from "./location.js";
 
 /* --- EXPORTS --- */
 export { Player as default };
@@ -68,9 +69,7 @@ const Player = class extends Element {
   enter(room, loc = null) {
     this.#validateStatus(Player.Status.PLAYING);
 
-    if (!(room instanceof Room)) {
-      throw new ETypeError(`input is not of type Room`, room);
-    }
+    Validator.instanceOf(room, Room);
     if (loc === null) {
       loc = room.getWelcomeLocation();
     } else {
@@ -101,11 +100,8 @@ const Player = class extends Element {
 
   /* --- METHOD: move --- */
   move(dir) {
+    Validator.enumMember(dir, Direction);
     this.#validateStatus(Player.Status.PLAYING);
-
-    if (!(dir in Direction)) {
-      throw new ETypeError(`input is not of a Direction`, dir);
-    }
 
     const dims = this.#room.getDimensions();
     const loc = this.#loc;
