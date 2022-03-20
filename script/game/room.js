@@ -118,7 +118,7 @@ const Room = class extends Element {
       console.log(
         "Cannot add element because there are no available locations."
       );
-      return false;
+      return;
     }
 
     // if no location specified, choose it randomly
@@ -128,7 +128,7 @@ const Room = class extends Element {
       loc = this.#availableLocs[x][y];
     } else if (!this.isAvailable(loc)) {
       console.log("Cannot add element because location is not available.");
-      return false;
+      return;
     }
 
     // update available/occupied locations
@@ -151,7 +151,7 @@ const Room = class extends Element {
 
     if (!this.isOccupied(loc)) {
       console.log("Cannot remove element because location is not occupied.");
-      return false;
+      return;
     }
 
     // detach element from cell
