@@ -5,14 +5,17 @@ GENERAL:
 - GitHub.
 - README.md
 
-WEB:
+WEB/COMPATIBILITY:
 - Smooth page loading.
 - Touch.
 - Responsive web design.
+  * Responsive text. <h1 style="font-size:10vw">Hello World</h1>
+  * Responsive images. <img src="img_girl.jpg" style="max-width:100%;height:auto;">
 - Cross-Browser Testing (BrowserStack: https://www.browserstack.com/)
-- Doesn't work on Mac! 
+- Doesn't work on Mac (Safari)!
   * Replace '#' with '_'?
   * Doesn't load on IPhone
+- Check on Tablet.
 
 SCRIPT:
 - GUI: Add launch() method?
@@ -84,6 +87,8 @@ EASY:
 - Use CamelCase for color names?
 
 HARD:
+- Host Git repository on a cPanel account
+  * https://docs.cpanel.net/knowledge-base/web-services/guide-to-git-host-git-repositories-on-a-cpanel-account/
 - Why users won't see my javascript updates?
 - Should test the Randy to determine its delay. Can compare it with the auto pilot.
 - Fix the way game element are displayed. It is not consistent - sometimes relative to cell width/height
@@ -91,11 +96,6 @@ HARD:
 - Memory: Door shapes? Mark visited doors (show them open)?
 - Make Randy prioritize rooms shaped according to higher ranks?
 - Display distance from target?
-- App not working on Safari.
-- Responsive Web Design:
-  - Responsive text. <h1 style="font-size:10vw">Hello World</h1>
-  - Responsive images. <img src="img_girl.jpg" style="max-width:100%;height:auto;">
-- Check on Tablet.
 - Top window to include HTML management.
 - Add auto playing via click/touch? Maybe by voice?
 - Resume pause if arrow key pressed?
