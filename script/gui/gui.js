@@ -1,16 +1,16 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
 import Random from "../library/random.js";
-import Location from "../game/location.js";
 import Direction from "../game/direction.js";
+import Location from "../game/location.js";
 import Door from "../game/door.js";
 import Stone from "../game/stone.js";
 import Game, { BACKTRACK, STONES_REQUIRED } from "../game/game.js";
-import Displayer from "./displayer.js";
+import TIterator from "./timed-iterator.js";
+import RandomPath from "./random-path.js";
 import Stopwatch from "./stopwatch.js";
 import RandyManager from "./randy-manager.js";
-import RandomPath from "./random-path.js";
-import TIterator from "./timed-iterator.js";
-import { ETypeError } from "../library/errors.js";
+import Displayer from "./displayer.js";
 
 /* --- EXPORTS --- */
 export { GUI as default };
@@ -79,7 +79,12 @@ const GUI = class {
     stones = DEFAULT_STONES,
     sound = DEFAULT_SOUND
   ) {
-    GUI.#validator(master, undo, clock, randy, stones, sound);
+    Validator.instanceOf(master, HTMLElement);
+    Validator.boolean(undo);
+    Validator.boolean(clock);
+    Validator.boolean(randy);
+    Validator.boolean(stones);
+    Validator.boolean(sound);
     this.#master = master; // slave to be set later...
 
     // configuration
@@ -123,29 +128,7 @@ const GUI = class {
     this.#html = null;
   }
 
-  /// VALIDATION
-
-  /* --- METHOD: #validator --- */
-  static #validator(master, undo, clock, randy, stones, sound) {
-    if (!(master instanceof HTMLElement)) {
-      throw new ETypeError(`master is not an HTML element`, master);
-    }
-    if (typeof undo !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, undo);
-    }
-    if (typeof clock !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, clock);
-    }
-    if (typeof randy !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, randy);
-    }
-    if (typeof stones !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, stones);
-    }
-    if (typeof sound !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, sound);
-    }
-  }
+  /// DISPLAY
 
   /* --- METHOD: #refresh --- */
   #refresh() {
