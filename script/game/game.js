@@ -8,7 +8,6 @@ import Direction from "./direction.js";
 // import Location from "./location";
 import Door from "./door.js";
 import Stone from "./stone.js";
-import Cell from "./cell.js";
 import Room from "./room.js";
 import Player from "./player.js";
 
