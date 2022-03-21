@@ -8,7 +8,6 @@ export { Door as default };
 
 /* --- ENUM: DoorType --- */
 const DoorType = {
-  ENTRY: "ENTRY",
   PLAIN: "PLAIN",
   TARGET: "TARGET",
 };
