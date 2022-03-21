@@ -1,5 +1,5 @@
 /* --- IMPORTS --- */
-import { ETypeError, ERangeError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 
 /* --- EXPORTS --- */
 export { Scheduler as default };
@@ -14,15 +14,8 @@ const Scheduler = class {
   /* --- METHOD: after --- */
   static after(milliseconds, callback) {
     // argument validation
-    if (!Number.isInteger(milliseconds)) {
-      throw new ETypeError(`input is not an integer`, milliseconds);
-    }
-    if (milliseconds <= 0) {
-      throw new ERangeError(`input is not positive`, milliseconds);
-    }
-    if (typeof callback !== "function") {
-      throw new ETypeError(`callback is not a function`, callback);
-    }
+    Validator.positiveInteger(milliseconds);
+    Validator.function(callback);
 
     const jobId = Scheduler.#generateJobId();
     this.#jobs[jobId] = window.setTimeout(callback, milliseconds);
