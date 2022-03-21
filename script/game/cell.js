@@ -6,28 +6,15 @@ import Element from "./element.js";
 /* --- EXPORTS --- */
 export { Cell as default };
 
-/* --- ENUM: CellType --- */
-const CellType = {
-  PLAIN: "PLAIN",
-  WELCOME: "WELCOME",
-};
-Object.freeze(CellType);
-
 /*
  * CLASS: Cell
  *****************************************************************************/
 const Cell = class extends Element {
-  #type;
   #element;
 
-  /* --- INNER: Type --- */
-  static Type = CellType;
-
   /* --- C'TOR: constructor --- */
-  constructor(type = Cell.Type.PLAIN) {
+  constructor() {
     super();
-    Validator.enumMember(type, Cell.Type);
-    this.#type = type;
     this.#element = null;
   }
 
@@ -38,11 +25,6 @@ const Cell = class extends Element {
       throw new RuntimeError(`cannot attach elements to an occupied cell`);
     }
     this.#element = element;
-  }
-
-  /* --- METHOD: getType --- */
-  getType() {
-    return this.#type;
   }
 
   /* --- METHOD: getElement --- */

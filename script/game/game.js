@@ -265,56 +265,50 @@ const Game = class {
     const room = player.getRoom();
 
     let [elementType, winStatus] = [null, false];
-    switch (room.getCellType(loc)) {
-      case Cell.Type.PLAIN: // plain cell
-        const element = room.getElement(loc);
-        if (element === null) {
-          console.log("Nothing to inspect...");
-        } else if (element instanceof Door) {
-          const doorType = element.getType();
-          if (doorType === Door.Type.PLAIN) {
-            player.enter(element.open());
-          } else if (doorType === Door.Type.TARGET) {
-            // NOTE: If stones are required, they are only required for the
-            // primary player.
-            if (index > 0) {
-              winStatus = true;
-            } else {
-              if (this.stonesRequired()) {
-                console.log(`Where are them stones?`);
-              } else {
-                winStatus = true;
-              }
-            }
-            if (winStatus) {
-              console.log(`Player ${index} has won the game!`);
-              this.stop();
-            }
+    if (room.isWelcomeLocation(loc)) {
+      if (BACKTRACK) {
+        this.playerBacktrack(index); // go back to previous room
+      }
+    } else {
+      const element = room.getElement(loc);
+      if (element === null) {
+        console.log("Nothing to inspect...");
+      } else if (element instanceof Door) {
+        const doorType = element.getType();
+        if (doorType === Door.Type.PLAIN) {
+          player.enter(element.open());
+        } else if (doorType === Door.Type.TARGET) {
+          // NOTE: If stones are required, they are only required for the
+          // primary player.
+          if (index > 0) {
+            winStatus = true;
           } else {
-            console.assert(false); // sanity check
+            if (this.stonesRequired()) {
+              console.log(`Where are them stones?`);
+            } else {
+              winStatus = true;
+            }
           }
-          elementType = doorType;
-        } else if (element instanceof Stone) {
-          const level = this.getRoomLevel(room.getId());
-          const missing = this.#missingStones[level];
-          elementType = element.getType();
-          missing.splice(missing.indexOf(elementType), 1);
-          if (missing.length == 0) {
-            delete this.#missingStones[level];
+          if (winStatus) {
+            console.log(`Player ${index} has won the game!`);
+            this.stop();
           }
-          room.removeElement(player.getLocation());
+        } else {
+          console.assert(false); // sanity check
         }
-        break;
-
-      case Cell.Type.WELCOME: // welcome cell
-        if (BACKTRACK) {
-          this.playerBacktrack(index); // go back to previous room
+        elementType = doorType;
+      } else if (element instanceof Stone) {
+        const level = this.getRoomLevel(room.getId());
+        const missing = this.#missingStones[level];
+        elementType = element.getType();
+        missing.splice(missing.indexOf(elementType), 1);
+        if (missing.length == 0) {
+          delete this.#missingStones[level];
         }
-        break;
-
-      default:
-        console.assert(false); // sanity check
+        room.removeElement(player.getLocation());
+      }
     }
+
     return [elementType, winStatus];
   }
 

@@ -65,11 +65,6 @@ const Room = class extends Element {
     return this.#welcomeLoc.clone();
   }
 
-  /* --- METHOD: getCellType --- */
-  getCellType(loc) {
-    return this.#getCell(loc).getType();
-  }
-
   /* --- METHOD: getElement --- */
   getElement(loc) {
     this.validateLocation(loc);
@@ -225,12 +220,10 @@ const Room = class extends Element {
     for (let x = 0; x < columns; x++) {
       this.#availableLocs[x] = {};
       for (let y = 0; y < rows; y++) {
+        this.#grid[x][y] = new Cell();
         const loc = new Location(x, y);
-        if (this.isWelcomeLocation(loc)) {
-          this.#grid[x][y] = new Cell(Cell.Type.WELCOME);
-          // NOTE: Welcome location is reserved.
-        } else {
-          this.#grid[x][y] = new Cell();
+        // NOTE: Welcome location is reserved.
+        if (!this.isWelcomeLocation(loc)) {
           this.#availableLocs[x][y] = loc;
         }
       }
