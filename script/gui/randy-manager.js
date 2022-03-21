@@ -1,9 +1,10 @@
 /* --- IMPORTS --- */
+import { RuntimeError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 import Random from "../library/random.js";
 import Game from "../game/game.js";
 import Scheduler from "./scheduler.js";
 import Randy from "./randy.js";
-import { ETypeError, ERangeError, RuntimeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { RandyManager as default };
@@ -23,25 +24,14 @@ const RandyManager = class {
 
   /* --- C'TOR: constructor --- */
   constructor(game, refreshCallback, doneCallback) {
-    RandyManager.#validator(game, refreshCallback, doneCallback);
+    Validator.instanceOf(game, Game);
+    Validator.function(refreshCallback);
+    Validator.function(doneCallback);
     this.#game = game;
     this.#refreshCallback = refreshCallback;
     this.#doneCallback = doneCallback;
     this.#randys = {};
     this.#active = false;
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(game, refreshCallback, doneCallback) {
-    if (!(game instanceof Game)) {
-      throw new ETypeError(`input is not of type Game`, game);
-    }
-    if (typeof refreshCallback !== "function") {
-      throw new ETypeError(`callback is not a function`, refreshCallback);
-    }
-    if (typeof doneCallback !== "function") {
-      throw new ETypeError(`callback is not a function`, doneCallback);
-    }
   }
 
   /* --- isActive() --- */
@@ -51,12 +41,7 @@ const RandyManager = class {
 
   /* --- METHOD: start --- */
   start(numRandys) {
-    if (!Number.isInteger(numRandys)) {
-      throw new ETypeError(`input is not an integer`, numRandys);
-    }
-    if (numRandys <= 0) {
-      throw new ERangeError(`input is not positive`, numRandys);
-    }
+    Validator.positiveInteger(numRandys);
 
     if (this.isActive()) {
       throw new RuntimeError(`trying to start an active manager`);
