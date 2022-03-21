@@ -1,6 +1,7 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
+import { StatusError } from "../library/errors.js";
 import Scheduler from "./scheduler.js";
-import { ETypeError, ERangeError, StatusError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Stopwatch as default };
@@ -42,15 +43,8 @@ const Stopwatch = class {
     this.#validateStatus(Stopwatch.Status.IDLE);
 
     // argument validation
-    if (!Number.isInteger(delay)) {
-      throw new ETypeError(`input is not an integer`, delay);
-    }
-    if (delay <= 0) {
-      throw new ERangeError(`input is not positive`, delay);
-    }
-    if (typeof callback !== "function") {
-      throw new ETypeError(`callback is not a function`, callback);
-    }
+    Validator.positiveInteger(delay);
+    Validator.function(callback);
 
     this.#time = 0;
     this.#delay = delay;
