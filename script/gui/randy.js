@@ -50,13 +50,13 @@ const Randy = class {
     let goingTo = null;
     const doors = state.doors;
     for (const door of doors) {
-      // if there is an exit door in the room, then choose it
-      if (door.type === Door.Type.EXIT) {
+      // if there is a target door in the room, then choose it
+      if (door.type === Door.Type.TARGET) {
         goingTo = door.loc;
       }
     }
 
-    // no exit point found, choose neighbor randomly
+    // no target point found, choose neighbor randomly
     if (goingTo === null) {
       // choose neighbor from the highest level
       let choices = [doors[0]];

@@ -624,12 +624,12 @@ const GUI = class {
       return;
     }
 
-    // gather door choices (stop if can exit)
+    // gather door choices (stop if a target door found)
     const doors = state.doors;
     const choicesByLevel = {};
     for (const door of doors) {
-      if (door.type === Door.Type.EXIT) {
-        // NOTE: Auto pilot will go fo the exit door, but only after
+      if (door.type === Door.Type.TARGET) {
+        // NOTE: Auto pilot will go for a target door, but only after
         // collecting all them stones (if stones flag enabled).
         if (!this.#CFGN().stones || !this.#game.stonesRequired()) {
           this.#playerGoTo(door.loc);
@@ -911,8 +911,8 @@ const GUI = class {
       this.#setStatus(GUI.Status.REWARD);
       this.#unset();
       this.#playerWon();
-    } else if (elementType === Door.Type.EXIT) {
-      // NOTE: If the player inspected an exit door but hasn't won the game,
+    } else if (elementType === Door.Type.TARGET) {
+      // NOTE: If the player inspected a target door but hasn't won the game,
       // then it must be the case that stones are required yet the player
       // didn't collect them all.
       // alert("Where are them stones?");

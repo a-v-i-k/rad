@@ -9,7 +9,7 @@ export { Door as default };
 /* --- ENUM: DoorType --- */
 const DoorType = {
   PLAIN: "PLAIN",
-  EXIT: "EXIT",
+  TARGET: "TARGET",
 };
 Object.freeze(DoorType);
 

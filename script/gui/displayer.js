@@ -56,9 +56,9 @@ const TERMINAL_DOOR_FRONT_FILL = "burlywood";
 const TERMINAL_DOOR_WINDOW_FILL = "silver";
 const TERMINAL_DOOR_HANDLE_FILL = DOOR_HANDLE_FILL;
 
-const EXIT_DOOR_FRONT_FILL = "goldenrod";
-const EXIT_DOOR_WINDOW_FILL = "gold";
-const EXIT_DOOR_HANDLE_FILL = "gold";
+const TARGET_DOOR_FRONT_FILL = "goldenrod";
+const TARGET_DOOR_WINDOW_FILL = "gold";
+const TARGET_DOOR_HANDLE_FILL = "gold";
 
 const BARS_OUTLINE = "darkslategray";
 const INSIDE_FILL = "black";
@@ -255,7 +255,7 @@ const Displayer = class {
     const status = this.getStatus();
     console.assert(status !== Displayer.Status.IDLE); // sanity check
 
-    // // display big exit door
+    // // display big target door
     // this.#HTML().idle = this.#HTML().canvas;
     // this.#setBackground(ROOM_BACKGROUND);
     // this.#clearDisplay();
@@ -268,7 +268,7 @@ const Displayer = class {
     //   CELL_CASCADE_OUTLINE,
     //   CELL_CASCADE_SHAPE
     // );
-    // this.#displayExitDoor(bbox, true);
+    // this.#displayTargetDoor(bbox, true);
 
     let child = this.#HTML().canvas;
     if (status === Displayer.Status.NONE) {
@@ -539,9 +539,9 @@ const Displayer = class {
       const bbox = new BoundingBox(x0, y0, this.#cellwidth, this.#cellheight);
 
       // display door
-      if (door.type === Door.Type.EXIT) {
-        // exit door
-        this.#displayExitDoor(bbox, state.stonesRequired);
+      if (door.type === Door.Type.TARGET) {
+        // target door
+        this.#displayTargetDoor(bbox, state.stonesRequired);
       } else {
         // level door
         this.#displayLevelDoor(bbox, door.level, door.ownerId);
@@ -549,15 +549,15 @@ const Displayer = class {
     }
   }
 
-  /* --- METHOD: #drawExitDoor --- */
-  #displayExitDoor(bbox, hide = false) {
+  /* --- METHOD: #displayTargetDoor --- */
+  #displayTargetDoor(bbox, hide = false) {
     let frontFill, windowFill, handleFill;
     if (hide) {
       frontFill = windowFill = handleFill = DOOR_OUTLINE;
     } else {
-      frontFill = EXIT_DOOR_FRONT_FILL;
-      windowFill = EXIT_DOOR_WINDOW_FILL;
-      handleFill = EXIT_DOOR_HANDLE_FILL;
+      frontFill = TARGET_DOOR_FRONT_FILL;
+      windowFill = TARGET_DOOR_WINDOW_FILL;
+      handleFill = TARGET_DOOR_HANDLE_FILL;
     }
     this.#doors.drawFancyDoor(
       bbox,
