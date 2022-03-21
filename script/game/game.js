@@ -54,7 +54,7 @@ const Game = class {
   /* --- INNER: State --- */
   static State = class {
     constructor(game, player) {
-      console.assert(player instanceof Player); // sanity check
+      console.assert(game instanceof Game); // sanity check
       console.assert(player instanceof Player); // sanity check
 
       // player
