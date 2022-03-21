@@ -46,6 +46,13 @@ const Validator = class {
     }
   }
 
+  /* --- number --- */
+  static number(input) {
+    if (typeof input !== "number") {
+      throw new ETypeError(`input is not a number`, input);
+    }
+  }
+
   /* --- string --- */
   static string(input) {
     if (typeof input !== "string") {
