@@ -1,7 +1,8 @@
 /* --- IMPORTS --- */
+import { ETypeError, ValueError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 import BoundingBox from "./bounding-box.js";
 import Polyline from "./polyline.js";
-import { ETypeError, ValueError, ERangeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { Drawer as default };
@@ -25,20 +26,7 @@ const Drawer = class {
     if (!(canvas instanceof HTMLElement) || canvas.tagName !== "CANVAS") {
       throw new ETypeError(`canvas is not an HTML canvas element`, canvas);
     }
-    Drawer.validateColor(background);
-  }
-
-  /* --- METHOD: validateColor --- */
-  static validateColor(color) {
-    // validate CSS color
-    var s = new Option().style;
-    s.color = color;
-    // if (s.color == "") {
-    //   console.log(color);
-    // }
-    if (s.color === "") {
-      throw new ETypeError(`input ${color} is not a valid color`, color);
-    }
+    Validator.color(background);
   }
 
   /* --- METHOD: getWidth --- */
@@ -58,7 +46,7 @@ const Drawer = class {
 
   /* --- METHOD: setBackground --- */
   setBackground(background) {
-    Drawer.validateColor(background);
+    Validator.color(background);
     this.#background = background;
   }
 
@@ -75,7 +63,7 @@ const Drawer = class {
   drawLine(pt1, pt2, strokeStyle, lineWidth = 1) {
     this.#validatePoint(pt1);
     this.#validatePoint(pt2);
-    Drawer.validateColor(strokeStyle);
+    Validator.color(strokeStyle);
 
     const context = this.#getContext();
     context.lineWidth = lineWidth;
@@ -91,9 +79,9 @@ const Drawer = class {
   /* --- METHOD: drawRectangle --- */
   drawRectangle(bbox, strokeStyle, fillStyle = null, lineWidth = 1) {
     this.#validateBoundingBox(bbox);
-    Drawer.validateColor(strokeStyle);
+    Validator.color(strokeStyle);
     if (fillStyle !== null) {
-      Drawer.validateColor(fillStyle);
+      Validator.color(fillStyle);
     }
 
     const context = this.#getContext();
@@ -111,7 +99,7 @@ const Drawer = class {
   /* --- METHOD: fillRectangle --- */
   fillRectangle(bbox, fillStyle) {
     this.#validateBoundingBox(bbox);
-    Drawer.validateColor(fillStyle);
+    Validator.color(fillStyle);
 
     const context = this.#getContext();
     context.beginPath();
@@ -142,17 +130,12 @@ const Drawer = class {
     lineWidth = 1
   ) {
     this.#validatePoint([x, y]);
-    if (!Number.isInteger(r)) {
-      throw new ETypeError(`radius is not an integer`, r);
-    }
-    if (r < 0) {
-      throw new ERangeError(`radius is negative`, r);
-    }
+    Validator.positiveInteger(r);
     this.#validateAngle(sAngle);
     this.#validateAngle(eAngle);
-    Drawer.validateColor(strokeStyle);
+    Validator.color(strokeStyle);
     if (fillStyle !== null) {
-      Drawer.validateColor(fillStyle);
+      Validator.color(fillStyle);
     }
 
     const context = this.#getContext();
@@ -171,9 +154,9 @@ const Drawer = class {
   /* --- METHOD: drawPolygon --- */
   drawPolygon(polyline, strokeStyle, fillStyle = null, lineWidth = 1) {
     this.#validatePolyline(polyline);
-    Drawer.validateColor(strokeStyle);
+    Validator.color(strokeStyle);
     if (fillStyle !== null) {
-      Drawer.validateColor(fillStyle);
+      Validator.color(fillStyle);
     }
 
     const context = this.#getContext();
@@ -197,34 +180,17 @@ const Drawer = class {
   /* --- METHOD: injectText --- */
   injectText(text, x, y, fillStyle, fontSize) {
     // validate text
-    if (typeof text !== "string") {
-      throw new ETypeError(`text is not a string`, text);
-    }
+    Validator.string(text);
 
     // validate position
-    if (!Number.isInteger(x)) {
-      throw new ETypeError(`input is not an integer`, x);
-    }
-    if (x < 0) {
-      throw new ERangeError(`input is negative`, x);
-    }
-    if (!Number.isInteger(y)) {
-      throw new ETypeError(`input is not an integer`, y);
-    }
-    if (y < 0) {
-      throw new ERangeError(`input is negative`, y);
-    }
+    Validator.nonnegativeInteger(x);
+    Validator.nonnegativeInteger(y);
 
     // validate fill style
-    Drawer.validateColor(fillStyle);
+    Validator.color(fillStyle);
 
     // validate font size
-    if (!Number.isInteger(fontSize)) {
-      throw new ETypeError(`input is not an integer`, fontSize);
-    }
-    if (fontSize <= 0) {
-      throw new ERangeError(`input is not positive`, fontSize);
-    }
+    Validator.positiveInteger(fontSize);
 
     const context = this.#getContext();
     context.beginPath();
@@ -237,22 +203,9 @@ const Drawer = class {
 
   /* --- METHOD: #validateBoundingBox --- */
   #validateBoundingBox(bbox) {
-    if (!(bbox instanceof BoundingBox)) {
-      throw new ETypeError(`input is not of type BoundingBox`, bbox);
-    }
-    const width = this.#canvas.width,
-      height = this.#canvas.height;
-    if (
-      bbox.x0 < 0 ||
-      bbox.x0 + bbox.width > width ||
-      bbox.y0 < 0 ||
-      bbox.y0 + bbox.height > height
-    ) {
-      throw new ERangeError(
-        `bounding box is not contained in [${0}, ${width}] x [${0}, ${height}]`,
-        bbox
-      );
-    }
+    Validator.instanceOf(bbox, BoundingBox);
+    Validator.range(bbox.x0, 0, this.#canvas.width - bbox.width);
+    Validator.range(bbox.y0, 0, this.#canvas.height - bbox.height);
   }
 
   /* --- METHOD: #validatePoint --- */
@@ -263,36 +216,19 @@ const Drawer = class {
     if (!Number.isInteger(point[0]) || !Number.isInteger(point[1])) {
       throw new ValueError(`given point has non-integer coordinates`, point);
     }
-    const width = this.#canvas.width,
-      height = this.#canvas.height;
-    if (
-      point[0] < 0 ||
-      point[0] > width - 1 ||
-      point[1] < 0 ||
-      point[1] > height - 1
-    ) {
-      throw new ERangeError(
-        `point is not contained in [0, ${width - 1}] x [0, ${height - 1}]`,
-        point
-      );
-    }
+    Validator.range(point[0], 0, this.#canvas.width - 1);
+    Validator.range(point[1], 0, this.#canvas.height - 1);
   }
 
-  /* --- METHOD: #validatePolyline --- */
+  /* --- METHOD: #validateAngle --- */
   #validateAngle(angle) {
-    if (typeof angle !== "number") {
-      throw new ETypeError(`angle is not a number`, angle);
-    }
-    // if (angle < 0 || angle > 2 * Math.PI) {
-    //   throw new ERangeError(`angle is not contained in [0, 2*PI]`, angle);
-    // }
+    Validator.number(angle);
+    // Validator.range(angle, 0, 2 * Math.PI);
   }
 
   /* --- METHOD: #validatePolyline --- */
   #validatePolyline(polyline) {
-    if (!(polyline instanceof Polyline)) {
-      throw new ETypeError(`input is not of type Polyline`, polyline);
-    }
+    Validator.instanceOf(polyline, Polyline);
     if (polyline.points.length < 2) {
       throw new ValueError(`polyline contains less than 2 points`);
     }
