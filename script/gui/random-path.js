@@ -1,9 +1,9 @@
 /* --- IMPORTS --- */
+import Validator from "../library/validation.js";
 import Random from "../library/random.js";
-import Location from "../game/location.js";
 import Direction from "../game/direction.js";
+import Location from "../game/location.js";
 import TIterator from "./timed-iterator.js";
-import { ETypeError, ERangeError } from "../library/errors.js";
 
 /* --- EXPORTS --- */
 export { RandomPath as default };
@@ -20,7 +20,11 @@ const RandomPath = class {
 
   /* --- C'TOR: constructor --- */
   constructor(delay, src, dst, stepCallback, endCallback) {
-    RandomPath.#validator(delay, src, dst, stepCallback, endCallback);
+    Validator.positiveInteger(delay);
+    Validator.instanceOf(src, Location);
+    Validator.instanceOf(dst, Location);
+    Validator.function(stepCallback);
+    Validator.function(endCallback);
     this.#loc = src;
     this.#goingTo = dst;
     this.#stepCallback = stepCallback;
@@ -33,28 +37,6 @@ const RandomPath = class {
         this.#active = false;
       }
     );
-  }
-
-  /* --- METHOD: #validator --- */
-  static #validator(delay, src, dst, stepCallback, endCallback) {
-    if (!Number.isInteger(delay)) {
-      throw new ETypeError(`input is not an integer`, delay);
-    }
-    if (delay <= 0) {
-      throw new ERangeError(`input is not positive`, delay);
-    }
-    if (!(src instanceof Location)) {
-      throw new ETypeError(`input is not of type Location`, src);
-    }
-    if (!(dst instanceof Location)) {
-      throw new ETypeError(`input is not of type Location`, dst);
-    }
-    if (typeof stepCallback !== "function") {
-      throw new ETypeError(`callback is not a function`, stepCallback);
-    }
-    if (typeof endCallback !== "function") {
-      throw new ETypeError(`callback is not a function`, endCallback);
-    }
   }
 
   /* --- isActive() --- */
