@@ -19,14 +19,22 @@ WEB/COMPATIBILITY:
 - Check on Tablet.
 
 SCRIPT:
-- CELL/DOOR: WelcomeCell -> Door.Type.WELCOME
+- GAME: Discard player as argument to state extraction.
+- GAME-TESTER: Add arguments numLevels and roomsPerLevel.
+- GAME-TESTER: Fix stoneRequirement and player 0 issue.
+- ROOM: Merge createGrid and createCells.
+- GAME: GameStateExtractor class?
+- GAME: DoorManager class?
+- GAME: Network class? NetworkBuilder class?
+- GAME-DISPLAYER: Remove dependence of Displayer in Game.
+- GUI: Color welcome door according to level.
+- GUI: randyIsDone - Do something with index?
 - GUI: Add launch() method?
 - GUI: Split GUI class into smaller classes.
 - GUI: HTMLManager class?
 - GUI: Maybe display something when quitting?
 - GUI: Separate page title and game title.
 - GUI: EventManager class?
-- GUI: randyIsDone - Do something with index?
 - ROOM: Reconsider availableLocs/occupiedLocs data structures.
 - GAME: A lot of the game state information doesn't change, so maybe we can
   compute such information once and store it for later use.
@@ -44,6 +52,7 @@ SCRIPT:
 - GRAPHUTILS: getRandomTree - Stop earlier the MST search if already found tree.
 
 EASY:
+- Group Validator tests in a #validator method?
 - Fix circular inclusion of Room and Door?
   * Solution 1: Add Enterable class that Room inherits from.
   * Solution 2: Replace addDoor/addStone in Room with addElement.
