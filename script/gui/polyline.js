@@ -1,5 +1,5 @@
 /* --- IMPORTS --- */
-import { ETypeError, ERangeError } from "../library/errors.js";
+import Validator from "../library/validation.js";
 
 /* --- EXPORTS --- */
 export { Polyline as default };
@@ -17,18 +17,8 @@ const Polyline = class {
 
   /* --- addPoint --- */
   addPoint(x, y) {
-    if (!Number.isInteger(x)) {
-      throw new ETypeError(`coordinate is not an integer`, x);
-    }
-    if (x < 0) {
-      throw new ERangeError(`coordinate is negative`, x);
-    }
-    if (!Number.isInteger(y)) {
-      throw new ETypeError(`coordinate is not an integer`, y);
-    }
-    if (y < 0) {
-      throw new ERangeError(`coordinate is negative`, y);
-    }
+    Validator.nonnegativeInteger(x);
+    Validator.nonnegativeInteger(y);
     this.points.push([x, y]);
   }
 };
