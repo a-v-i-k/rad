@@ -23,7 +23,6 @@ SCRIPT:
 - GAME-TESTER: Add arguments numLevels and roomsPerLevel.
 - GAME-TESTER: Fix stoneRequirement and player 0 issue.
 - ROOM: Merge createGrid and createCells.
-- GAME: GameStateExtractor class?
 - GAME: DoorManager class?
 - GAME: Network class? NetworkBuilder class?
 - GAME-DISPLAYER: Remove dependence of Displayer in Game.
