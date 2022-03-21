@@ -60,6 +60,16 @@ const Validator = class {
     }
   }
 
+  /* --- color --- */
+  static color(input) {
+    // validate CSS color
+    var s = new Option().style;
+    s.color = input;
+    if (s.color === "") {
+      throw new ETypeError(`input is not a valid color`, color);
+    }
+  }
+
   /// RANGE
 
   /* --- positiveInteger --- */
