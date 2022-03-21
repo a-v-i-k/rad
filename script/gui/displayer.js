@@ -291,9 +291,7 @@ const Displayer = class {
 
   /* --- METHOD: displayPlay --- */
   displayPlay(stones) {
-    if (typeof stones !== "boolean") {
-      throw new ETypeError(`input is not a boolean`, stones);
-    }
+    Validator.boolean(stones);
     if (this.getStatus() === Displayer.Status.IDLE) {
       this.#clearIdle();
     } else if (this.getStatus() === Displayer.Status.QUOTE) {
