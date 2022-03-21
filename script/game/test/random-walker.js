@@ -50,14 +50,14 @@ const RandomWalker = class {
     let goingTo = null;
     const doors = state.doors;
     for (const door of doors) {
-      // if there is a target door in the room, then choose it
-      if (door.type === Door.Type.TARGET) {
+      // if there is an exit door in the room, then choose it
+      if (door.type === Door.Type.EXIT) {
         goingTo = door.loc;
       }
     }
 
     if (goingTo === null) {
-      // no target door found, choose neighbor randomly
+      // no exit point found, choose neighbor randomly
       if (this.#lastRoomId !== null && doors.length > 1) {
         // don't go back to the room you just came from
         const index = doors.findIndex((door) => {

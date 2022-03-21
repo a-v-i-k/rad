@@ -277,7 +277,7 @@ const Game = class {
         const doorType = element.getType();
         if (doorType === Door.Type.PLAIN) {
           player.enter(element.open());
-        } else if (doorType === Door.Type.TARGET) {
+        } else if (doorType === Door.Type.EXIT) {
           // NOTE: If stones are required, they are only required for the
           // primary player.
           if (index > 0) {
@@ -403,10 +403,10 @@ const Game = class {
 
     // create and add doors to rooms
     network.V().forEach((nu) => {
-      // no doors in target room
+      // no doors in exit room
       if (nu !== target) {
         network.neighbors(nu).forEach((nv) => {
-          const type = nv === target ? Door.Type.TARGET : Door.Type.PLAIN;
+          const type = nv === target ? Door.Type.EXIT : Door.Type.PLAIN;
           const door = new Door(type, rooms[nv]);
           rooms[nu].addElement(door);
         });
