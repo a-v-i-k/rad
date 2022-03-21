@@ -32,14 +32,35 @@ const Validator = class {
     }
   }
 
-  /// INTEGER
-
   /* --- integer --- */
   static integer(input) {
     if (!Number.isInteger(input)) {
       throw new ETypeError(`input is not an integer`, input);
     }
   }
+
+  /* --- boolean --- */
+  static boolean(input) {
+    if (typeof input !== "boolean") {
+      throw new ETypeError(`input is not a boolean`, input);
+    }
+  }
+
+  /* --- string --- */
+  static string(input) {
+    if (typeof input !== "string") {
+      throw new ETypeError(`input is not a string`, input);
+    }
+  }
+
+  /* --- function --- */
+  static function(input) {
+    if (typeof input !== "function") {
+      throw new ETypeError(`input is not a function`, input);
+    }
+  }
+
+  /// RANGE
 
   /* --- positiveInteger --- */
   static positiveInteger(input) {
