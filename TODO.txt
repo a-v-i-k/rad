@@ -4,6 +4,7 @@ GENERAL:
 - Stats; e.g., count steps.
 - GitHub.
 - README.md
+- TODO.md
 
 WEB/COMPATIBILITY:
 - Smooth page loading.
