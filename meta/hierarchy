@@ -3,11 +3,11 @@ Directory Hierarchy
 ===============================================================================
 
 rad
-├── Backup.bat
 ├── index.html
 ├── notes.txt
 ├── README.md
 ├── TODO.txt
+├── zipit.bat
 ├── css
 │   └── styles.css
 ├── design

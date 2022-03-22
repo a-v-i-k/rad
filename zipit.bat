@@ -1,4 +1,8 @@
 
+rem ZIP EXECUTABLE
+SET ZIPEXEC="C:\Program Files\7-Zip\7z"
+SET ZIPPARAMS=a
+
 rem VERSION
 SET version-major=1
 SET version-minor=02
@@ -12,7 +16,4 @@ if exist %ZIPFILE% (
 )
 
 rem ZIP
-"C:\Program Files\7-Zip\7z" a %ZIPFILE% ..\rad\
-
-rem BACKUP
-COPY /Y %ZIPFILE% C:\Users\kavi\Dropbox\avik\__backup__\web\rad\%ZIPFILE%
+%ZIPEXEC% %ZIPPARAMS% %ZIPFILE% ..\rad\
