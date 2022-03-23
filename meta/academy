@@ -4,6 +4,7 @@ Academy
 
 - State-oriented programming? Separate state from style.
   * GUI.display(System.getState());
+  * Applicable for game-like programs; for example, not GUI or a calculator.
 
 - Every game can be "reduced" to this game.
 
