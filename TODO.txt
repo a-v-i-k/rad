@@ -15,11 +15,16 @@ WEB/COMPATIBILITY:
 - Cross-Browser Testing (BrowserStack: https://www.browserstack.com/)
 - W3C Validator: https://validator.w3.org/
 - Doesn't work on Mac (Safari)!
-  * Replace '#' with '_'?
+  * Replace '#' with '_'? Perhaps a general script for this (python?)?
   * Doesn't load on IPhone
 - Check on Tablet.
 
 SCRIPT:
+- Use radial gradient to color player/Randy.
+- Apply lessons learned from studying HTML canvas (e.g., context handling).
+- Apply lessons learned from sdp-template.
+- Add text in cases in HTML where something is not supported (e.g., canvas).
+- Chack canvas and getContext (validation after querySelector).
 - GAME: Discard player as argument to state extraction.
 - GAME-TESTER: Add arguments numLevels and roomsPerLevel.
 - GAME-TESTER: Fix stoneRequirement and player 0 issue.
